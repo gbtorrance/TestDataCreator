@@ -1,0 +1,134 @@
+TestRoot, type:, minOccurs:1, maxOccurs:1
+   @AttribA, type:string, req:true
+   [SEQUENCE], minOccurs:0, maxOccurs:2
+      [SEQUENCE], minOccurs:0, maxOccurs:2
+         M, type:string, minOccurs:1, maxOccurs:1
+         N, type:integer, minOccurs:1, maxOccurs:1
+      [SEQUENCE], minOccurs:0, maxOccurs:2
+         M, type:string, minOccurs:1, maxOccurs:1
+         N, type:integer, minOccurs:1, maxOccurs:1
+      B, type:BType, minOccurs:1, maxOccurs:1
+         BA, type:string, minOccurs:1, maxOccurs:1
+         BB, type:integer, minOccurs:1, maxOccurs:1
+      M, type:string, minOccurs:1, maxOccurs:1
+      N, type:integer, minOccurs:1, maxOccurs:1
+      T, type:BType, minOccurs:1, maxOccurs:1
+         BA, type:string, minOccurs:1, maxOccurs:1
+         BB, type:integer, minOccurs:1, maxOccurs:1
+         [CHOICE], minOccurs:1, maxOccurs:1
+            TBC, type:string, minOccurs:1, maxOccurs:1
+            TBD, type:string, minOccurs:1, maxOccurs:1
+      U, type:TestType, minOccurs:1, maxOccurs:1
+      C, type:integer, minOccurs:0, maxOccurs:2
+      C, type:integer, minOccurs:0, maxOccurs:2
+      [CHOICE], minOccurs:1, maxOccurs:1
+         R, type:RType, minOccurs:1, maxOccurs:1
+         S, type:RType, minOccurs:1, maxOccurs:1
+            @SAttrib, type:integer, req:false
+      [CHOICE], minOccurs:0, maxOccurs:1
+         D, type:, minOccurs:1, maxOccurs:1
+            E, type:integer, minOccurs:0, maxOccurs:1
+            V, type:integer, minOccurs:0, maxOccurs:1
+            W, type:string, minOccurs:1, maxOccurs:1
+         F, type:TestType, minOccurs:0, maxOccurs:4
+         F, type:TestType, minOccurs:0, maxOccurs:4
+         F, type:TestType, minOccurs:0, maxOccurs:4
+         F, type:TestType, minOccurs:0, maxOccurs:4
+         [SEQUENCE], minOccurs:0, maxOccurs:2
+            G, type:TestType, minOccurs:1, maxOccurs:1
+            H, type:TestType, minOccurs:1, maxOccurs:1
+            [SEQUENCE], minOccurs:0, maxOccurs:2
+               I, type:TestType, minOccurs:1, maxOccurs:1
+               J, type:TestType, minOccurs:1, maxOccurs:1
+            [SEQUENCE], minOccurs:0, maxOccurs:2
+               I, type:TestType, minOccurs:1, maxOccurs:1
+               J, type:TestType, minOccurs:1, maxOccurs:1
+         [SEQUENCE], minOccurs:0, maxOccurs:2
+            G, type:TestType, minOccurs:1, maxOccurs:1
+            H, type:TestType, minOccurs:1, maxOccurs:1
+            [SEQUENCE], minOccurs:0, maxOccurs:2
+               I, type:TestType, minOccurs:1, maxOccurs:1
+               J, type:TestType, minOccurs:1, maxOccurs:1
+            [SEQUENCE], minOccurs:0, maxOccurs:2
+               I, type:TestType, minOccurs:1, maxOccurs:1
+               J, type:TestType, minOccurs:1, maxOccurs:1
+         [SEQUENCE], minOccurs:1, maxOccurs:1
+            K, type:TestType, minOccurs:1, maxOccurs:1
+            L, type:TestType, minOccurs:1, maxOccurs:1
+         [CHOICE], minOccurs:1, maxOccurs:1
+            P, type:TestType, minOccurs:1, maxOccurs:1
+            Q, type:TestType, minOccurs:1, maxOccurs:3
+            Q, type:TestType, minOccurs:1, maxOccurs:3
+            Q, type:TestType, minOccurs:1, maxOccurs:3
+         [CHOICE], minOccurs:1, maxOccurs:2
+            X, type:TestType, minOccurs:1, maxOccurs:1
+            Y, type:TestType, minOccurs:1, maxOccurs:1
+         [CHOICE], minOccurs:1, maxOccurs:2
+            X, type:TestType, minOccurs:1, maxOccurs:1
+            Y, type:TestType, minOccurs:1, maxOccurs:1
+   [SEQUENCE], minOccurs:0, maxOccurs:2
+      [SEQUENCE], minOccurs:0, maxOccurs:2
+         M, type:string, minOccurs:1, maxOccurs:1
+         N, type:integer, minOccurs:1, maxOccurs:1
+      [SEQUENCE], minOccurs:0, maxOccurs:2
+         M, type:string, minOccurs:1, maxOccurs:1
+         N, type:integer, minOccurs:1, maxOccurs:1
+      B, type:BType, minOccurs:1, maxOccurs:1
+         BA, type:string, minOccurs:1, maxOccurs:1
+         BB, type:integer, minOccurs:1, maxOccurs:1
+      M, type:string, minOccurs:1, maxOccurs:1
+      N, type:integer, minOccurs:1, maxOccurs:1
+      T, type:BType, minOccurs:1, maxOccurs:1
+         BA, type:string, minOccurs:1, maxOccurs:1
+         BB, type:integer, minOccurs:1, maxOccurs:1
+         [CHOICE], minOccurs:1, maxOccurs:1
+            TBC, type:string, minOccurs:1, maxOccurs:1
+            TBD, type:string, minOccurs:1, maxOccurs:1
+      U, type:TestType, minOccurs:1, maxOccurs:1
+      C, type:integer, minOccurs:0, maxOccurs:2
+      C, type:integer, minOccurs:0, maxOccurs:2
+      [CHOICE], minOccurs:1, maxOccurs:1
+         R, type:RType, minOccurs:1, maxOccurs:1
+         S, type:RType, minOccurs:1, maxOccurs:1
+            @SAttrib, type:integer, req:false
+      [CHOICE], minOccurs:0, maxOccurs:1
+         D, type:, minOccurs:1, maxOccurs:1
+            E, type:integer, minOccurs:0, maxOccurs:1
+            V, type:integer, minOccurs:0, maxOccurs:1
+            W, type:string, minOccurs:1, maxOccurs:1
+         F, type:TestType, minOccurs:0, maxOccurs:4
+         F, type:TestType, minOccurs:0, maxOccurs:4
+         F, type:TestType, minOccurs:0, maxOccurs:4
+         F, type:TestType, minOccurs:0, maxOccurs:4
+         [SEQUENCE], minOccurs:0, maxOccurs:2
+            G, type:TestType, minOccurs:1, maxOccurs:1
+            H, type:TestType, minOccurs:1, maxOccurs:1
+            [SEQUENCE], minOccurs:0, maxOccurs:2
+               I, type:TestType, minOccurs:1, maxOccurs:1
+               J, type:TestType, minOccurs:1, maxOccurs:1
+            [SEQUENCE], minOccurs:0, maxOccurs:2
+               I, type:TestType, minOccurs:1, maxOccurs:1
+               J, type:TestType, minOccurs:1, maxOccurs:1
+         [SEQUENCE], minOccurs:0, maxOccurs:2
+            G, type:TestType, minOccurs:1, maxOccurs:1
+            H, type:TestType, minOccurs:1, maxOccurs:1
+            [SEQUENCE], minOccurs:0, maxOccurs:2
+               I, type:TestType, minOccurs:1, maxOccurs:1
+               J, type:TestType, minOccurs:1, maxOccurs:1
+            [SEQUENCE], minOccurs:0, maxOccurs:2
+               I, type:TestType, minOccurs:1, maxOccurs:1
+               J, type:TestType, minOccurs:1, maxOccurs:1
+         [SEQUENCE], minOccurs:1, maxOccurs:1
+            K, type:TestType, minOccurs:1, maxOccurs:1
+            L, type:TestType, minOccurs:1, maxOccurs:1
+         [CHOICE], minOccurs:1, maxOccurs:1
+            P, type:TestType, minOccurs:1, maxOccurs:1
+            Q, type:TestType, minOccurs:1, maxOccurs:3
+            Q, type:TestType, minOccurs:1, maxOccurs:3
+            Q, type:TestType, minOccurs:1, maxOccurs:3
+         [CHOICE], minOccurs:1, maxOccurs:2
+            X, type:TestType, minOccurs:1, maxOccurs:1
+            Y, type:TestType, minOccurs:1, maxOccurs:1
+         [CHOICE], minOccurs:1, maxOccurs:2
+            X, type:TestType, minOccurs:1, maxOccurs:1
+            Y, type:TestType, minOccurs:1, maxOccurs:1
