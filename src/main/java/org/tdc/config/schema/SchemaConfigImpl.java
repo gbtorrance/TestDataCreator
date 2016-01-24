@@ -9,10 +9,8 @@ import org.tdc.util.Addr;
 
 public class SchemaConfigImpl implements SchemaConfig {
 	
-	// TODO DOT_CONFIG folders don't show up in Eclipse; change approach or suggest turning off filter for ".* resources" in Package Explorer
-	
 	private static final Logger log = LoggerFactory.getLogger(SchemaConfigImpl.class);
-	private static final String DOT_CONFIG = ".config_s";
+	private static final String CONFIG_FOLDER = "tdc.schema";
 
 	private Path schemasRoot;
 	private Addr addr;
@@ -23,7 +21,7 @@ public class SchemaConfigImpl implements SchemaConfig {
 		this.schemasRoot = schemasRoot;
 		this.addr = addr;
 		this.schemaRoot = schemasRoot.resolve(addr.getPath());
-		this.schemaConfigRoot = schemaRoot.resolve(DOT_CONFIG);
+		this.schemaConfigRoot = schemaRoot.resolve(CONFIG_FOLDER);
 		validateDirectories();
 		log.debug("Creating SchemaConfigImpl: {}", addr);
 	}
@@ -53,7 +51,7 @@ public class SchemaConfigImpl implements SchemaConfig {
 			throw new IllegalStateException("Schema dir does not exist: " + schemaRoot.toString());
 		}
 		if (!Files.isDirectory(schemaConfigRoot)) {
-			throw new IllegalStateException("Schema '" + DOT_CONFIG + "' dir does not exist: " + schemaConfigRoot.toString());
+			throw new IllegalStateException("Schema '" + CONFIG_FOLDER + "' dir does not exist: " + schemaConfigRoot.toString());
 		}
 	}
 }

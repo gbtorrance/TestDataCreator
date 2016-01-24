@@ -14,7 +14,7 @@ public class ModelDefConfigImpl implements ModelDefConfig {
 	// TODO support multi-level addressing rather than just name? can be done by walking the folders to determine when each .config appears
 	
 	private static final Logger log = LoggerFactory.getLogger(ModelDefConfigImpl.class);
-	private static final String DOT_CONFIG = ".config_md";
+	private static final String CONFIG_FOLDER = "tdc.modeldef";
 	private static final String CONFIG_FILE = "ModelDefConfig.xml";
 
 	private SchemaConfig schemaConfig;
@@ -34,7 +34,7 @@ public class ModelDefConfigImpl implements ModelDefConfig {
 		this.schemaConfig = schemaConfig;
 		this.addr = schemaConfig.getAddr().resolve(name);
 		this.modelDefRoot = schemaConfig.getSchemaRoot().resolve(name);
-		this.modelDefConfigRoot = modelDefRoot.resolve(DOT_CONFIG);
+		this.modelDefConfigRoot = modelDefRoot.resolve(CONFIG_FOLDER);
 		this.modelDefConfigFile = modelDefConfigRoot.resolve(CONFIG_FILE);
 		validateDirectories();
 		loadConfig();
@@ -96,7 +96,7 @@ public class ModelDefConfigImpl implements ModelDefConfig {
 			throw new IllegalStateException("ModelDef dir does not exist: " + modelDefRoot.toString());
 		}
 		if (!Files.isDirectory(modelDefConfigRoot)) {
-			throw new IllegalStateException("ModelDef '" + DOT_CONFIG + "' dir does not exist: " + modelDefConfigRoot.toString());
+			throw new IllegalStateException("ModelDef '" + CONFIG_FOLDER + "' dir does not exist: " + modelDefConfigRoot.toString());
 		}
 	}
 	
