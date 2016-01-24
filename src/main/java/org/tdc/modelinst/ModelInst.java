@@ -1,10 +1,10 @@
 package org.tdc.modelinst;
 
-import org.tdc.config.modelinst.ModelInstConfig;
+import org.tdc.config.model.ModelConfig;
 import org.tdc.modeldef.ModelDef;
 
 public interface ModelInst {
-	ModelInstConfig getModelInstConfig();
+	ModelConfig getModelConfig();
 	ModelDef getModelDef();
 	ElementNodeInst getRootElement();
 }

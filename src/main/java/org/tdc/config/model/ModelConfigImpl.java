@@ -1,7 +1,9 @@
-package org.tdc.config.modeldef;
+package org.tdc.config.model;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -9,19 +11,19 @@ import org.tdc.config.XMLConfigWrapper;
 import org.tdc.config.schema.SchemaConfig;
 import org.tdc.util.Addr;
 
-public class ModelDefConfigImpl implements ModelDefConfig {
+public class ModelConfigImpl implements ModelConfig {
 	
 	// TODO support multi-level addressing rather than just name? can be done by walking the folders to determine when each .config appears
 	
-	private static final Logger log = LoggerFactory.getLogger(ModelDefConfigImpl.class);
-	private static final String CONFIG_FOLDER = "tdc.modeldef";
-	private static final String CONFIG_FILE = "ModelDefConfig.xml";
+	private static final Logger log = LoggerFactory.getLogger(ModelConfigImpl.class);
+	private static final String CONFIG_FOLDER = "tdc.model";
+	private static final String CONFIG_FILE = "ModelConfig.xml";
 
 	private SchemaConfig schemaConfig;
 	private Addr addr;
-	private Path modelDefRoot;
-	private Path modelDefConfigRoot;
-	private Path modelDefConfigFile;
+	private Path modelRoot;
+	private Path modelConfigRoot;
+	private Path modelConfigFile;
 	
 	// config file items
 	private String schemaRootFile;
@@ -29,16 +31,18 @@ public class ModelDefConfigImpl implements ModelDefConfig {
 	private String schemaRootElementNamespace;
 	private boolean schemaFailOnParserWarning;
 	private boolean schemaFailOnParserNonFatalError;
+	private int defaultOccurrenceDepth;
+	private Map<String, Integer> occurrenceDepthMap = new HashMap<>();
 	
-	public ModelDefConfigImpl(SchemaConfig schemaConfig, String name) {
+	public ModelConfigImpl(SchemaConfig schemaConfig, String name) {
 		this.schemaConfig = schemaConfig;
 		this.addr = schemaConfig.getAddr().resolve(name);
-		this.modelDefRoot = schemaConfig.getSchemaRoot().resolve(name);
-		this.modelDefConfigRoot = modelDefRoot.resolve(CONFIG_FOLDER);
-		this.modelDefConfigFile = modelDefConfigRoot.resolve(CONFIG_FILE);
+		this.modelRoot = schemaConfig.getSchemaRoot().resolve(name);
+		this.modelConfigRoot = modelRoot.resolve(CONFIG_FOLDER);
+		this.modelConfigFile = modelConfigRoot.resolve(CONFIG_FILE);
 		validateDirectories();
 		loadConfig();
-		log.debug("Creating ModelDefConfigImpl: {}", addr);
+		log.debug("Creating ModelConfigImpl: {}", addr);
 	}
 	
 	@Override
@@ -52,13 +56,13 @@ public class ModelDefConfigImpl implements ModelDefConfig {
 	}
 	
 	@Override
-	public Path getModelDefRoot() {
-		return modelDefRoot;
+	public Path getModelRoot() {
+		return modelRoot;
 	}
 
 	@Override
-	public Path getModelDefConfigRoot() {
-		return modelDefConfigRoot;
+	public Path getModelConfigRoot() {
+		return modelConfigRoot;
 	}
 	
 	@Override
@@ -91,17 +95,32 @@ public class ModelDefConfigImpl implements ModelDefConfig {
 		return schemaFailOnParserNonFatalError;
 	}
 	
-	private void validateDirectories() {
-		if (!Files.isDirectory(modelDefRoot)) {
-			throw new IllegalStateException("ModelDef dir does not exist: " + modelDefRoot.toString());
+	@Override
+	public int getDefaultOccurrenceDepth() {
+		return defaultOccurrenceDepth;
+	}
+
+	@Override
+	public int getMPathOccurrenceDepth(String mpath) {
+		// TODO cleanup terminology here; not sure I'm happy with the naming
+		int depth = defaultOccurrenceDepth;
+		if (occurrenceDepthMap.containsKey(mpath)) {
+			depth = occurrenceDepthMap.get(mpath).intValue();
 		}
-		if (!Files.isDirectory(modelDefConfigRoot)) {
-			throw new IllegalStateException("ModelDef '" + CONFIG_FOLDER + "' dir does not exist: " + modelDefConfigRoot.toString());
+		return depth;
+	}
+
+	private void validateDirectories() {
+		if (!Files.isDirectory(modelRoot)) {
+			throw new IllegalStateException("Model dir does not exist: " + modelRoot.toString());
+		}
+		if (!Files.isDirectory(modelConfigRoot)) {
+			throw new IllegalStateException("Model '" + CONFIG_FOLDER + "' dir does not exist: " + modelConfigRoot.toString());
 		}
 	}
 	
 	private void loadConfig() {
-		XMLConfigWrapper config = new XMLConfigWrapper(modelDefConfigFile.toFile());
+		XMLConfigWrapper config = new XMLConfigWrapper(modelConfigFile.toFile());
 		loadConfigItems(config);
 	}
 	
@@ -111,5 +130,12 @@ public class ModelDefConfigImpl implements ModelDefConfig {
 		schemaRootElementNamespace = config.getString("SchemaRootElementNamespace", true);
 		schemaFailOnParserWarning = config.getBoolean("SchemaFailOnParserWarning", false , false); // default: false, required: false
 		schemaFailOnParserNonFatalError = config.getBoolean("SchemaFailOnParserNonFatalError", true, false); // default: true, required: false
+		defaultOccurrenceDepth = config.getInt("DefaultOccurrenceDepth", 5, false);
+		for (int i = 0; i < config.getMaxIndex("OccurrenceDepth"); i++) {
+			String baseKey = "OccurrenceDepth(" + i + ")";
+			String mpath = config.getString(baseKey, true);
+			int depth = config.getInt(baseKey + "[@Depth]", true);
+			occurrenceDepthMap.put(mpath, depth);
+		}
 	}
 }

@@ -12,12 +12,9 @@ import java.util.Scanner;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.tdc.config.modeldef.ModelDefConfig;
-import org.tdc.config.modeldef.ModelDefConfigFactory;
-import org.tdc.config.modeldef.ModelDefConfigFactoryImpl;
-import org.tdc.config.modelinst.ModelInstConfig;
-import org.tdc.config.modelinst.ModelInstConfigFactory;
-import org.tdc.config.modelinst.ModelInstConfigFactoryImpl;
+import org.tdc.config.model.ModelConfig;
+import org.tdc.config.model.ModelConfigFactory;
+import org.tdc.config.model.ModelConfigFactoryImpl;
 import org.tdc.config.schema.SchemaConfigFactory;
 import org.tdc.config.schema.SchemaConfigFactoryImpl;
 import org.tdc.model.TDCNode;
@@ -38,8 +35,7 @@ public class ModelTest {
 	private static final int INDENT_SIZE = 3;
 	
 	private static SchemaConfigFactory schemaConfigFactory;
-	private static ModelDefConfigFactory modelDefConfigFactory;
-	private static ModelInstConfigFactory modelInstConfigFactory;
+	private static ModelConfigFactory modelConfigFactory;
 
 	private static SchemaFactory schemaFactory;
 	private static ModelDefFactory modelDefFactory;
@@ -93,8 +89,7 @@ public class ModelTest {
 		Path schemaRoot = Paths.get("testfiles/TDCFiles/Schemas");
 
 		schemaConfigFactory = new SchemaConfigFactoryImpl(schemaRoot);
-		modelDefConfigFactory = new ModelDefConfigFactoryImpl(schemaConfigFactory);
-		modelInstConfigFactory = new ModelInstConfigFactoryImpl(modelDefConfigFactory);
+		modelConfigFactory = new ModelConfigFactoryImpl(schemaConfigFactory);
 
 		schemaFactory = new SchemaFactoryImpl();
 		modelDefFactory = new ModelDefFactoryImpl(schemaFactory);
@@ -104,10 +99,7 @@ public class ModelTest {
 	@Test
 	public void
 	test1() {
-//		String mdAddr = "Test/TestSchemaV1.0/ModelDef_Test1";
-//		String miAddr = mdAddr + "/ModelInst1";
-		String mdAddr = "Test/TestSchemaV1.0/ModelDef_OldTest";
-		String miAddr = mdAddr + "/ModelInst1";
+//		String modelAddr = "Test/TestSchemaV1.0/Model_OldTest";
 //		System.out.println("--------------------------------------------------");
 //		outputModelDefSummary(mdAddr);
 //		System.out.println("--------------------------------------------------");
@@ -116,34 +108,34 @@ public class ModelTest {
 //		outputModelInstSummary(miAddr);
 //		System.out.println("--------------------------------------------------");
 //		outputModelInstMPath(miAddr);
-		compareModelDefSummary(mdAddr, "ModelDefSummary.txt");
-		compareModelDefMPath(mdAddr, "ModelDefMPath.txt");
-		compareModelInstSummary(miAddr, "ModelInstSummary.txt");
-		compareModelInstMPath(miAddr, "ModelInstMPath.txt");
+//		compareModelDefSummary(modelAddr, "ModelDefSummary.txt");
+//		compareModelDefMPath(modelAddr, "ModelDefMPath.txt");
+//		compareModelInstSummary(modelAddr, "ModelInstSummary.txt");
+//		compareModelInstMPath(modelAddr, "ModelInstMPath.txt");
 	}
 	
 	@Test
 	public void
 	oldTest_modelDef_structure_created_correctly() {
-		compareModelDefSummary("Test/TestSchemaV1.0/ModelDef_OldTest", "ModelDefSummary.txt");
+		compareModelDefSummary("Test/TestSchemaV1.0/Model_OldTest", "ModelDefSummary.txt");
 	}
 	
 	@Test
 	public void
 	oldTest_modelDef_mpath_created_correctly() {
-		compareModelDefMPath("Test/TestSchemaV1.0/ModelDef_OldTest", "ModelDefMPath.txt");
+		compareModelDefMPath("Test/TestSchemaV1.0/Model_OldTest", "ModelDefMPath.txt");
 	}
 	
 	@Test
 	public void
 	oldTest_modelInst_structure_created_correctly() {
-		compareModelInstSummary("Test/TestSchemaV1.0/ModelDef_OldTest/ModelInst1", "ModelInstSummary.txt");
+		compareModelInstSummary("Test/TestSchemaV1.0/Model_OldTest", "ModelInstSummary.txt");
 	}
 	
 	@Test
 	public void
 	oldTest_modelInst_mpath_created_correctly() {
-		compareModelInstMPath("Test/TestSchemaV1.0/ModelDef_OldTest/ModelInst1", "ModelInstMPath.txt");
+		compareModelInstMPath("Test/TestSchemaV1.0/Model_OldTest", "ModelInstMPath.txt");
 	}
 
 	// ------------------------------
@@ -205,15 +197,15 @@ public class ModelTest {
 	// ------------------------------
 	
 	private ModelDef getModelDef(String addrStr) {
-		Addr modelDefAddr = new Addr(addrStr);
-		ModelDefConfig modelDefConfig = modelDefConfigFactory.getModelDefConfig(modelDefAddr);
-		return modelDefFactory.getModelDef(modelDefConfig);
+		Addr modelAddr = new Addr(addrStr);
+		ModelConfig modelConfig = modelConfigFactory.getModelConfig(modelAddr);
+		return modelDefFactory.getModelDef(modelConfig);
 	}
 	
 	private ModelInst getModelInst(String addrStr) {
-		Addr modelInstAddr = new Addr(addrStr);
-		ModelInstConfig modelInstConfig = modelInstConfigFactory.getModelInstConfig(modelInstAddr);
-		return modelInstFactory.getModelInst(modelInstConfig);
+		Addr modelAddr = new Addr(addrStr);
+		ModelConfig modelConfig = modelConfigFactory.getModelConfig(modelAddr);
+		return modelInstFactory.getModelInst(modelConfig);
 	}
 	
 	private void compareSummary(TDCNode rootNode, String resourceName) {

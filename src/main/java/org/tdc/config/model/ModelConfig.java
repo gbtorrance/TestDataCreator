@@ -1,18 +1,16 @@
-package org.tdc.config.modeldef;
+package org.tdc.config.model;
 
 import java.nio.file.Path;
 
 import org.tdc.config.schema.SchemaConfig;
 import org.tdc.util.Addr;
 
-// TODO possibly change package to be model.def rather than modeldef (for consistency)
-
-public interface ModelDefConfig {
+public interface ModelConfig {
 	SchemaConfig getSchemaConfig();
 
 	Addr getAddr();
-	Path getModelDefRoot();
-	Path getModelDefConfigRoot();
+	Path getModelRoot();
+	Path getModelConfigRoot();
 	
 	String getSchemaRootFile();
 	Path getSchemaRootFileFullPath();
@@ -21,4 +19,6 @@ public interface ModelDefConfig {
 	boolean isFailOnParserWarning();
 	boolean isFailOnParserNonFatalError();
 
+	int getDefaultOccurrenceDepth();
+	int getMPathOccurrenceDepth(String mpath);
 }

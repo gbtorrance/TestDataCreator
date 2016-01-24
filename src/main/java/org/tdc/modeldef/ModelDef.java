@@ -1,10 +1,10 @@
 package org.tdc.modeldef;
 
-import org.tdc.config.modeldef.ModelDefConfig;
+import org.tdc.config.model.ModelConfig;
 import org.tdc.schema.Schema;
 
 public interface ModelDef {
-	ModelDefConfig getModelDefConfig();
+	ModelConfig getModelConfig();
 	Schema getSchema();
 	ElementNodeDef getRootElement();
 }

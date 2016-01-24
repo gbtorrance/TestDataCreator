@@ -2,7 +2,7 @@ package org.tdc.modelinst;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.tdc.config.modelinst.ModelInstConfig;
+import org.tdc.config.model.ModelConfig;
 import org.tdc.modeldef.ModelDef;
 import org.tdc.modeldef.ModelDefFactory;
 import org.tdc.util.Addr;
@@ -21,12 +21,12 @@ public class ModelInstFactoryImpl implements ModelInstFactory {
 	}
 	
 	@Override
-	public ModelInst getModelInst(ModelInstConfig config) {
+	public ModelInst getModelInst(ModelConfig config) {
 		Addr addr = config.getAddr();
 		ModelInst modelInst = cache.get(addr);
 		if (modelInst == null) {
-			ModelDef modelDef = modelDefFactory.getModelDef(config.getModelDefConfig());
-			modelInst = buildNewModelInst(modelDef, config);
+			ModelDef modelDef = modelDefFactory.getModelDef(config);
+			modelInst = buildNewModelInst(modelDef);
 			cache.put(addr, modelInst);
 		}
 		else {
@@ -35,10 +35,10 @@ public class ModelInstFactoryImpl implements ModelInstFactory {
 		return modelInst;
 	}
 	
-	private ModelInst buildNewModelInst(ModelDef modelDef, ModelInstConfig config) {
+	private ModelInst buildNewModelInst(ModelDef modelDef) {
 		// TODO possibly support building from serialized object;
 		//      factory to make determination based on info in config
-		ModelInstBuilder modelInstBuilder = new ModelInstBuilderImpl(config, modelDef);
+		ModelInstBuilder modelInstBuilder = new ModelInstBuilderImpl(modelDef);
 		return modelInstBuilder.build();
 	}
 }

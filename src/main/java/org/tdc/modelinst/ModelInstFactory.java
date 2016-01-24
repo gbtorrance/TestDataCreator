@@ -1,7 +1,7 @@
 package org.tdc.modelinst;
 
-import org.tdc.config.modelinst.ModelInstConfig;
+import org.tdc.config.model.ModelConfig;
 
 public interface ModelInstFactory {
-	ModelInst getModelInst(ModelInstConfig config);
+	ModelInst getModelInst(ModelConfig config);
 }

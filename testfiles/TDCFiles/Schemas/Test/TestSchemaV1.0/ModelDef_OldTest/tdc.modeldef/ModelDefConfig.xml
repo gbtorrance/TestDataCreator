@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Config>
-	<SchemaRootFile>TestSchemaV1.0/OldTest.xsd</SchemaRootFile>
-	<SchemaRootElementName>TestRoot</SchemaRootElementName>
-	<SchemaRootElementNamespace>http://com.gurtz.tdc/test</SchemaRootElementNamespace>
-</Config>

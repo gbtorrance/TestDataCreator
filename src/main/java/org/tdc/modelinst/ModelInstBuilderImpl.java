@@ -5,7 +5,7 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.tdc.config.modelinst.ModelInstConfig;
+import org.tdc.config.model.ModelConfig;
 import org.tdc.model.MPathBuilder;
 import org.tdc.model.MPathIndex;
 import org.tdc.modeldef.AttribNodeDef;
@@ -20,14 +20,12 @@ public class ModelInstBuilderImpl implements ModelInstBuilder {
 	
 	private static final Logger log = LoggerFactory.getLogger(ModelInstBuilderImpl.class);
 
-	private ModelInstConfig config;
 	private ModelDef modelDef;
 	private int rowOffset;
 	private MPathIndex<NodeInst> mpathIndex; 
 	private MPathBuilder mpathBuilder;
 	
-	public ModelInstBuilderImpl(ModelInstConfig config, ModelDef modelDef) {
-		this.config = config;
+	public ModelInstBuilderImpl(ModelDef modelDef) {
 		this.modelDef = modelDef;
 	}
 	
@@ -36,7 +34,7 @@ public class ModelInstBuilderImpl implements ModelInstBuilder {
 		log.debug("Start building ModelInst tree");
 		ElementNodeInst rootElementInst = buildRootElementInst(modelDef.getRootElement());
 		log.debug("Finish building ModelInst tree: rootElementInst: {}", rootElementInst.getName()); 
-		return new ModelInstImpl(config, modelDef, rootElementInst, mpathIndex);
+		return new ModelInstImpl(modelDef, rootElementInst, mpathIndex);
 	}
 	
 	private ElementNodeInst buildRootElementInst(ElementNodeDef rootElementNodeDef) {
@@ -144,7 +142,7 @@ public class ModelInstBuilderImpl implements ModelInstBuilder {
 	
 	private int getOccurDepth(NonAttribNodeDef nonAttribNodeDef) {
 		// TODO determine a more flexible/configurable way to handle occurrences
-		int configOccurDepth = config.getMPathOccurrenceDepth(nonAttribNodeDef.getMPath());
+		int configOccurDepth = modelDef.getModelConfig().getMPathOccurrenceDepth(nonAttribNodeDef.getMPath());
 		int occurDepth = 
 				nonAttribNodeDef.isUnbounded() || nonAttribNodeDef.getMaxOccurs() > configOccurDepth ? 
 						configOccurDepth :

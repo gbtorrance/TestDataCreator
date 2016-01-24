@@ -2,7 +2,7 @@ package org.tdc.modeldef;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.tdc.config.modeldef.ModelDefConfig;
+import org.tdc.config.model.ModelConfig;
 import org.tdc.schema.Schema;
 import org.tdc.schema.SchemaFactory;
 import org.tdc.util.Addr;
@@ -21,7 +21,7 @@ public class ModelDefFactoryImpl implements ModelDefFactory {
 	}
 	
 	@Override
-	public ModelDef getModelDef(ModelDefConfig config) {
+	public ModelDef getModelDef(ModelConfig config) {
 		Addr addr = config.getAddr();
 		ModelDef modelDef = cache.get(addr);
 		if (modelDef == null) {
@@ -35,7 +35,7 @@ public class ModelDefFactoryImpl implements ModelDefFactory {
 		return modelDef;
 	}
 	
-	private ModelDef buildNewModelDef(ModelDefConfig config, Schema schema) {
+	private ModelDef buildNewModelDef(ModelConfig config, Schema schema) {
 		// TODO possibly support building from serialized object;
 		//      factory to make determination based on info in config
 		ModelDefBuilder modelDefBuilder = new ModelDefBuilderImpl(config, schema);

@@ -8,7 +8,7 @@ import org.apache.xerces.xs.XSLoader;
 import org.apache.xerces.xs.XSModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.tdc.config.modeldef.ModelDefConfig;
+import org.tdc.config.model.ModelConfig;
 import org.tdc.model.MPathIndex;
 import org.tdc.schema.Schema;
 import org.w3c.dom.DOMErrorHandler;
@@ -18,11 +18,11 @@ public class ModelDefBuilderImpl implements ModelDefBuilder {
 
 	private static final Logger log = LoggerFactory.getLogger(ModelDefBuilderImpl.class);
 	
-	private ModelDefConfig config;
+	private ModelConfig config;
 	private Schema schema;
 	private DOMImplementationRegistry domRegistry;
 	
-	public ModelDefBuilderImpl(ModelDefConfig config, Schema schema) {
+	public ModelDefBuilderImpl(ModelConfig config, Schema schema) {
 		this.config = config;
 		this.schema = schema;
 		initDOMRegistry();

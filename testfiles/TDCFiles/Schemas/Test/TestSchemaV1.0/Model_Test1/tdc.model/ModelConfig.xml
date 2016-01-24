@@ -5,4 +5,7 @@
 	<SchemaRootElementNamespace>http://com.gurtz.tdc/test</SchemaRootElementNamespace>
 	<SchemaFailOnParserWarning>true</SchemaFailOnParserWarning>
 	<SchemaFailOnParserNonFatalError>true</SchemaFailOnParserNonFatalError>
+	
+	<DefaultOccurrenceDepth>3</DefaultOccurrenceDepth>
+	<!--OccurrenceDepth Depth="3">...mpath...</OccurrenceDepth -->
 </Config>

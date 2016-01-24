@@ -1,7 +1,7 @@
 package org.tdc.modeldef;
 
-import org.tdc.config.modeldef.ModelDefConfig;
+import org.tdc.config.model.ModelConfig;
 
 public interface ModelDefFactory {
-	ModelDef getModelDef(ModelDefConfig config);
+	ModelDef getModelDef(ModelConfig config);
 }
