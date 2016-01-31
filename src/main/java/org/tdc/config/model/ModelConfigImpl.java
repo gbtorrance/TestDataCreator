@@ -16,13 +16,11 @@ public class ModelConfigImpl implements ModelConfig {
 	// TODO support multi-level addressing rather than just name? can be done by walking the folders to determine when each .config appears
 	
 	private static final Logger log = LoggerFactory.getLogger(ModelConfigImpl.class);
-	private static final String CONFIG_FOLDER = "tdc.model";
-	private static final String CONFIG_FILE = "ModelConfig.xml";
+	private static final String CONFIG_FILE = "TDCModelConfig.xml";
 
 	private SchemaConfig schemaConfig;
 	private Addr addr;
 	private Path modelRoot;
-	private Path modelConfigRoot;
 	private Path modelConfigFile;
 	
 	// config file items
@@ -38,8 +36,7 @@ public class ModelConfigImpl implements ModelConfig {
 		this.schemaConfig = schemaConfig;
 		this.addr = schemaConfig.getAddr().resolve(name);
 		this.modelRoot = schemaConfig.getSchemaRoot().resolve(name);
-		this.modelConfigRoot = modelRoot.resolve(CONFIG_FOLDER);
-		this.modelConfigFile = modelConfigRoot.resolve(CONFIG_FILE);
+		this.modelConfigFile = modelRoot.resolve(CONFIG_FILE);
 		validateDirectories();
 		loadConfig();
 		log.debug("Creating ModelConfigImpl: {}", addr);
@@ -61,18 +58,13 @@ public class ModelConfigImpl implements ModelConfig {
 	}
 
 	@Override
-	public Path getModelConfigRoot() {
-		return modelConfigRoot;
-	}
-	
-	@Override
 	public String getSchemaRootFile() {
 		return schemaRootFile;
 	}
 	
 	@Override
 	public Path getSchemaRootFileFullPath() {
-		return schemaConfig.getSchemaConfigRoot().resolve(schemaRootFile);
+		return schemaConfig.getSchemaRoot().resolve(schemaRootFile);
 	}
 
 	@Override
@@ -113,9 +105,6 @@ public class ModelConfigImpl implements ModelConfig {
 	private void validateDirectories() {
 		if (!Files.isDirectory(modelRoot)) {
 			throw new IllegalStateException("Model dir does not exist: " + modelRoot.toString());
-		}
-		if (!Files.isDirectory(modelConfigRoot)) {
-			throw new IllegalStateException("Model '" + CONFIG_FOLDER + "' dir does not exist: " + modelConfigRoot.toString());
 		}
 	}
 	

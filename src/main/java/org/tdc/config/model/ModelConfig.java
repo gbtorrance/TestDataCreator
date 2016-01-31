@@ -10,7 +10,6 @@ public interface ModelConfig {
 
 	Addr getAddr();
 	Path getModelRoot();
-	Path getModelConfigRoot();
 	
 	String getSchemaRootFile();
 	Path getSchemaRootFileFullPath();

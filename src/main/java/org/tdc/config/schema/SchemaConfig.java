@@ -8,5 +8,4 @@ public interface SchemaConfig {
 	Path getSchemasRoot();
 	Addr getAddr();
 	Path getSchemaRoot();
-	Path getSchemaConfigRoot();
 }
