@@ -11,25 +11,29 @@ import org.tdc.util.Addr;
 public class SchemaConfigImpl implements SchemaConfig {
 	
 	private static final Logger log = LoggerFactory.getLogger(SchemaConfigImpl.class);
-	private static final String CONFIG_FILE = "TDCModelConfig.xml";
+	private static final String CONFIG_FILE = "TDCSchemaConfig.xml";
 
-	private Path schemasRoot;
+	private Path schemasConfigRoot;
 	private Addr addr;
-	private Path schemaRoot;
+	private Path schemaConfigRoot;
 	private Path schemaConfigFile;
+	private Path schemaFilesRoot;
 	
-	public SchemaConfigImpl(Path schemasRoot, Addr addr) {
-		this.schemasRoot = schemasRoot;
-		this.addr = addr;
-		this.schemaRoot = schemasRoot.resolve(addr.getPath());
-		this.schemaConfigFile = schemaRoot.resolve(CONFIG_FILE);
-		validateDirectories();
+	public SchemaConfigImpl(Path schemasConfigRoot, Addr addr) {
 		log.debug("Creating SchemaConfigImpl: {}", addr);
+		this.schemasConfigRoot = schemasConfigRoot;
+		this.addr = addr;
+		this.schemaConfigRoot = schemasConfigRoot.resolve(addr.getPath());
+		if (!Files.isDirectory(schemaConfigRoot)) {
+			throw new IllegalStateException("Schema config root dir does not exist: " + schemaConfigRoot.toString());
+		}
+		this.schemaConfigFile = schemaConfigRoot.resolve(CONFIG_FILE);
+		loadConfig();
 	}
 	
 	@Override
-	public Path getSchemasRoot() {
-		return schemasRoot;
+	public Path getSchemasConfigRoot() {
+		return schemasConfigRoot;
 	}
 	
 	@Override
@@ -38,14 +42,13 @@ public class SchemaConfigImpl implements SchemaConfig {
 	}
 
 	@Override
-	public Path getSchemaRoot() {
-		return schemaRoot;
+	public Path getSchemaConfigRoot() {
+		return schemaConfigRoot;
 	}
 
-	private void validateDirectories() {
-		if (!Files.isDirectory(schemaRoot)) {
-			throw new IllegalStateException("Schema dir does not exist: " + schemaRoot.toString());
-		}
+	@Override
+	public Path getSchemaFilesRoot() {
+		return schemaFilesRoot;
 	}
 
 	private void loadConfig() {
@@ -54,6 +57,9 @@ public class SchemaConfigImpl implements SchemaConfig {
 	}
 
 	private void loadConfigItems(XMLConfigWrapper config) {
-		// nothing needed yet
+		schemaFilesRoot = this.schemaConfigRoot.resolve(config.getString("SchemaFilesRoot", true));
+		if (!Files.isDirectory(schemaFilesRoot)) {
+			throw new IllegalStateException("Schema files root dir does not exist: " + schemaFilesRoot.toString());
+		}
 	}
 }

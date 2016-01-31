@@ -13,17 +13,17 @@ public class SchemaConfigFactoryImpl implements SchemaConfigFactory {
 	private static final Logger log = LoggerFactory.getLogger(SchemaConfigFactoryImpl.class);
 
 	private Cache<SchemaConfig> cache = new CacheImpl<>();
-	private Path schemasRoot;
+	private Path schemasConfigRoot;
 	
-	public SchemaConfigFactoryImpl(Path schemasRoot) {
-		this.schemasRoot = schemasRoot;
+	public SchemaConfigFactoryImpl(Path schemasConfigRoot) {
+		this.schemasConfigRoot = schemasConfigRoot;
 	}
 
 	@Override
 	public SchemaConfig getSchemaConfig(Addr addr) {
 		SchemaConfig schemaConfig = cache.get(addr);
 		if (schemaConfig == null) {
-			schemaConfig = new SchemaConfigImpl(schemasRoot, addr);
+			schemaConfig = new SchemaConfigImpl(schemasConfigRoot, addr);
 			cache.put(addr, schemaConfig);
 		}
 		else {

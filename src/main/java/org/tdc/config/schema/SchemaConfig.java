@@ -5,7 +5,8 @@ import java.nio.file.Path;
 import org.tdc.util.Addr;
 
 public interface SchemaConfig {
-	Path getSchemasRoot();
+	Path getSchemasConfigRoot();
 	Addr getAddr();
-	Path getSchemaRoot();
+	Path getSchemaConfigRoot();
+	Path getSchemaFilesRoot();
 }

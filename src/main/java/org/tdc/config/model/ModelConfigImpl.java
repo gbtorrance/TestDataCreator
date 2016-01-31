@@ -20,7 +20,7 @@ public class ModelConfigImpl implements ModelConfig {
 
 	private SchemaConfig schemaConfig;
 	private Addr addr;
-	private Path modelRoot;
+	private Path modelConfigRoot;
 	private Path modelConfigFile;
 	
 	// config file items
@@ -33,13 +33,15 @@ public class ModelConfigImpl implements ModelConfig {
 	private Map<String, Integer> occurrenceDepthMap = new HashMap<>();
 	
 	public ModelConfigImpl(SchemaConfig schemaConfig, String name) {
+		log.debug("Creating ModelConfigImpl: {}", addr);
 		this.schemaConfig = schemaConfig;
 		this.addr = schemaConfig.getAddr().resolve(name);
-		this.modelRoot = schemaConfig.getSchemaRoot().resolve(name);
-		this.modelConfigFile = modelRoot.resolve(CONFIG_FILE);
-		validateDirectories();
+		this.modelConfigRoot = schemaConfig.getSchemaConfigRoot().resolve(name);
+		if (!Files.isDirectory(modelConfigRoot)) {
+			throw new IllegalStateException("Model config root dir does not exist: " + modelConfigRoot.toString());
+		}
+		this.modelConfigFile = modelConfigRoot.resolve(CONFIG_FILE);
 		loadConfig();
-		log.debug("Creating ModelConfigImpl: {}", addr);
 	}
 	
 	@Override
@@ -53,8 +55,8 @@ public class ModelConfigImpl implements ModelConfig {
 	}
 	
 	@Override
-	public Path getModelRoot() {
-		return modelRoot;
+	public Path getModelConfigRoot() {
+		return modelConfigRoot;
 	}
 
 	@Override
@@ -64,7 +66,7 @@ public class ModelConfigImpl implements ModelConfig {
 	
 	@Override
 	public Path getSchemaRootFileFullPath() {
-		return schemaConfig.getSchemaRoot().resolve(schemaRootFile);
+		return schemaConfig.getSchemaFilesRoot().resolve(schemaRootFile);
 	}
 
 	@Override
@@ -102,12 +104,6 @@ public class ModelConfigImpl implements ModelConfig {
 		return depth;
 	}
 
-	private void validateDirectories() {
-		if (!Files.isDirectory(modelRoot)) {
-			throw new IllegalStateException("Model dir does not exist: " + modelRoot.toString());
-		}
-	}
-	
 	private void loadConfig() {
 		XMLConfigWrapper config = new XMLConfigWrapper(modelConfigFile.toFile());
 		loadConfigItems(config);
