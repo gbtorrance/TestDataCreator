@@ -48,30 +48,42 @@ Sure, why not. Here are a few sample screenshots (with comments) ...
 - Additional information, such as form line number, data type, notes, and occurrence is shown beginning in column U. (To save space, the text in some of these cells is 'shrunk'; to view, the user simply needs to click on each cell.)
 - The 'Occurs' column (X) represents the 'minOccurs' and 'maxOccurs' for each element. (For example, '0..1' indicates minOccurs=0, maxOccurs=1, and '3..n' indicates minOccurs=3, maxOccurs=unbounded.)
 - Non-leaf/parent elements are shown in blue. Attributes are shown in green, prefixed with '@'.
+
 ___
+
 ![screenshot2](https://cloud.githubusercontent.com/assets/16735709/13554421/742b23b6-e375-11e5-9d4a-0fbc1f0ba2ee.JPG)
 - In the sample above, notice the '[CHOICE]' marker on line 52. This indicates the start of a 'choice' within the XML. 
 - The red '>' markers to the left of 'USAddress' and 'ForeignAddress' indicate each of the possible choices allowed by the schema. A user may only populate values for at most *one* of the choices (otherwise the resulting XML will fail schema validation).
+
 ___
+
 ![screenshot3](https://cloud.githubusercontent.com/assets/16735709/13554425/7430e10c-e375-11e5-8c57-2c4284f1ef8b.JPG)
 - In the sample above, notice the '1' and '2' on the left? The schema definition allows the 'DependentDetail' element (lines 176, 186, 196) to be repeated. (It has 'Occurs' defined as '0..100', meaning minOccurs=0, maxOccurs=100.)
   - In 'test case' 1 (column Y), two dependents are specified (Sally and Josiah). 
   - In 'test case' 2 (column Z), only one dependent is specified (Jackson).
 - Also notice the 'choice' in each repeating group. Any level of nested choices and repeating element groups is supported.
+
 ___
+
 ![screenshot4](https://cloud.githubusercontent.com/assets/16735709/13554423/742e96c2-e375-11e5-880f-ae7df3a551a7.JPG)
 - In the sample above, notice the '1 | 1' and '1 | 2' on the left? This indicates that the 'W2StateLocalTaxGrp' element repeats (twice in the image), but that it is *also* part of a larger group of elements that repeats. Any level of repeating element groups is supported.
+
 ___
+
 ![screenshot5](https://cloud.githubusercontent.com/assets/16735709/13554424/7430390a-e375-11e5-9dba-b3f9e99a9962.JPG)
 - The sample above shows another 'page' ('Manifest') in the same Excel 'book' file. 
   - When testing an MeF system, every 'test case' must contain a manifest file in addition to a tax return file (in this case, a 1040A). But this is completely configurable based on the needs of the system being tested. Some systems may require multiple 'pages' per 'test case'; some only one.
 - Notice that 'test cases' 1 and 2 are also represented on this 'page. This shows how a 'test case' can be made up of any number of 'test documents' on any number of 'pages'.
+
 ___
+
 ![screenshot6](https://cloud.githubusercontent.com/assets/16735709/13554426/74387e6c-e375-11e5-99bc-5abe90a53965.JPG)
 - The sample above shows the 'Log' worksheet. 
 - Notice that there are numerous schemas-validation errors shown. These will need to be resolved by a user before valid XML files can be generated.
 - The '<-----' markers are hyperlinks that, when clicked, will take the user to the location of each error.
+
 ___
+
 If you're interested in playing around with the Excel 'book' file, click here: [2015_IRS-1040_Demo.xlsx](https://github.com/gbtorrance/TestDataCreator/files/160333/2015_IRS-1040_Demo.xlsx)
 
 ## That's it for now
