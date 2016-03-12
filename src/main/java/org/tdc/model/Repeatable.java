@@ -1,7 +1,7 @@
 package org.tdc.model;
 
 /**
- * Defines functionality of notes that can be repeated.
+ * Defines functionality of nodes that can be repeated.
  */
 public interface Repeatable {
 	int getMinOccurs();
