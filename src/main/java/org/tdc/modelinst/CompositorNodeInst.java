@@ -3,6 +3,11 @@ package org.tdc.modelinst;
 import org.tdc.modeldef.CompositorNodeDef;
 import org.tdc.modeldef.CompositorType;
 
+/**
+ * A {@link NonAttribNodeInst} implementation specific to "compositors".
+ * 
+ * <p>Compositors (such as "sequence" and "choice") are nodes that can contain other nodes.
+ */
 public class CompositorNodeInst extends NonAttribNodeInst {
 	
 	public CompositorNodeInst(NonAttribNodeInst parent, CompositorNodeDef compositorNodeDef) {

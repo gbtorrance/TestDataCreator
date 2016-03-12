@@ -2,6 +2,11 @@ package org.tdc.modeldef;
 
 import org.tdc.model.AbstractNode;
 
+/**
+ * Abstract implementation of {@link AbstractNode} that is specific to "definition" Models ({@link org.tdc.modeldef.ModelDef ModelDef}).
+ * 
+ * @see NodeDef
+ */
 public abstract class AbstractNodeDef extends AbstractNode {
 
 	public AbstractNodeDef(AbstractNodeDef parent) {

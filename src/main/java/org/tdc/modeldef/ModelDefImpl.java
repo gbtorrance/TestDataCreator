@@ -6,6 +6,11 @@ import org.tdc.config.model.ModelConfig;
 import org.tdc.model.MPathIndex;
 import org.tdc.schema.Schema;
 
+/**
+ * A {@link ModelDef} implementation.
+ * 
+ * <p>This light-weight object's primary purpose is as a holder for the ModelDef's root {@link ElementNodeDef}.
+ */
 public class ModelDefImpl implements ModelDef {
 
 	private static final Logger log = LoggerFactory.getLogger(ModelDefImpl.class);

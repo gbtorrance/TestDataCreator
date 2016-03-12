@@ -11,6 +11,11 @@ import org.tdc.config.XMLConfigWrapper;
 import org.tdc.config.schema.SchemaConfig;
 import org.tdc.util.Addr;
 
+/**
+ * A {@link ModelConfig} implementation.
+ * 
+ * <p>Reads from XML configuration files. 
+ */
 public class ModelConfigImpl implements ModelConfig {
 	
 	// TODO support multi-level addressing rather than just name? can be done by walking the folders to determine when each .config appears

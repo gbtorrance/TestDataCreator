@@ -1,5 +1,10 @@
 package org.tdc.modelinst;
 
+/**
+ * Defines formatting for {@link NoteInst}.
+ * 
+ * <p>--PLACEHOLDER FOR FUTURE USE--
+ */
 public class NoteFormat {
 	
 	public static NoteFormat BASIC_PRE = new NoteFormat(0);

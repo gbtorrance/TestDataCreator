@@ -1,5 +1,8 @@
 package org.tdc.util;
 
+/**
+ * Static helper methods.
+ */
 public class Util {
 	
 	public static String spaces(int count) {

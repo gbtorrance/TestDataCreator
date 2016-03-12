@@ -7,6 +7,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.tdc.util.Addr;
 
+/**
+ * A {@link BookDefConfig} implementation.
+ * 
+ * <p>Reads from XML configuration files. 
+ */
 public class BookDefConfigImpl implements BookDefConfig {
 	
 	private static final Logger log = LoggerFactory.getLogger(BookDefConfigImpl.class);

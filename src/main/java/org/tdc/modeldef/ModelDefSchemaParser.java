@@ -27,6 +27,10 @@ import org.tdc.model.MPathBuilder;
 import org.tdc.model.MPathIndex;
 import org.w3c.dom.Node;
 
+/**
+ * Parser that takes an Apache Xerces {@link XSModel} representation of a Schema, and
+ * constructs a {@link ModelDef} object tree, returning the root {@link ElementNodeDef}.
+ */
 public class ModelDefSchemaParser {
 
 	private static final Logger log = LoggerFactory.getLogger(ModelDefSchemaParser.class);

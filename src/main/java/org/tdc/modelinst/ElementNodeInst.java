@@ -9,6 +9,9 @@ import org.tdc.model.Nameable;
 import org.tdc.model.Typeable;
 import org.tdc.modeldef.ElementNodeDef;
 
+/**
+ * A {@link NonAttribNodeInst} implementation specific to XML elements.
+ */
 public class ElementNodeInst extends NonAttribNodeInst implements CanHaveAttributes, Nameable, Typeable {
 	
 	private List<AttribNodeInst> attributes = new ArrayList<>();

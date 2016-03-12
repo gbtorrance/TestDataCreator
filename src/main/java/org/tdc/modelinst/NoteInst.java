@@ -1,5 +1,10 @@
 package org.tdc.modelinst;
 
+/**
+ * A {@link AbstractNodeInst} implementation specific to notes (that can be displayed above or below nodes in a {@link ModelInst}).
+ * 
+ * <p>--PLACEHOLDER FOR FUTURE USE--
+ */
 public class NoteInst extends AbstractNodeInst {
 	
 	private String text;

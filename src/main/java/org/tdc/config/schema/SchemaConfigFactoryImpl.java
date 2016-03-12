@@ -8,6 +8,11 @@ import org.tdc.util.Addr;
 import org.tdc.util.Cache;
 import org.tdc.util.CacheImpl;
 
+/**
+ * A {@link SchemaConfigFactory} implementation.
+ * 
+ * <p>Caches configuration objects to ensure only one instance per {@linkplain org.tdc.util.Addr address}.
+ */
 public class SchemaConfigFactoryImpl implements SchemaConfigFactory {
 
 	private static final Logger log = LoggerFactory.getLogger(SchemaConfigFactoryImpl.class);

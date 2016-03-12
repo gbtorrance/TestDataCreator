@@ -14,6 +14,15 @@ import org.tdc.schema.Schema;
 import org.w3c.dom.DOMErrorHandler;
 import org.w3c.dom.bootstrap.DOMImplementationRegistry;
 
+/**
+ * A {@link ModelDefBuilder} implementation.
+ * 
+ * <p>Builds an Apache Xerces {@link XSModel} from the Schema on the file system, 
+ * starting with the root element and root element namespace defined in the configuration.
+ * It then uses {@link ModelDefSchemaParser} to build an in-memory ModelDef object tree
+ * from the XSModel, and injects this tree, along with other dependencies, into a new {@link ModelDef} instance, 
+ * which is then returned.
+ */
 public class ModelDefBuilderImpl implements ModelDefBuilder {
 
 	private static final Logger log = LoggerFactory.getLogger(ModelDefBuilderImpl.class);

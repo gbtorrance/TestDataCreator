@@ -9,6 +9,15 @@ import org.tdc.model.CanHaveChildren;
 import org.tdc.model.NonAttrib;
 import org.tdc.model.TDCNode;
 
+/**
+ * Abstract class that supports writing a structured representation of a {@link TDCNode} tree
+ * for testing or debugging purposes.
+ * 
+ * <p>Using this approach, Models can be more easily compared by simply doing a string comparison of the
+ * expected and actual Model representations. 
+ * 
+ * <p>Uses the template method pattern to have subclasses provided specific string content for each node of the tree. 
+ */
 public abstract class AbstractModelWriterForTesting {
 	
 	private TDCNode rootNode;

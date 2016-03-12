@@ -6,6 +6,9 @@ import org.tdc.model.Requireable;
 import org.tdc.model.Typeable;
 import org.tdc.modeldef.AttribNodeDef;
 
+/**
+ * A {@link NodeInst} implementation specific to attribute nodes.
+ */
 public class AttribNodeInst extends NodeInst implements Attrib, Nameable, Typeable, Requireable {
 	
 	public AttribNodeInst(ElementNodeInst parent, AttribNodeDef attribNodeDef) {

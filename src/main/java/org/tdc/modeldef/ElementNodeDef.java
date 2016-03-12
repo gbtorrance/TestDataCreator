@@ -8,6 +8,9 @@ import org.tdc.model.CanHaveAttributes;
 import org.tdc.model.Nameable;
 import org.tdc.model.Typeable;
 
+/**
+ * A {@link NonAttribNodeDef} implementation specific to XML elements.
+ */
 public class ElementNodeDef extends NonAttribNodeDef implements CanHaveAttributes, Nameable, Typeable {
 	
 	private String name;
@@ -71,8 +74,6 @@ public class ElementNodeDef extends NonAttribNodeDef implements CanHaveAttribute
 	public String toString() {
 		return super.toString() + ", name: " + name + ", dataType: " + dataType;
 	}
-
-	
 	
 	// TODO make generic; MeF specific
 	public String getLineNum() {

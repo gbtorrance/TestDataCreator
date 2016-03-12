@@ -16,6 +16,13 @@ import org.tdc.modeldef.ModelDef;
 import org.tdc.modeldef.NodeDef;
 import org.tdc.modeldef.NonAttribNodeDef;
 
+/**
+ * A {@link ModelInstBuilder} implementation.
+ * 
+ * Does the complex work of constructing an in-memory {@link ModelInst} object tree
+ * from a {@link ModelDef}, and then injects the root {@link ElementNodeInst},
+ * along with other dependencies, into a new {@link ModelInst}, which is then returned.
+ */
 public class ModelInstBuilderImpl implements ModelInstBuilder {
 	
 	private static final Logger log = LoggerFactory.getLogger(ModelInstBuilderImpl.class);

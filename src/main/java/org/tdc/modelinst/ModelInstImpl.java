@@ -6,6 +6,12 @@ import org.tdc.config.model.ModelConfig;
 import org.tdc.model.MPathIndex;
 import org.tdc.modeldef.ModelDef;
 
+/**
+ * A {@link ModelInst} implementation.
+ * 
+ * <p>This light-weight object's primary purpose is as a holder for the ModelInst's root {@link ElementNodeInst}.
+ *
+ */
 public class ModelInstImpl implements ModelInst {
 
 	private static final Logger log = LoggerFactory.getLogger(ModelInstImpl.class);

@@ -11,9 +11,17 @@ import org.tdc.modeldef.CompositorType;
 import org.tdc.modeldef.ElementNodeDef;
 import org.tdc.modeldef.NodeDef;
 
+/**
+ * MPath builder used during the parsing/building process for Models 
+ * ({@link org.tdc.modeldef.ModelDef ModelDef} and {@link org.tdc.modelinst.ModelInst ModelInst}) 
+ * to track state as nodes are created, and return MPath addresses to be stored
+ * in an {@link MPathIndex} objects.  
+ *  
+ * @see MPathIndex
+ */
 public class MPathBuilder {
 	
-	// TODO why dependent on NodeDef objects??? likely due to flattened/missing objects in inst model; consider moving to modeldef package
+	// TODO why depend on NodeDef objects??? likely due to flattened/missing objects in inst model; consider moving to modeldef package
 	
 	private Deque<MPathState> state = new ArrayDeque<>();
 	

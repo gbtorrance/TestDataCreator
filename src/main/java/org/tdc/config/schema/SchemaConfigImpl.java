@@ -8,6 +8,11 @@ import org.slf4j.LoggerFactory;
 import org.tdc.config.XMLConfigWrapper;
 import org.tdc.util.Addr;
 
+/**
+ * A {@link SchemaConfig} implementation.
+ * 
+ * <p>Reads from XML configuration files. 
+ */
 public class SchemaConfigImpl implements SchemaConfig {
 	
 	private static final Logger log = LoggerFactory.getLogger(SchemaConfigImpl.class);

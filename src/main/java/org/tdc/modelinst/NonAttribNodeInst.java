@@ -11,6 +11,12 @@ import org.tdc.modeldef.CompositorNodeDef;
 import org.tdc.modeldef.CompositorType;
 import org.tdc.modeldef.NonAttribNodeDef;
 
+/**
+ * A {@link NodeInst} implementation specific to nodes that are NOT attributes (such as compositors and elements).
+ * 
+ * @see CompositorNodeInst
+ * @see ElementNodeInst
+ */
 public abstract class NonAttribNodeInst extends NodeInst implements NonAttrib, CanHaveChildren, Repeatable {
 	
 	private List<NonAttribNodeInst> children = new ArrayList<>();

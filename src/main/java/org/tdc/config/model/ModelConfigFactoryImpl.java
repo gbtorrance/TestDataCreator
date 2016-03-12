@@ -8,6 +8,13 @@ import org.tdc.util.Addr;
 import org.tdc.util.Cache;
 import org.tdc.util.CacheImpl;
 
+/**
+ * A {@link ModelConfigFactory} implementation.
+ * 
+ * <p>Creates parent-level {@link SchemaConfig} instances, as necessary.
+ * 
+ * <p>Caches configuration objects to ensure only one instance per {@linkplain org.tdc.util.Addr address}.
+ */
 public class ModelConfigFactoryImpl implements ModelConfigFactory {
 
 	private static final Logger log = LoggerFactory.getLogger(ModelConfigFactoryImpl.class);

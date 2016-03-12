@@ -1,5 +1,8 @@
 package org.tdc.model;
 
+/**
+ * Abstract {@link TDCNode} implementation.
+ */
 public abstract class AbstractNode implements TDCNode {
 
 	private AbstractNode parent;

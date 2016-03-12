@@ -8,6 +8,12 @@ import org.tdc.model.CanHaveChildren;
 import org.tdc.model.NonAttrib;
 import org.tdc.model.Repeatable;
 
+/**
+ * A {@link NodeDef} implementation specific to nodes that are NOT attributes (such as compositors and elements).
+ * 
+ * @see CompositorNodeDef
+ * @see ElementNodeDef
+ */
 public abstract class NonAttribNodeDef extends NodeDef implements NonAttrib, CanHaveChildren, Repeatable {
 	
 	public static final int MIN_MAX_UNDEFINED = -2;

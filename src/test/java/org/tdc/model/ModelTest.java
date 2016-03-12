@@ -17,7 +17,6 @@ import org.tdc.config.model.ModelConfigFactory;
 import org.tdc.config.model.ModelConfigFactoryImpl;
 import org.tdc.config.schema.SchemaConfigFactory;
 import org.tdc.config.schema.SchemaConfigFactoryImpl;
-import org.tdc.model.TDCNode;
 import org.tdc.modeldef.ModelDef;
 import org.tdc.modeldef.ModelDefFactory;
 import org.tdc.modeldef.ModelDefFactoryImpl;
@@ -30,7 +29,17 @@ import org.tdc.util.Addr;
 import org.tdc.util.MPathModelWriterForTesting;
 import org.tdc.util.SummaryModelWriterForTesting;
 
+/**
+ * Unit tests for {@link ModelDef} and {@link ModelInst}.
+ * 
+ * <p>These tests output various Models to an intermediary String format, 
+ * which is then compared with expected results to determine pass or fail.
+ * 
+ * @see org.tdc.util.AbstractModelWriterForTesting AbstractModelWriterForTesting
+ */
 public class ModelTest {
+	
+	// TODO these tests need quite a bit of work still
 	
 	private static final int INDENT_SIZE = 3;
 	

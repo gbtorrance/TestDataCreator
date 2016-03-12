@@ -5,6 +5,9 @@ import org.tdc.model.Nameable;
 import org.tdc.model.Requireable;
 import org.tdc.model.Typeable;
 
+/**
+ * A {@link NodeDef} implementation specific to attributes.
+ */
 public class AttribNodeDef extends NodeDef implements Attrib, Nameable, Typeable, Requireable {
 	
 	private String name;

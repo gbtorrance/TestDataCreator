@@ -2,6 +2,12 @@ package org.tdc.modelinst;
 
 import org.tdc.model.AbstractNode;
 
+/**
+ * Abstract implementation of {@link AbstractNode} that is specific to "instance" Models ({@link org.tdc.modelinst.ModelInst ModelInst}).
+ *
+ * @see NodeInst
+ * @see NoteInst
+ */
 public abstract class AbstractNodeInst extends AbstractNode {
 
 	public AbstractNodeInst(AbstractNodeInst parent) {

@@ -1,5 +1,13 @@
 package org.tdc.modeldef;
 
+/**
+ * Abstract {@link AbstractNodeDef} implementation.
+ * 
+ * <p>This addition to the class hierarchy may seem unnecessary, but is included for consistency with the "instance" model classes.
+ * 
+ * @see AttribNodeDef
+ * @see NonAttribNodeDef
+ */
 public abstract class NodeDef extends AbstractNodeDef {
 	
 	protected NodeDef(NonAttribNodeDef parent) {

@@ -3,6 +3,9 @@ package org.tdc.util;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+/**
+ * Support for standardized naming and addressing of high-level domain objects such as Schema, Model, and BookDef 
+ */
 public class Addr {
 	
 	private Path addrPath;

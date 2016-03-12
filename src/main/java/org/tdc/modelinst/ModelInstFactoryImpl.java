@@ -9,6 +9,15 @@ import org.tdc.util.Addr;
 import org.tdc.util.Cache;
 import org.tdc.util.CacheImpl;
 
+/**
+ * A {@link ModelInstFactory} implementation.
+ * 
+ * <p>Creates parent-level {@link ModelDef} instances, as necessary.
+ * 
+ * <p>Caches objects to ensure only one instance per {@linkplain org.tdc.util.Addr address}.
+ * 
+ * <p>Makes use of a {@link ModelInstBuilder} to do all the heavy lifting of object construction.
+ */
 public class ModelInstFactoryImpl implements ModelInstFactory {
 
 	private static final Logger log = LoggerFactory.getLogger(ModelInstFactoryImpl.class);

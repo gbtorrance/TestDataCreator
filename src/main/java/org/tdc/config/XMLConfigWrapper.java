@@ -8,6 +8,12 @@ import org.apache.commons.configuration.XMLConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Wrapper for Apache Commons {@link XMLConfiguration} class.
+ * 
+ * <p>Implements various helper getter methods, and ensures that, if a required
+ * configuration item is not specified, a {@link NoSuchElementException} will be thrown.  
+ */
 public class XMLConfigWrapper {
 	
 	private static final Logger log = LoggerFactory.getLogger(XMLConfigWrapper.class);

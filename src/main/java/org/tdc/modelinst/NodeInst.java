@@ -6,6 +6,14 @@ import java.util.List;
 
 import org.tdc.modeldef.NodeDef;
 
+/**
+ * Abstract {@link AbstractNodeInst} implementation that adds the ability to associate a "definition" node ({@link NodeDef}) to an "instance" node ({@link NodeInst}).
+ * 
+ * <p>These nodes also have their own specific row and column position "offset" in the {@link ModelInst} tree.
+ * 
+ * @see AttribNodeInst
+ * @see NonAttribNodeInst
+ */
 public abstract class NodeInst extends AbstractNodeInst {
 	
 	private NodeDef nodeDef;
