@@ -3,13 +3,14 @@ package org.tdc.modeldef;
 /**
  * Abstract {@link AbstractNodeDef} implementation.
  * 
- * <p>This addition to the class hierarchy may seem unnecessary, but is included for consistency with the "instance" model classes.
- * 
  * @see AttribNodeDef
  * @see NonAttribNodeDef
  */
 public abstract class NodeDef extends AbstractNodeDef {
 	
+	private int colOffset = -1;
+	private int rowOffset = -1;
+
 	protected NodeDef(NonAttribNodeDef parent) {
 		super(parent);
 	}
@@ -17,6 +18,24 @@ public abstract class NodeDef extends AbstractNodeDef {
 	@Override
 	public NonAttribNodeDef getParent() {
 		return (NonAttribNodeDef)super.getParent();
+	}
+	
+	public int getColOffset() {
+		return colOffset;
+	}
+	
+	// intentionally package level
+	void setColOffset(int colOffset) {
+		this.colOffset = colOffset;
+	}
+	
+	public int getRowOffset() {
+		return rowOffset;
+	}
+	
+	// intentionally package level
+	void setRowOffset(int rowOffset) {
+		this.rowOffset = rowOffset;
 	}
 }
 

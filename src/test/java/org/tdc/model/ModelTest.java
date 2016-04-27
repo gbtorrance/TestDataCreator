@@ -71,7 +71,6 @@ public class ModelTest {
 	 - complex
 	 - simple
 	 ------------
-	 
 	 - root element is sequence repeating
 	 - root element is choice
 	 - contains group
@@ -81,7 +80,18 @@ public class ModelTest {
 	 
 	 - flattening situations
 	 - ensure default repeating does not exceed maximum for type in question
+	 ------------
+	 Schema scenarios list
+	 ------------
+	 - root element, complex, 1..1, sequence, 3 simple children
+	 - root element, complex, 1..1, choice, 3 simple children
+	 - root element, complex, 1..1, all, 3 simple children
+	 - root element, complex, 0..2, sequence, 3 simple children
+	 - root element, complex, 0..2, choice, 3 simple children
+	 - root element, complex, 0..2, all, 3 simple children
 	 
+	 
+
 	
 	
 

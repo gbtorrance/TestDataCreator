@@ -58,9 +58,9 @@ public class ModelInstBuilderImpl implements ModelInstBuilder {
 		return (ElementNodeInst)list.get(0);
 	}
 	
-	// TODO reconsider; are generics needed here? probably should not use wildcards as return type
+	// TODO consider simplifying use of generics by using List<NonAttribNodeInst> for all return types (rather than bounded wildcards)
 	private List<? extends NonAttribNodeInst> buildTree(
-			NonAttribNodeInst parentNonAttribNodeInst, NonAttribNodeDef nonAttribNodeDef,int colOffset) {
+			NonAttribNodeInst parentNonAttribNodeInst, NonAttribNodeDef nonAttribNodeDef, int colOffset) {
 		
 		List<? extends NonAttribNodeInst> list;
 		if (nonAttribNodeDef instanceof ElementNodeDef) {

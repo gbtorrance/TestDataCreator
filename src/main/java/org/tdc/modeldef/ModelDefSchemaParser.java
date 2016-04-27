@@ -38,6 +38,7 @@ public class ModelDefSchemaParser {
 	private XSModel xsModel;
 	private MPathIndex<NodeDef> mpathIndex; 
 	private MPathBuilder mpathBuilder = new MPathBuilder();
+	private int rowOffset;
 
 	public ModelDefSchemaParser(XSModel xsModel, MPathIndex<NodeDef> mpathIndex) {
 		this.xsModel = xsModel;
@@ -45,6 +46,7 @@ public class ModelDefSchemaParser {
 	}
 	
 	public ElementNodeDef buildModelDefTreeFromSchema(String rootElementName, String rootElementNamespace) {
+		rowOffset = 0;
         XSElementDeclaration ed = xsModel.getElementDeclaration(rootElementName, rootElementNamespace);
         
         // create root element with no parent
@@ -53,17 +55,20 @@ public class ModelDefSchemaParser {
         rootElementNodeDef.setMaxOccurs(1); // root element must always occur once and only once
         
         // build a model tree, beginning with the root
-        processElementDeclaration(ed, rootElementNodeDef);
+        processElementDeclaration(ed, rootElementNodeDef, 0);
         
         return rootElementNodeDef;
 	}
 	
-	private void processElementDeclaration(XSElementDeclaration xsElementDecl, ElementNodeDef elementNodeDef) {
+	private void processElementDeclaration(XSElementDeclaration xsElementDecl, ElementNodeDef elementNodeDef, int colOffset) {
 		
 		// set the name
     	elementNodeDef.setName(xsElementDecl.getName());
     	elementNodeDef.setMPath(buildMPath(elementNodeDef));
+    	elementNodeDef.setColOffset(colOffset);
+    	elementNodeDef.setRowOffset(rowOffset++);
     	mpathBuilder.zoomIn();
+    	colOffset++;
     	
     	// elements can be of a simple type or complex type
         XSTypeDefinition xsTypeDef = xsElementDecl.getTypeDefinition();
@@ -75,7 +80,7 @@ public class ModelDefSchemaParser {
         else if (xsTypeDef.getTypeCategory() == XSTypeDefinition.COMPLEX_TYPE) {
         	
         	// process complex type definition
-    		processComplexTypeDefinition( (XSComplexTypeDefinition)xsTypeDef, elementNodeDef);
+    		processComplexTypeDefinition( (XSComplexTypeDefinition)xsTypeDef, elementNodeDef, colOffset);
         }
         else {
         	// should *never* occur; throw unchecked exception to indicate failure to properly understand XSD model
@@ -83,6 +88,7 @@ public class ModelDefSchemaParser {
         }
         processAnnotation(xsElementDecl, elementNodeDef);
         
+        colOffset--;
         mpathBuilder.zoomOut();
 	}
 	
@@ -91,10 +97,10 @@ public class ModelDefSchemaParser {
 		// TODO Anything to do for restriction/list/union ... or restriction/extension? 
 	}
 	
-	private void processComplexTypeDefinition(XSComplexTypeDefinition xsComplexTypeDef, ElementNodeDef elementNodeDef) {
+	private void processComplexTypeDefinition(XSComplexTypeDefinition xsComplexTypeDef, ElementNodeDef elementNodeDef, int colOffset) {
 		
 		// process attributes
-		processAttributes(xsComplexTypeDef, elementNodeDef);
+		processAttributes(xsComplexTypeDef, elementNodeDef, colOffset);
 		
 		// process based on type of content
     	if (xsComplexTypeDef.getContentType() == XSComplexTypeDefinition.CONTENTTYPE_SIMPLE) {
@@ -131,7 +137,7 @@ public class ModelDefSchemaParser {
     		if (xsComplexTypeDef.getContentType() == XSComplexTypeDefinition.CONTENTTYPE_ELEMENT ||
     			xsComplexTypeDef.getContentType() == XSComplexTypeDefinition.CONTENTTYPE_MIXED) {
     			
-        		processParticle(xsComplexTypeDef.getParticle(), elementNodeDef);
+        		processParticle(xsComplexTypeDef.getParticle(), elementNodeDef, colOffset);
     		}
     	}
     	else {
@@ -140,7 +146,7 @@ public class ModelDefSchemaParser {
     	}
 	}
 	
-	private void processParticle(XSParticle xsParticle, NonAttribNodeDef nonAttribNodeDef) {
+	private void processParticle(XSParticle xsParticle, NonAttribNodeDef nonAttribNodeDef, int colOffset) {
 		
 		// get term
     	XSTerm xsTerm = (XSTerm)xsParticle.getTerm();
@@ -161,7 +167,7 @@ public class ModelDefSchemaParser {
     		nonAttribNodeDef.addChild(newElementNodeDef);
     		
     		// process element declaration (for new element node)
-        	processElementDeclaration((XSElementDeclaration)xsTerm, newElementNodeDef);
+        	processElementDeclaration((XSElementDeclaration)xsTerm, newElementNodeDef, colOffset);
     	}
     	else if (xsTerm instanceof XSModelGroup) {
     		
@@ -171,6 +177,8 @@ public class ModelDefSchemaParser {
     		// create compositor node (as child of current element
     		CompositorNodeDef compositorNodeDef = createCompositorNode(nonAttribNodeDef, xsModelGroup);
     		compositorNodeDef.setMPath(buildMPath(compositorNodeDef));
+    		compositorNodeDef.setColOffset(colOffset);
+    		compositorNodeDef.setRowOffset(rowOffset++);
     		compositorNodeDef.setMinOccurs(xsParticle.getMinOccurs());
     		compositorNodeDef.setMaxOccurs(xsParticle.getMaxOccursUnbounded() ? NonAttribNodeDef.MAX_UNBOUNDED : xsParticle.getMaxOccurs());
     		
@@ -178,7 +186,7 @@ public class ModelDefSchemaParser {
     		nonAttribNodeDef.addChild(compositorNodeDef);
     		
     		// process model group (for new compositor node)
-        	processModelGroup(xsModelGroup, compositorNodeDef);
+        	processModelGroup(xsModelGroup, compositorNodeDef, colOffset);
     	} 
     	else if (xsTerm instanceof XSWildcard) {
     		
@@ -193,7 +201,7 @@ public class ModelDefSchemaParser {
     	}
 	}
 	
-	private void processModelGroup(XSModelGroup xsModelGroup, CompositorNodeDef compositorNodeDef) {
+	private void processModelGroup(XSModelGroup xsModelGroup, CompositorNodeDef compositorNodeDef, int colOffset) {
 		
 		// note: model groups do not have names; leave as null
 		
@@ -201,16 +209,18 @@ public class ModelDefSchemaParser {
     	XSObjectList xsObjectList = (XSObjectList)xsModelGroup.getParticles();
     	ListIterator<?> listIterator = xsObjectList.listIterator();
     	mpathBuilder.zoomIn();
+    	colOffset++;
     	while (listIterator.hasNext()) {
     		
     		// process child particle
     		XSParticle xsParticle = (XSParticle)listIterator.next();
-    		processParticle(xsParticle, compositorNodeDef);
+    		processParticle(xsParticle, compositorNodeDef, colOffset);
     	}
+    	colOffset--;
     	mpathBuilder.zoomOut();
 	}
 	
-	private void processAttributes(XSComplexTypeDefinition xsComplexTypeDef, ElementNodeDef elementNodeDef) {
+	private void processAttributes(XSComplexTypeDefinition xsComplexTypeDef, ElementNodeDef elementNodeDef, int colOffset) {
 		XSObjectList xsObjectList = xsComplexTypeDef.getAttributeUses();
 		if (xsObjectList != null) {
 			for (int i = 0; i < xsObjectList.getLength(); i++) {
@@ -222,6 +232,8 @@ public class ModelDefSchemaParser {
 				AttribNodeDef attribNodeDef = new AttribNodeDef(elementNodeDef);
 				attribNodeDef.setName(attribDecl.getName());
 				attribNodeDef.setMPath(buildMPath(attribNodeDef));
+				attribNodeDef.setColOffset(colOffset);
+				attribNodeDef.setRowOffset(rowOffset++);
 				attribNodeDef.setDataType(getDataType(attribType));
 				attribNodeDef.setIsRequired(attribUse.getRequired());
 				elementNodeDef.addAttribute(attribNodeDef);

@@ -27,3 +27,5 @@ out/
 *.iws
 *.iml
 
+# TestDataCreator
+testfiles/Temp/
