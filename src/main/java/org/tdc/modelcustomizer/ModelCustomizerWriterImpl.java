@@ -71,22 +71,32 @@ public class ModelCustomizerWriterImpl implements ModelCustomizerWriter {
 
 	private void writeNode(NodeDef node) {
 		String name;
-		if (node instanceof ElementNodeDef) {
-			ElementNodeDef elementNodeDef = (ElementNodeDef)node;
-			name = elementNodeDef.getName();
-		}
-		else if (node instanceof AttribNodeDef) {
+		if (node instanceof AttribNodeDef) {
 			AttribNodeDef attribNodeDef = (AttribNodeDef)node;
 			name = "@" + attribNodeDef.getName();
 		}
-		else if (node instanceof CompositorNodeDef) {
-			CompositorNodeDef compositorNodeDef = (CompositorNodeDef)node;
-			name = "[" + compositorNodeDef.getType().toString() + "]";
-			
-		}
 		else {
-			throw new IllegalStateException("Node not expected to be of type: " + node.getClass().getTypeName());
+			if (node instanceof ElementNodeDef) {
+				ElementNodeDef elementNodeDef = (ElementNodeDef)node;
+				name = elementNodeDef.getName();
+			}
+			else if (node instanceof CompositorNodeDef) {
+				CompositorNodeDef compositorNodeDef = (CompositorNodeDef)node;
+				name = "[" + compositorNodeDef.getType().toString() + "]";
+				
+			}
+			else {
+				throw new IllegalStateException("Node not expected to be of type: " + node.getClass().getTypeName());
+			}
+			// node is a subclass of NonAttribNodeDef...
+			outputNonAttribChoiceMarker((NonAttribNodeDef)node);
 		}
 		sheet.setCellValue(name, rowStart + node.getRowOffset(), colStart + node.getColOffset());
+	}
+
+	private void outputNonAttribChoiceMarker(NonAttribNodeDef node) {
+		if (node.isChildOfChoice()) {
+			sheet.setCellValue(">", rowStart + node.getRowOffset(), colStart + node.getColOffset() - 1);
+		}
 	}
 }

@@ -82,16 +82,9 @@ public abstract class NonAttribNodeInst extends NodeInst implements NonAttrib, C
 	}
 	
 	public boolean isChildOfChoice() {
-		boolean result = false;
 		// since compositor 'inst' nodes are sometimes removed in the 'inst' model for visual clarity,
-		// we need to check the parent of the 'def' node to see if it is a choice
-		NonAttribNodeDef parentOfDefNode = getNodeDef().getParent();
-		if (parentOfDefNode != null && 
-				parentOfDefNode instanceof CompositorNodeDef &&
-				((CompositorNodeDef)parentOfDefNode).getType() == CompositorType.CHOICE) {
-			result = true;
-		}
-		return result;
+		// we need to check if the 'def' node is the child of a choice
+		return getNodeDef().isChildOfChoice();
 	}
 	
 	public boolean isFirstChildOfChoice() {

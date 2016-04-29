@@ -67,6 +67,17 @@ public abstract class NonAttribNodeDef extends NodeDef implements NonAttrib, Can
 	void addChild(NonAttribNodeDef child) {
 		children.add(child);
 	}
+	
+	public boolean isChildOfChoice() {
+		boolean result = false;
+		NonAttribNodeDef parentNode = getParent();
+		if (parentNode != null && 
+				parentNode instanceof CompositorNodeDef &&
+				((CompositorNodeDef)parentNode).getType() == CompositorType.CHOICE) {
+			result = true;
+		}
+		return result;
+	}
 
 	@Override
 	public String toString() {
