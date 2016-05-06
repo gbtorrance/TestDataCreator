@@ -21,11 +21,11 @@ public class ModelDefImpl implements ModelDef {
 	private MPathIndex<NodeDef> mpathIndex;
 	
 	public ModelDefImpl(ModelConfig config, Schema schema, ElementNodeDef rootElement, MPathIndex<NodeDef> mpathIndex) {
+		log.info("Creating ModelDefImpl: {}", config.getAddr());
 		this.config = config;
 		this.schema = schema;
 		this.rootElement = rootElement;
 		this.mpathIndex = mpathIndex;
-		log.debug("Creating ModelDefImpl: {}", config.getAddr());
 	}
 	
 	@Override

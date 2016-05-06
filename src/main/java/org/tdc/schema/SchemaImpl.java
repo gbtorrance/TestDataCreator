@@ -14,8 +14,8 @@ public class SchemaImpl implements Schema {
 	private SchemaConfig config;
 	
 	public SchemaImpl(SchemaConfig config) {
+		log.info("Creating SchemaImpl: {}", config.getAddr());
 		this.config = config;
-		log.debug("Creating SchemaImpl: {}", config.getAddr());
 	}
 
 }

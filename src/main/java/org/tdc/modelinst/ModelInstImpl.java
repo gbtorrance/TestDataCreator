@@ -21,10 +21,10 @@ public class ModelInstImpl implements ModelInst {
 	private MPathIndex<NodeInst> mpathIndex;
 	
 	public ModelInstImpl(ModelDef modelDef, ElementNodeInst rootElement, MPathIndex<NodeInst> mpathIndex) {
+		log.info("Creating ModelInstImpl: {}", modelDef.getModelConfig().getAddr());
 		this.modelDef = modelDef;
 		this.rootElement = rootElement;
 		this.mpathIndex = mpathIndex;
-		log.debug("Creating ModelInstImpl: {}", getModelConfig().getAddr());
 	}
 	
 	@Override

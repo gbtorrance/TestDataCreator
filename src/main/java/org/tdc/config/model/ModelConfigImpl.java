@@ -9,6 +9,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.tdc.config.XMLConfigWrapper;
 import org.tdc.config.schema.SchemaConfig;
+import org.tdc.modelcustomizer.ModelCustomizerFormat;
+import org.tdc.modelcustomizer.ModelCustomizerFormatImpl;
+import org.tdc.spreadsheet.CellStyle;
 import org.tdc.util.Addr;
 
 /**
@@ -23,10 +26,10 @@ public class ModelConfigImpl implements ModelConfig {
 	private static final Logger log = LoggerFactory.getLogger(ModelConfigImpl.class);
 	private static final String CONFIG_FILE = "TDCModelConfig.xml";
 
-	private SchemaConfig schemaConfig;
-	private Addr addr;
-	private Path modelConfigRoot;
-	private Path modelConfigFile;
+	private final SchemaConfig schemaConfig;
+	private final Addr addr;
+	private final Path modelConfigRoot;
+	private final Path modelConfigFile;
 	
 	// config file items
 	private String schemaRootFile;
@@ -34,13 +37,14 @@ public class ModelConfigImpl implements ModelConfig {
 	private String schemaRootElementNamespace;
 	private boolean schemaFailOnParserWarning;
 	private boolean schemaFailOnParserNonFatalError;
+	private ModelCustomizerFormat modelCustomizerFormat;
 	private int defaultOccurrenceDepth;
 	private Map<String, Integer> occurrenceDepthMap = new HashMap<>();
 	
 	public ModelConfigImpl(SchemaConfig schemaConfig, String name) {
-		log.debug("Creating ModelConfigImpl: {}", addr);
 		this.schemaConfig = schemaConfig;
 		this.addr = schemaConfig.getAddr().resolve(name);
+		log.info("Creating ModelConfigImpl: {}", addr);
 		this.modelConfigRoot = schemaConfig.getSchemaConfigRoot().resolve(name);
 		if (!Files.isDirectory(modelConfigRoot)) {
 			throw new IllegalStateException("Model config root dir does not exist: " + modelConfigRoot.toString());
@@ -95,6 +99,11 @@ public class ModelConfigImpl implements ModelConfig {
 	}
 	
 	@Override
+	public ModelCustomizerFormat getModelCustomizerFormat() {
+		return modelCustomizerFormat;
+	}
+	
+	@Override
 	public int getDefaultOccurrenceDepth() {
 		return defaultOccurrenceDepth;
 	}
@@ -115,16 +124,29 @@ public class ModelConfigImpl implements ModelConfig {
 	}
 	
 	private void loadConfigItems(XMLConfigWrapper config) {
-		schemaRootFile = config.getString("SchemaRootFile", true);
-		schemaRootElementName = config.getString("SchemaRootElementName", true);
-		schemaRootElementNamespace = config.getString("SchemaRootElementNamespace", true);
-		schemaFailOnParserWarning = config.getBoolean("SchemaFailOnParserWarning", false , false); // default: false, required: false
-		schemaFailOnParserNonFatalError = config.getBoolean("SchemaFailOnParserNonFatalError", true, false); // default: true, required: false
+		schemaRootFile = config.getString("SchemaRootFile", null, true);
+		schemaRootElementName = config.getString("SchemaRootElementName", null, true);
+		schemaRootElementNamespace = config.getString("SchemaRootElementNamespace", null, true);
+		schemaFailOnParserWarning = config.getBoolean("SchemaFailOnParserWarning", false , false);
+		schemaFailOnParserNonFatalError = config.getBoolean("SchemaFailOnParserNonFatalError", true, false);
+
+		CellStyle defaultNodeStyle = config.getCellStyle("CustomizerFormat.DefaultNodeStyle", null, true);
+		CellStyle parentNodeStyle = config.getCellStyle("CustomizerFormat.ParentNodeStyle", defaultNodeStyle, false);
+		CellStyle attribNodeStyle = config.getCellStyle("CustomizerFormat.AttribNodeStyle", defaultNodeStyle, false);
+		CellStyle compositorNodeStyle = config.getCellStyle("CustomizerFormat.CompositorNodeStyle", defaultNodeStyle, false);
+		CellStyle choiceMarkerStyle = config.getCellStyle("CustomizerFormat.ChoiceMarkerStyle", defaultNodeStyle, false);
+		int treeStructureColumnCount = config.getInt("CustomizerFormat.TreeStructureColumnCount", 0, true);
+		int treeStructureColumnWidth = config.getInt("CustomizerFormat.TreeStructureColumnWidth", 0, true);
+		modelCustomizerFormat = new ModelCustomizerFormatImpl(
+				defaultNodeStyle, parentNodeStyle, attribNodeStyle,
+				compositorNodeStyle, choiceMarkerStyle, 
+				treeStructureColumnCount, treeStructureColumnWidth);
+		
 		defaultOccurrenceDepth = config.getInt("DefaultOccurrenceDepth", 5, false);
 		for (int i = 0; i < config.getMaxIndex("OccurrenceDepth"); i++) {
 			String baseKey = "OccurrenceDepth(" + i + ")";
-			String mpath = config.getString(baseKey, true);
-			int depth = config.getInt(baseKey + "[@Depth]", true);
+			String mpath = config.getString(baseKey, null, true);
+			int depth = config.getInt(baseKey + "[@Depth]", 0, true);
 			occurrenceDepthMap.put(mpath, depth);
 		}
 	}

@@ -25,7 +25,7 @@ public class SchemaConfigImpl implements SchemaConfig {
 	private Path schemaFilesRoot;
 	
 	public SchemaConfigImpl(Path schemasConfigRoot, Addr addr) {
-		log.debug("Creating SchemaConfigImpl: {}", addr);
+		log.info("Creating SchemaConfigImpl: {}", addr);
 		this.schemasConfigRoot = schemasConfigRoot;
 		this.addr = addr;
 		this.schemaConfigRoot = schemasConfigRoot.resolve(addr.getPath());
@@ -62,7 +62,7 @@ public class SchemaConfigImpl implements SchemaConfig {
 	}
 
 	private void loadConfigItems(XMLConfigWrapper config) {
-		schemaFilesRoot = this.schemaConfigRoot.resolve(config.getString("SchemaFilesRoot", true));
+		schemaFilesRoot = this.schemaConfigRoot.resolve(config.getString("SchemaFilesRoot", null, true));
 		if (!Files.isDirectory(schemaFilesRoot)) {
 			throw new IllegalStateException("Schema files root dir does not exist: " + schemaFilesRoot.toString());
 		}

@@ -1,11 +1,9 @@
 package org.tdc.model;
 
-import java.io.BufferedOutputStream;
-import java.io.OutputStream;
-import java.nio.file.Files;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
 
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -62,13 +60,12 @@ public class ModelCustomizerWriterTest {
 		ModelConfig config = modelConfigFactory.getModelConfig(modelAddr);
 		ModelDef modelDef = modelDefFactory.getModelDef(config);
 		
-		ModelCustomizerWriter customizer = new ModelCustomizerWriterImpl(modelDef.getRootElement(), sheet, 1, 1);
+		ModelCustomizerWriter customizer = new ModelCustomizerWriterImpl(
+				modelDef.getRootElement(), config.getModelCustomizerFormat(), sheet, 1, 1);
 		customizer.writeCustomizer();
 		
-		Path path = Paths.get("testfiles/Temp/TestModelCustomizer.xls");
-		try (OutputStream fileOut = new BufferedOutputStream(
-				Files.newOutputStream(path, StandardOpenOption.CREATE))) {
-			
+		File file = new File("testfiles/Temp/TestModelCustomizer.xlsx");
+		try (FileOutputStream fileOut = new FileOutputStream(file)) {
 			workbook.write(fileOut);
 			workbook.close();
 		}

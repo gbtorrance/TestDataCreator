@@ -3,6 +3,7 @@ package org.tdc.config.model;
 import java.nio.file.Path;
 
 import org.tdc.config.schema.SchemaConfig;
+import org.tdc.modelcustomizer.ModelCustomizerFormat;
 import org.tdc.util.Addr;
 
 /**
@@ -21,7 +22,8 @@ public interface ModelConfig {
 	String getSchemaRootElementNamespace();
 	boolean isFailOnParserWarning();
 	boolean isFailOnParserNonFatalError();
-
+	ModelCustomizerFormat getModelCustomizerFormat();
+	
 	int getDefaultOccurrenceDepth();
 	int getMPathOccurrenceDepth(String mpath);
 }

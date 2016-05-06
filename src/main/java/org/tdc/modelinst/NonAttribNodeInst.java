@@ -7,8 +7,6 @@ import java.util.List;
 import org.tdc.model.CanHaveChildren;
 import org.tdc.model.NonAttrib;
 import org.tdc.model.Repeatable;
-import org.tdc.modeldef.CompositorNodeDef;
-import org.tdc.modeldef.CompositorType;
 import org.tdc.modeldef.NonAttribNodeDef;
 
 /**

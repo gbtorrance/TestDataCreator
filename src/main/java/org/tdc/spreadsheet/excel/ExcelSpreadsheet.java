@@ -1,10 +1,17 @@
 package org.tdc.spreadsheet.excel;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.apache.poi.xssf.usermodel.XSSFCell;
+import org.apache.poi.xssf.usermodel.XSSFColor;
+import org.apache.poi.xssf.usermodel.XSSFFont;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.tdc.spreadsheet.CellStyle;
 import org.tdc.spreadsheet.Spreadsheet;
 
 /**
@@ -17,7 +24,9 @@ public class ExcelSpreadsheet implements Spreadsheet {
 	
 	private static final Logger log = LoggerFactory.getLogger(ExcelSpreadsheet.class);
 
-	private XSSFSheet xssfSheet;
+	private final XSSFSheet xssfSheet;
+	
+	private POICellStyleLookup poiCellStyleLookup = new POICellStyleLookup();
 	
 	public ExcelSpreadsheet(XSSFSheet xssfSheet) {
 		this.xssfSheet = xssfSheet;
@@ -31,10 +40,35 @@ public class ExcelSpreadsheet implements Spreadsheet {
 
 	@Override
 	public void setCellValue(String value, int rowNum, int colNum) {
-		XSSFCell cell = getCell(rowNum, colNum);
-		cell.setCellValue(value);
+		setCellValue(value, rowNum, colNum, null);
 	}
 	
+	@Override
+	public void setCellValue(String value, int rowNum, int colNum, CellStyle cellStyle) {
+		XSSFCell cell = getCell(rowNum, colNum);
+		cell.setCellValue(value);
+		if (cellStyle != null) {
+			cell.setCellStyle(poiCellStyleLookup.getPOICellStyle(cellStyle));
+		}
+		else if (poiCellStyleLookup.hasDefaultPOICellStyle()) {
+			cell.setCellStyle(poiCellStyleLookup.getDefaultPOICellStyle());
+		}
+	}
+	
+	@Override
+	public void setDefaultCellStyle(CellStyle cellStyle) {
+		this.poiCellStyleLookup.setDefaultCellStyle(cellStyle);
+	}
+
+	@Override
+	public void setColumnWidth(int colNum, int colWidth) {
+		// Whereas the public methods in this class use 1-based index values, 
+		// Apache POI libraries use 0-based indexes;
+		// this method accepts 1-based indexes and converts to 0-based indexes for POI (as necessary)
+		
+		xssfSheet.setColumnWidth(colNum-1, colWidth);
+	}
+
 	private String getCellValue(XSSFCell cell) {
 		return getCellValueByType(cell, cell.getCellType());
 	}
@@ -94,5 +128,50 @@ public class ExcelSpreadsheet implements Spreadsheet {
 				throw new IllegalStateException("Cell type " + cell.getCellType() + " is unknown");
 		}
 		return value;
+	}
+	
+	/**
+	 * A cache/factory for creating and looking up POI-based CellStyle objects (i.e. specific to Excel files) using
+	 * TDC-based CellStyle objects (i.e. generic).  
+	 */
+	private class POICellStyleLookup {
+		private Map<CellStyle, org.apache.poi.ss.usermodel.CellStyle> map = new HashMap<>();
+		private CellStyle defaultCellStyle;
+		private org.apache.poi.ss.usermodel.CellStyle defaultPOICellStyle;
+		
+		public org.apache.poi.ss.usermodel.CellStyle getPOICellStyle(CellStyle cellStyle) {
+			org.apache.poi.ss.usermodel.CellStyle poiStyle;
+			poiStyle = map.get(cellStyle);
+			if (poiStyle == null) {
+				poiStyle = createPOICellStyleFromCellStyle(cellStyle);
+				map.put(cellStyle, poiStyle);
+			}
+			return poiStyle;
+		}
+		
+		public org.apache.poi.ss.usermodel.CellStyle getDefaultPOICellStyle() {
+			return defaultPOICellStyle;
+		}
+		
+		public boolean hasDefaultPOICellStyle() {
+			return defaultPOICellStyle != null;
+		}
+		
+		public void setDefaultCellStyle(CellStyle cellStyle) {
+			this.defaultCellStyle = cellStyle;
+			this.defaultPOICellStyle = (cellStyle == null ? null : getPOICellStyle(defaultCellStyle));
+		}
+
+		private org.apache.poi.ss.usermodel.CellStyle createPOICellStyleFromCellStyle(CellStyle cellStyle) {
+			XSSFWorkbook workbook = ExcelSpreadsheet.this.xssfSheet.getWorkbook();
+			XSSFFont font = workbook.createFont();
+			font.setFontName(cellStyle.getFontName());
+			font.setFontHeight(cellStyle.getFontHeight());
+			font.setColor(new XSSFColor(cellStyle.getColor()));
+			font.setItalic(cellStyle.getItalic());
+			org.apache.poi.ss.usermodel.CellStyle poiCellStyle = workbook.createCellStyle();
+			poiCellStyle.setFont(font);
+			return poiCellStyle;
+		}
 	}
 }
