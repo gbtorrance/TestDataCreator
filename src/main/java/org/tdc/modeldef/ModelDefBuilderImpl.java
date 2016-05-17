@@ -16,7 +16,7 @@ import org.w3c.dom.bootstrap.DOMImplementationRegistry;
 
 /**
  * A {@link ModelDefBuilder} implementation.
- * 
+ *
  * <p>Builds an Apache Xerces {@link XSModel} from the Schema on the file system, 
  * starting with the root element and root element namespace defined in the configuration.
  * It then uses {@link ModelDefSchemaParser} to build an in-memory ModelDef object tree
@@ -50,7 +50,7 @@ public class ModelDefBuilderImpl implements ModelDefBuilder {
 	}
 	
 	private XSModel buildXSModelFromSchemas(Path rootSchemaFile) {
-        XSImplementation xsImpl = (XSImplementation)domRegistry.getDOMImplementation("XS-Loader");
+		XSImplementation xsImpl = (XSImplementation)domRegistry.getDOMImplementation("XS-Loader");
 		XSLoader schemaLoader = xsImpl.createXSLoader(null);
 		DOMErrorHandler errorHandler = new ModelDefDOMErrorHandler(
 				config.isFailOnParserWarning(), config.isFailOnParserNonFatalError());
@@ -71,7 +71,7 @@ public class ModelDefBuilderImpl implements ModelDefBuilder {
 	}
 
 	private void initDOMRegistry() {
-        System.setProperty(DOMImplementationRegistry.PROPERTY, "org.apache.xerces.dom.DOMXSImplementationSourceImpl");
+		System.setProperty(DOMImplementationRegistry.PROPERTY, "org.apache.xerces.dom.DOMXSImplementationSourceImpl");
 		try {
 			domRegistry = DOMImplementationRegistry.newInstance();
 		} 
