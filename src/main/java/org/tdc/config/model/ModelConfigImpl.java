@@ -143,7 +143,7 @@ public class ModelConfigImpl implements ModelConfig {
 				treeStructureColumnCount, treeStructureColumnWidth);
 		
 		defaultOccurrenceDepth = config.getInt("DefaultOccurrenceDepth", 5, false);
-		for (int i = 0; i < config.getMaxIndex("OccurrenceDepth"); i++) {
+		for (int i = 0; i < config.getCount("OccurrenceDepth"); i++) {
 			String baseKey = "OccurrenceDepth(" + i + ")";
 			String mpath = config.getString(baseKey, null, true);
 			int depth = config.getInt(baseKey + "[@Depth]", 0, true);

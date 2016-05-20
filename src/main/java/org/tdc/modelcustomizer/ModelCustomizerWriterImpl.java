@@ -36,6 +36,7 @@ public class ModelCustomizerWriterImpl implements ModelCustomizerWriter {
 	 * Constructor. 
 	 * 
 	 * @param rootElement Root {@link ElementNodeDef} of the {@link ModelDef} to customize. 
+	 * @param format{@link ModelCustomizerFormat} containing format and style information to use for writing.
 	 * @param sheet {@link Spreadsheet} to write to.
 	 * @param rowStart Row start position
 	 * @param colStart Column start position

@@ -70,6 +70,10 @@ public class XMLConfigWrapper {
 		return config.getMaxIndex(key);
 	}
 	
+	public int getCount(String key) {
+		return config.getMaxIndex(key) + 1;
+	}
+	
 	public boolean getBoolean(String key, boolean defaultValue, boolean required) {
 		boolean found = validateRequired(key, required);
 		boolean result = config.getBoolean(key, defaultValue);
