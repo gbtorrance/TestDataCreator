@@ -1,7 +1,7 @@
 package org.tdc.evaluator.operator;
 
 /**
- * An {@link Operator} implementation for 'equals'.
+ * An {@link Operator} implementation for 'not-equals'.
  */
 public class NotEqualsOperator extends EqualsOperator {
 	@Override

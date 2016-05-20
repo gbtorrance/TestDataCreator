@@ -1,5 +1,8 @@
 package org.tdc.evaluator.operator;
 
+/**
+ * An {@link Operator} implementation for 'equals'.
+ */
 public class EqualsOperator implements Operator {
 	@Override
 	public boolean testTrue(String operand1, String operand2) {
