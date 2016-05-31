@@ -1,14 +1,17 @@
 package org.tdc.modelinst;
 
+import org.tdc.model.CompositorNode;
+import org.tdc.model.CompositorType;
+import org.tdc.model.ModelVisitor;
+import org.tdc.model.NonAttribNode;
 import org.tdc.modeldef.CompositorNodeDef;
-import org.tdc.modeldef.CompositorType;
 
 /**
- * A {@link NonAttribNodeInst} implementation specific to "compositors".
+ * A {@link NonAttribNodeInst} implementation specific to compositors.
  * 
  * <p>Compositors (such as "sequence" and "choice") are nodes that can contain other nodes.
  */
-public class CompositorNodeInst extends NonAttribNodeInst {
+public class CompositorNodeInst extends NonAttribNodeInst implements CompositorNode {
 	
 	public CompositorNodeInst(NonAttribNodeInst parent, CompositorNodeDef compositorNodeDef) {
 		super(parent, compositorNodeDef);
@@ -19,22 +22,21 @@ public class CompositorNodeInst extends NonAttribNodeInst {
 		return (CompositorNodeDef)super.getNodeDef();
 	}
 
-	public CompositorType getType() {
-		return getNodeDef().getType();
+	@Override
+	public CompositorType getCompositorType() {
+		return getNodeDef().getCompositorType();
 	}
 
 	@Override
-	public String toShortString() {
-		return getNodeDef().toShortString();
+	public String getDispName() {
+		return getNodeDef().getDispName();
 	}
 
 	@Override
-	public String toTestSummaryString() {
-		return "[" + getType() + "], minOccurs:" + getMinOccurs() + ", maxOccurs:" + getMaxOccurs();
-	}
-
-	@Override
-	public String toString() {
-		return super.toString() + ", type (compositor def node): " + getNodeDef().getType();
+	public void accept(ModelVisitor visitor) {
+		visitor.visit(this);
+		for (NonAttribNode nonAttrib : getChildren()) {
+			nonAttrib.accept(visitor);
+		}
 	}
 }

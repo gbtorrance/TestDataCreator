@@ -4,9 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.tdc.model.CanHaveChildren;
-import org.tdc.model.NonAttrib;
-import org.tdc.model.Repeatable;
+import org.tdc.model.NonAttribNode;
 import org.tdc.modeldef.NonAttribNodeDef;
 
 /**
@@ -15,12 +13,11 @@ import org.tdc.modeldef.NonAttribNodeDef;
  * @see CompositorNodeInst
  * @see ElementNodeInst
  */
-public abstract class NonAttribNodeInst extends NodeInst implements NonAttrib, CanHaveChildren, Repeatable {
+public abstract class NonAttribNodeInst extends NodeInst implements NonAttribNode {
 	
 	private List<NonAttribNodeInst> children = new ArrayList<>();
 	private int occurNum;
 	private int occurCount;
-//	private boolean isChoiceNode; // in other words, an immediate child of a choice compositor
 	
 	protected NonAttribNodeInst(NonAttribNodeInst parent, NonAttribNodeDef nonAttribNodeDef) {
 		super(parent, nonAttribNodeDef);
@@ -79,6 +76,7 @@ public abstract class NonAttribNodeInst extends NodeInst implements NonAttrib, C
 		this.occurCount = occurCount;
 	}
 	
+	@Override
 	public boolean isChildOfChoice() {
 		// since compositor 'inst' nodes are sometimes removed in the 'inst' model for visual clarity,
 		// we need to check if the 'def' node is the child of a choice
@@ -89,15 +87,6 @@ public abstract class NonAttribNodeInst extends NodeInst implements NonAttrib, C
 		return occurNum == 1 && isChildOfChoice();
 	}
 
-//	public boolean isChoiceNode() {
-//		return isChoiceNode;
-//	}
-//	
-//	// intentionally package level
-//	void setIsChoiceNode(boolean isChoiceNode) {
-//		this.isChoiceNode = isChoiceNode;
-//	}
-	
 	@Override
 	public NonAttribNodeDef getNodeDef() {
 		return (NonAttribNodeDef)super.getNodeDef();
@@ -105,7 +94,6 @@ public abstract class NonAttribNodeInst extends NodeInst implements NonAttrib, C
 
 	@Override
 	public String toString() {
-//		return super.toString() + ", occurNum: " + occurNum + ", isChoiceNode: " + isChoiceNode;
 		return super.toString() + ", occurNum: " + occurNum + ", occurCount: " + occurCount;		
 	}
 }

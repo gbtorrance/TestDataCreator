@@ -1,15 +1,13 @@
 package org.tdc.modelinst;
 
-import org.tdc.model.Attrib;
-import org.tdc.model.Nameable;
-import org.tdc.model.Requireable;
-import org.tdc.model.Typeable;
+import org.tdc.model.AttribNode;
+import org.tdc.model.ModelVisitor;
 import org.tdc.modeldef.AttribNodeDef;
 
 /**
  * A {@link NodeInst} implementation specific to attribute nodes.
  */
-public class AttribNodeInst extends NodeInst implements Attrib, Nameable, Typeable, Requireable {
+public class AttribNodeInst extends NodeInst implements AttribNode {
 	
 	public AttribNodeInst(ElementNodeInst parent, AttribNodeDef attribNodeDef) {
 		super(parent, attribNodeDef);
@@ -36,17 +34,13 @@ public class AttribNodeInst extends NodeInst implements Attrib, Nameable, Typeab
 	}
 
 	@Override
-	public String toShortString() {
-		return getNodeDef().toShortString();
+	public void accept(ModelVisitor visitor) {
+		visitor.visit(this);
 	}
 
 	@Override
-	public String toTestSummaryString() {
-		return "@" + getName() + ", type:" + getDataType() + ", req:" + isRequired();
-	}
-
-	@Override
-	public String toString() {
-		return super.toString();
+	public boolean isChildOfChoice() {
+		// attributes will always be children of elements, nothing else
+		return false;
 	}
 }

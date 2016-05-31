@@ -3,10 +3,10 @@ package org.tdc.util;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.tdc.model.Attrib;
+import org.tdc.model.AttribNode;
 import org.tdc.model.CanHaveAttributes;
 import org.tdc.model.CanHaveChildren;
-import org.tdc.model.NonAttrib;
+import org.tdc.model.NonAttribNode;
 import org.tdc.model.TDCNode;
 
 /**
@@ -52,15 +52,15 @@ public abstract class AbstractModelWriterForTesting {
 		lines.add(line);
 		if (node instanceof CanHaveAttributes) {
 			CanHaveAttributes canHaveAttributes = (CanHaveAttributes)node;
-			List<? extends Attrib> attribs = canHaveAttributes.getAttributes();
-			for (Attrib attrib : attribs) {
+			List<? extends AttribNode> attribs = canHaveAttributes.getAttributes();
+			for (AttribNode attrib : attribs) {
 				processNode(lines, attrib, level+1);
 			}
 		}
 		if (node instanceof CanHaveChildren) {
 			CanHaveChildren canHaveChildren = (CanHaveChildren)node;
-			List<? extends NonAttrib> nonAttribs = canHaveChildren.getChildren();
-			for (NonAttrib nonAttrib : nonAttribs) {
+			List<? extends NonAttribNode> nonAttribs = canHaveChildren.getChildren();
+			for (NonAttribNode nonAttrib : nonAttribs) {
 				processNode(lines, nonAttrib, level+1);
 			}
 		}

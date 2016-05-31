@@ -23,6 +23,7 @@ import org.apache.xerces.xs.XSTypeDefinition;
 import org.apache.xerces.xs.XSWildcard;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.tdc.model.CompositorType;
 import org.tdc.model.MPathBuilder;
 import org.tdc.model.MPathIndex;
 import org.w3c.dom.Node;
@@ -235,7 +236,7 @@ public class ModelDefSchemaParser {
 				attribNodeDef.setColOffset(colOffset);
 				attribNodeDef.setRowOffset(rowOffset++);
 				attribNodeDef.setDataType(getDataType(attribType));
-				attribNodeDef.setIsRequired(attribUse.getRequired());
+				attribNodeDef.setRequired(attribUse.getRequired());
 				elementNodeDef.addAttribute(attribNodeDef);
 			}
 		}

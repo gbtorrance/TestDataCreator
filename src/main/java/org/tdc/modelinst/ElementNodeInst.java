@@ -4,15 +4,16 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.tdc.model.CanHaveAttributes;
-import org.tdc.model.Nameable;
-import org.tdc.model.Typeable;
+import org.tdc.model.AttribNode;
+import org.tdc.model.ElementNode;
+import org.tdc.model.ModelVisitor;
+import org.tdc.model.NonAttribNode;
 import org.tdc.modeldef.ElementNodeDef;
 
 /**
  * A {@link NonAttribNodeInst} implementation specific to XML elements.
  */
-public class ElementNodeInst extends NonAttribNodeInst implements CanHaveAttributes, Nameable, Typeable {
+public class ElementNodeInst extends NonAttribNodeInst implements ElementNode {
 	
 	private List<AttribNodeInst> attributes = new ArrayList<>();
 	
@@ -44,25 +45,20 @@ public class ElementNodeInst extends NonAttribNodeInst implements CanHaveAttribu
 	public String getName() {
 		return getNodeDef().getName();
 	}
-
+	
 	@Override
 	public String getDataType() {
 		return getNodeDef().getDataType();
 	}
 
 	@Override
-	public String toShortString() {
-		return getNodeDef().toShortString();
+	public void accept(ModelVisitor visitor) {
+		visitor.visit(this);
+		for (AttribNode attrib : getAttributes()) {
+			attrib.accept(visitor);
+		}
+		for (NonAttribNode nonAttrib : getChildren()) {
+			nonAttrib.accept(visitor);
+		}
 	}
-
-	@Override
-	public String toTestSummaryString() {
-		return getName() + ", type:" + getDataType() + ", minOccurs:" + getMinOccurs() + ", maxOccurs:" + getMaxOccurs();
-	}
-
-	@Override
-	public String toString() {
-		return super.toString() +  ", name (element def node): " + getNodeDef().getName();
-	}
-
 }

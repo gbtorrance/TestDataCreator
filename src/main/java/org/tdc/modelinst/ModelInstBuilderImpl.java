@@ -5,11 +5,11 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.tdc.model.CompositorType;
 import org.tdc.model.MPathBuilder;
 import org.tdc.model.MPathIndex;
 import org.tdc.modeldef.AttribNodeDef;
 import org.tdc.modeldef.CompositorNodeDef;
-import org.tdc.modeldef.CompositorType;
 import org.tdc.modeldef.ElementNodeDef;
 import org.tdc.modeldef.ModelDef;
 import org.tdc.modeldef.NodeDef;
@@ -199,12 +199,12 @@ public class ModelInstBuilderImpl implements ModelInstBuilder {
 		//   - its parent is a compositor which is NOT a choice
 		//     (because if it's a choice, it needs to be clearly marked as such in the output, so it can't be flattened)
 		boolean canFlatten = false;
-		if ((compositorNodeDef.getType() == CompositorType.SEQUENCE) && //|| compositorNodeDef.getType() == CompositorType.CHOICE) &&
+		if ((compositorNodeDef.getCompositorType() == CompositorType.SEQUENCE) && //|| compositorNodeDef.getType() == CompositorType.CHOICE) &&
 				compositorNodeDef.getMinOccurs() == 1 &&
 				compositorNodeDef.getMaxOccurs() == 1 &&
 				(compositorNodeDef.getParent() instanceof ElementNodeDef ||
 						(compositorNodeDef.getParent() instanceof CompositorNodeDef &&
-								((CompositorNodeDef)compositorNodeDef.getParent()).getType() != CompositorType.CHOICE
+								((CompositorNodeDef)compositorNodeDef.getParent()).getCompositorType() != CompositorType.CHOICE
 						)
 				)
 			) {

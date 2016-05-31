@@ -6,10 +6,10 @@ import java.util.Map;
 /**
  * Index for associating Model nodes with their MPath addresses.
  * 
- * <p>MPath is an method designed for addressing nodes for both types of Models 
+ * <p>MPath is a method designed for addressing nodes for both types of Models 
  * ({@link org.tdc.modeldef.ModelDef ModelDef} and {@link org.tdc.modelinst.ModelInst ModelInst}). 
  * 
- * <p>Thought it has similarities to XPath, it is not the same. 
+ * <p>Though it has similarities to XPath, it is not the same. 
  * 
  * <p>XPath addresses nodes at the XML level. For XPath, the only thing that really matters is the structure of the XML itself,
  * regardless of what it took to get to that point.
@@ -21,7 +21,7 @@ import java.util.Map;
  * (with "}2" representing the second occurrence, "}3" representing the third, and so on).
  *   
  * <p>With this approach, nodes in the Models can be addressed, whether or not they contain any data values.
- * Another huge benefit is that, when Models changes (possibly due to Schema changes), nodes will generally
+ * Another huge benefit is that, when Models change (possibly due to Schema changes), nodes will generally
  * retain their same MPath, allowing for efficient and accurate upgrading of Models.
  * 
  * <p>Sample MPath:
@@ -47,7 +47,7 @@ import java.util.Map;
  * <br><tt>/TestRoot/!S/!S}4/T/!S/!C/TBD</tt> ..... and element node "TDB"
  * <br><tt>/TestRoot/!S/!S}4/U</tt>
  */
-public class MPathIndex<T extends AbstractNode> {
+public class MPathIndex<T extends AbstractTDCNode> {
 	
 	private Map<String, T> map = new HashMap<>();
 	

@@ -1,37 +1,44 @@
 package org.tdc.modeldef;
 
-import org.tdc.modeldef.CompositorType;
+import org.tdc.model.CompositorNode;
+import org.tdc.model.CompositorType;
+import org.tdc.model.ModelVisitor;
+import org.tdc.model.NonAttribNode;
 
 /**
  * A {@link NonAttribNodeDef} implementation specific to "compositors".
  * 
  * <p>Compositors (such as "sequence" and "choice") are nodes that can contain other nodes.
  */
-public class CompositorNodeDef extends NonAttribNodeDef {
+public class CompositorNodeDef extends NonAttribNodeDef implements CompositorNode {
 	
-	private CompositorType type;
+	private CompositorType compositorType;
 
-	public CompositorNodeDef(NonAttribNodeDef parent, CompositorType type) {
+	public CompositorNodeDef(NonAttribNodeDef parent, CompositorType compositorType) {
 		super(parent);
-		this.type = type;
-	}
-	
-	public CompositorType getType() {
-		return type;
+		this.compositorType = compositorType;
 	}
 	
 	@Override
-	public String toShortString() {
-		return "[" + type + "]";
+	public CompositorType getCompositorType() {
+		return compositorType;
+	}
+	
+	@Override
+	public String getDispName() {
+		return "[" + compositorType + "]";
 	}
 
 	@Override
-	public String toTestSummaryString() {
-		return "[" + type + "], minOccurs:" + getMinOccurs() + ", maxOccurs:" + getMaxOccurs();
+	public String getDispType() {
+		return "";
 	}
-
+	
 	@Override
-	public String toString() {
-		return super.toString() + ", type: " + type;
+	public void accept(ModelVisitor visitor) {
+		visitor.visit(this);
+		for (NonAttribNode nonAttrib : getChildren()) {
+			nonAttrib.accept(visitor);
+		}
 	}
 }

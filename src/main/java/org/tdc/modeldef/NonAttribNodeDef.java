@@ -4,9 +4,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.tdc.model.CanHaveChildren;
-import org.tdc.model.NonAttrib;
-import org.tdc.model.Repeatable;
+import org.tdc.model.CompositorType;
+import org.tdc.model.NonAttribNode;
 
 /**
  * A {@link NodeDef} implementation specific to nodes that are NOT attributes (such as compositors and elements).
@@ -14,7 +13,7 @@ import org.tdc.model.Repeatable;
  * @see CompositorNodeDef
  * @see ElementNodeDef
  */
-public abstract class NonAttribNodeDef extends NodeDef implements NonAttrib, CanHaveChildren, Repeatable {
+public abstract class NonAttribNodeDef extends NodeDef implements NonAttribNode {
 	
 	public static final int MIN_MAX_UNDEFINED = -2;
 	public static final int MAX_UNBOUNDED = -1;
@@ -68,19 +67,20 @@ public abstract class NonAttribNodeDef extends NodeDef implements NonAttrib, Can
 		children.add(child);
 	}
 	
+	@Override
 	public boolean isChildOfChoice() {
 		boolean result = false;
 		NonAttribNodeDef parentNode = getParent();
 		if (parentNode != null && 
 				parentNode instanceof CompositorNodeDef &&
-				((CompositorNodeDef)parentNode).getType() == CompositorType.CHOICE) {
+				((CompositorNodeDef)parentNode).getCompositorType() == CompositorType.CHOICE) {
 			result = true;
 		}
 		return result;
 	}
 
-	@Override
-	public String toString() {
-		return super.toString() + ", minOccurs: " + minOccurs + ", maxOccurs:" + maxOccurs;
+	@Override 
+	public String getDispOccurs() {
+		return minOccurs + ".." + (maxOccurs == -1 ? "n" : maxOccurs);
 	}
 }

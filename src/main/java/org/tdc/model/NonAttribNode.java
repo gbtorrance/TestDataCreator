@@ -1,10 +1,10 @@
 package org.tdc.model;
 
 /**
- * Marker interface to indicate that a particular node represents something that is NOT an attribute.
+ * Interface for non-attribute nodes (i.e. nodes other than attribute nodes). 
  * 
  * <p>Non-attribute nodes include elements and compositors (which are used for "composing" other elements and compositors).
  */
-public interface NonAttrib extends TDCNode {
+public interface NonAttribNode extends TDCNode, CanHaveChildren, Repeatable {
 
 }

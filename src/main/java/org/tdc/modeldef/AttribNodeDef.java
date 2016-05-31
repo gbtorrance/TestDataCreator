@@ -1,14 +1,12 @@
 package org.tdc.modeldef;
 
-import org.tdc.model.Attrib;
-import org.tdc.model.Nameable;
-import org.tdc.model.Requireable;
-import org.tdc.model.Typeable;
+import org.tdc.model.AttribNode;
+import org.tdc.model.ModelVisitor;
 
 /**
  * A {@link NodeDef} implementation specific to attributes.
  */
-public class AttribNodeDef extends NodeDef implements Attrib, Nameable, Typeable, Requireable {
+public class AttribNodeDef extends NodeDef implements AttribNode {
 	
 	private String name;
 	private String dataType;
@@ -44,7 +42,7 @@ public class AttribNodeDef extends NodeDef implements Attrib, Nameable, Typeable
 	}
 	
 	// intentionally package level
-	void setIsRequired(boolean isRequired) {
+	void setRequired(boolean isRequired) {
 		this.isRequired = isRequired;
 	}
 
@@ -54,17 +52,28 @@ public class AttribNodeDef extends NodeDef implements Attrib, Nameable, Typeable
 	}
 
 	@Override
-	public String toShortString() {
+	public String getDispName() {
 		return "@" + getName();
 	}
-
+	
 	@Override
-	public String toTestSummaryString() {
-		return "@" + name + ", type:" + dataType + ", req:" + isRequired + "";
+	public String getDispType() {
+		return dataType;
+	}
+	
+	@Override 
+	public String getDispOccurs() {
+		return isRequired ? "1..1" : "0..1";
+	}
+	
+	@Override
+	public void accept(ModelVisitor visitor) {
+		visitor.visit(this);
 	}
 
 	@Override
-	public String toString() {
-		return super.toString() + ", name: " + "@" + name + ", dataType: " + dataType;
+	public boolean isChildOfChoice() {
+		// attributes will always be children of elements, nothing else
+		return false;
 	}
 }

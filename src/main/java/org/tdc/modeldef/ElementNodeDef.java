@@ -4,14 +4,15 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.tdc.model.CanHaveAttributes;
-import org.tdc.model.Nameable;
-import org.tdc.model.Typeable;
+import org.tdc.model.AttribNode;
+import org.tdc.model.ElementNode;
+import org.tdc.model.ModelVisitor;
+import org.tdc.model.NonAttribNode;
 
 /**
  * A {@link NonAttribNodeDef} implementation specific to XML elements.
  */
-public class ElementNodeDef extends NonAttribNodeDef implements CanHaveAttributes, Nameable, Typeable {
+public class ElementNodeDef extends NonAttribNodeDef implements ElementNode {
 	
 	private String name;
 	private String dataType;
@@ -61,18 +62,24 @@ public class ElementNodeDef extends NonAttribNodeDef implements CanHaveAttribute
 	}
 	
 	@Override
-	public String toShortString() {
+	public String getDispName() {
 		return name;
 	}
 
 	@Override
-	public String toTestSummaryString() {
-		return name + ", type:" + dataType + ", minOccurs:" + getMinOccurs() + ", maxOccurs:" + getMaxOccurs();
+	public String getDispType() {
+		return dataType;
 	}
 
 	@Override
-	public String toString() {
-		return super.toString() + ", name: " + name + ", dataType: " + dataType;
+	public void accept(ModelVisitor visitor) {
+		visitor.visit(this);
+		for (AttribNode attrib : getAttributes()) {
+			attrib.accept(visitor);
+		}
+		for (NonAttribNode nonAttrib : getChildren()) {
+			nonAttrib.accept(visitor);
+		}
 	}
 	
 	// TODO make generic; MeF specific

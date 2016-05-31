@@ -7,7 +7,6 @@ import java.util.Map;
 
 import org.tdc.modeldef.AttribNodeDef;
 import org.tdc.modeldef.CompositorNodeDef;
-import org.tdc.modeldef.CompositorType;
 import org.tdc.modeldef.ElementNodeDef;
 import org.tdc.modeldef.NodeDef;
 
@@ -66,7 +65,7 @@ public class MPathBuilder {
 			name = "@" + ((AttribNodeDef)nodeDef).getName();
 		}
 		else if (nodeDef instanceof CompositorNodeDef) {
-			CompositorType compositorType = ((CompositorNodeDef)nodeDef).getType();
+			CompositorType compositorType = ((CompositorNodeDef)nodeDef).getCompositorType();
 			switch (compositorType) {
 			case SEQUENCE:
 				name = "!S";

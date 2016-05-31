@@ -5,9 +5,6 @@ package org.tdc.model;
  * 
  * <p>Named with "TDC" prefix to avoid confusion with w3c {@link org.w3c.dom.Node Node} object.
  */
-public interface TDCNode {
-	AbstractNode getParent();
-	String getMPath();
-	String toShortString();
-	String toTestSummaryString();
+public interface TDCNode extends CanHaveParent, Addressable, Displayable, Visitable {
+
 }

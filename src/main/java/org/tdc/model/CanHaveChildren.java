@@ -6,6 +6,6 @@ import java.util.List;
  * Defines functionality of nodes that can have children.
  */
 public interface CanHaveChildren {
-	List<? extends NonAttrib> getChildren();
+	List<? extends NonAttribNode> getChildren();
 	boolean hasChild();
 }

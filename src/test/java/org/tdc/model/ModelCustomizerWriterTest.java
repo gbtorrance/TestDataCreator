@@ -14,8 +14,8 @@ import org.tdc.config.model.ModelConfigFactory;
 import org.tdc.config.model.ModelConfigFactoryImpl;
 import org.tdc.config.schema.SchemaConfigFactory;
 import org.tdc.config.schema.SchemaConfigFactoryImpl;
+import org.tdc.modelcustomizer.AbstractModelCustomizer;
 import org.tdc.modelcustomizer.ModelCustomizerWriter;
-import org.tdc.modelcustomizer.ModelCustomizerWriterImpl;
 import org.tdc.modeldef.ModelDef;
 import org.tdc.modeldef.ModelDefFactory;
 import org.tdc.modeldef.ModelDefFactoryImpl;
@@ -60,9 +60,9 @@ public class ModelCustomizerWriterTest {
 		ModelConfig config = modelConfigFactory.getModelConfig(modelAddr);
 		ModelDef modelDef = modelDefFactory.getModelDef(config);
 		
-		ModelCustomizerWriter customizer = new ModelCustomizerWriterImpl(
-				modelDef.getRootElement(), config.getModelCustomizerFormat(), sheet, 1, 1);
-		customizer.writeCustomizer();
+		ModelCustomizerWriter writer = new ModelCustomizerWriter(
+				modelDef.getRootElement(), config.getModelCustomizerFormat(), sheet);
+		writer.writeCustomizer();
 		
 		File file = new File("testfiles/Temp/TestModelCustomizer.xlsx");
 		try (FileOutputStream fileOut = new FileOutputStream(file)) {

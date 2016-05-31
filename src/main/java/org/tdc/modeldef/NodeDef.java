@@ -1,17 +1,16 @@
 package org.tdc.modeldef;
 
+import org.tdc.model.AbstractTDCNode;
+
 /**
- * Abstract {@link AbstractNodeDef} implementation.
+ * {@link AbstractTDCNode} implementation specific to 'definition' nodes. 
  * 
  * @see AttribNodeDef
  * @see NonAttribNodeDef
  */
-public abstract class NodeDef extends AbstractNodeDef {
+public abstract class NodeDef extends AbstractTDCNode {
 	
-	private int colOffset = -1;
-	private int rowOffset = -1;
-
-	protected NodeDef(NonAttribNodeDef parent) {
+	public NodeDef(NonAttribNodeDef parent) {
 		super(parent);
 	}
 	
@@ -19,31 +18,22 @@ public abstract class NodeDef extends AbstractNodeDef {
 	public NonAttribNodeDef getParent() {
 		return (NonAttribNodeDef)super.getParent();
 	}
-	
-	public int getColOffset() {
-		return colOffset;
+
+	@Override
+	protected void setMPath(String mpath) {
+		// overriding to allow accessibility to other classes in this package
+		super.setMPath(mpath);
+	}
+
+	@Override
+	protected void setColOffset(int colOffset) {
+		// overriding to allow accessibility to other classes in this package
+		super.setColOffset(colOffset);
 	}
 	
-	// intentionally package level
-	void setColOffset(int colOffset) {
-		this.colOffset = colOffset;
-	}
-	
-	public int getRowOffset() {
-		return rowOffset;
-	}
-	
-	// intentionally package level
-	void setRowOffset(int rowOffset) {
-		this.rowOffset = rowOffset;
+	@Override
+	protected void setRowOffset(int rowOffset) {
+		// overriding to allow accessibility to other classes in this package
+		super.setRowOffset(rowOffset);
 	}
 }
-
-// TODO Add an AnyElementNode child of ElementNode?
-// TODO Consider 'groups'; probably a non-issue, though; just syntactical sugar for schemas
-// TODO Add annotations (probably at NonAttributeNode level)
-// TODO Add augmenting info
-// TODO Consider list, union, restriction on simple types
-// TODO Consider restriction and extension on simple and complex content
-// TODO Test empty element content type
-
