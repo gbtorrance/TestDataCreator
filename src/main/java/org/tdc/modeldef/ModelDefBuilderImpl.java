@@ -53,7 +53,7 @@ public class ModelDefBuilderImpl implements ModelDefBuilder {
 		XSImplementation xsImpl = (XSImplementation)domRegistry.getDOMImplementation("XS-Loader");
 		XSLoader schemaLoader = xsImpl.createXSLoader(null);
 		DOMErrorHandler errorHandler = new ModelDefDOMErrorHandler(
-				config.isFailOnParserWarning(), config.isFailOnParserNonFatalError());
+				config.getFailOnParserWarning(), config.getFailOnParserNonFatalError());
 		schemaLoader.getConfig().setParameter("error-handler", errorHandler);
 		XSModel xsModel = schemaLoader.loadURI(rootSchemaFile.toUri().toString());
 		return xsModel;

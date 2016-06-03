@@ -157,6 +157,30 @@ public class ModelTest {
 		compareModelInstMPath("Test/TestSchemaV1.0/Model_OldTest", "ModelInstMPath.txt");
 	}
 
+	@Test
+	public void
+	oldTest_modelDef_Customized_structure_created_correctly() {
+		compareModelDefSummary("Test/TestSchemaV1.0/Model_OldTest_Customized", "ModelDefSummary.txt");
+	}
+	
+	@Test
+	public void
+	oldTest_modelDef_Customized_mpath_created_correctly() {
+		compareModelDefMPath("Test/TestSchemaV1.0/Model_OldTest_Customized", "ModelDefMPath.txt");
+	}
+	
+	@Test
+	public void
+	oldTest_modelInst_Customized_structure_created_correctly() {
+		compareModelInstSummary("Test/TestSchemaV1.0/Model_OldTest_Customized", "ModelInstSummary_Customized.txt");
+	}
+	
+	@Test
+	public void
+	oldTest_modelInst_Customized_mpath_created_correctly() {
+		compareModelInstMPath("Test/TestSchemaV1.0/Model_OldTest_Customized", "ModelInstMPath_Customized.txt");
+	}
+
 	// ------------------------------
 	
 	private void compareModelDefSummary(String addrStr, String resourceName) {

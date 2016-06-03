@@ -2,116 +2,123 @@ package org.tdc.modelcustomizer;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.tdc.config.model.ModelCustomizerConfig;
 import org.tdc.model.AttribNode;
 import org.tdc.model.CompositorNode;
 import org.tdc.model.ElementNode;
-import org.tdc.model.ModelVisitor;
 import org.tdc.model.NonAttribNode;
 import org.tdc.model.TDCNode;
 import org.tdc.modeldef.ElementNodeDef;
 import org.tdc.spreadsheet.CellStyle;
 import org.tdc.spreadsheet.Spreadsheet;
 
+/**
+ * Implementation of class with functionality for creating an initial customizer spreadsheet.
+ */
 public class ModelCustomizerWriter extends AbstractModelCustomizer {
 
 	private static final Logger log = LoggerFactory.getLogger(ModelCustomizerWriter.class);
 
-	private int maxColOffset;
+	private int maxColumns;
 	
-	public ModelCustomizerWriter(ElementNodeDef rootElement, ModelCustomizerFormat format, Spreadsheet sheet) {
-		super(rootElement, format, sheet);
+	public ModelCustomizerWriter(ElementNodeDef rootElement, ModelCustomizerConfig config, Spreadsheet sheet) {
+		super(rootElement, config, sheet);
 	}
 	
 	public void writeCustomizer() {
-		getSheet().setDefaultCellStyle(getFormat().getDefaultNodeStyle());
-		maxColOffset = 0;
-		writeTree();
+		getSheet().setDefaultCellStyle(getConfig().getDefaultNodeStyle());
+		maxColumns = 0;
+		processTree();
 		formatColumns();
 	}
 	
-	private void writeTree() {
-		ElementNodeDef rootElement = getRootElement();
-		rootElement.accept(new WriteVisitor());
-	}
-	
-	private void processAttribNode(AttribNode node) {
-		trackMaxColOffset(node);
+	@Override
+	protected void processAttribNode(AttribNode node) {
+		trackMaxColumns(node);
 
-		outputNodeName(node, getFormat().getAttribNodeStyle());
-		outputNodeOccurs(node);
+		outputNodeName(node, getConfig().getAttribNodeStyle());
+		outputOccurs(node);
+		outputOccursOverride(node, true);
 	}
 
-	private void processCompositorNode(CompositorNode node) {
-		trackMaxColOffset(node);
+	@Override
+	protected void processCompositorNode(CompositorNode node) {
+		trackMaxColumns(node);
 
 		if (node.isChildOfChoice()) {
-			outputChoiceMarker(node, getFormat().getChoiceMarkerStyle());
+			outputChoiceMarker(node, getConfig().getChoiceMarkerStyle());
 		}
 		
-		outputNodeName(node, getFormat().getCompositorNodeStyle());
-		outputNodeOccurs(node);
+		outputNodeName(node, getConfig().getCompositorNodeStyle());
+		outputOccurs(node);
+		outputOccursOverride(node, false);
 	}
 	
-	private void processElementNode(ElementNode node) {
-		trackMaxColOffset(node);
+	@Override
+	protected void processElementNode(ElementNode node) {
+		trackMaxColumns(node);
 
 		if (node.isChildOfChoice()) {
-			outputChoiceMarker(node, getFormat().getChoiceMarkerStyle());
+			outputChoiceMarker(node, getConfig().getChoiceMarkerStyle());
 		}
 		
-		CellStyle cellStyle = getFormat().getDefaultNodeStyle();
+		CellStyle cellStyle = getConfig().getDefaultNodeStyle();
 		if (node.hasChild()) {
-			cellStyle = getFormat().getParentNodeStyle();
+			cellStyle = getConfig().getParentNodeStyle();
 		}
 
 		outputNodeName(node, cellStyle);
-		outputNodeOccurs(node);
+		outputOccurs(node);
+		outputOccursOverride(node, false);
 	}
 	
-	private void trackMaxColOffset(TDCNode node) {
-		maxColOffset = Integer.max(maxColOffset, node.getColOffset());
+	private void trackMaxColumns(TDCNode node) {
+		maxColumns = Integer.max(maxColumns, node.getColOffset()+1);
 	}
 	
-	private void outputNodeName(TDCNode node, CellStyle cellStyle) {
-		getSheet().setCellValue(node.getDispName(), getRowStart() + node.getRowOffset(), 
-				getColStart() + node.getColOffset(), cellStyle);
-	}
-	
-	private void outputNodeOccurs(TDCNode node) {
-		getSheet().setCellValue(node.getDispOccurs(), getRowStart() + node.getRowOffset(), 
-				getColStart() + getFormat().getTreeStructureColumnCount());
+	private void outputChoiceMarker(NonAttribNode node, CellStyle cellStyle) {
+		getSheet().setCellValue(">", getNodeRow(node), getNodeCol(node) - 1, cellStyle);
 	}
 
-	private void outputChoiceMarker(NonAttribNode node, CellStyle cellStyle) {
-		getSheet().setCellValue(">", getRowStart() + node.getRowOffset(), 
-				getColStart() + node.getColOffset() - 1, cellStyle);
+	private void outputNodeName(TDCNode node, CellStyle cellStyle) {
+		getSheet().setCellValue(node.getDispName(), getNodeRow(node), getNodeCol(node), cellStyle);
+	}
+	
+	private void outputOccurs(TDCNode node) {
+		getSheet().setCellValue(node.getDispOccurs(), getNodeRow(node), getDataCol(COL_OCCURS)); 
+	}
+	
+	private void outputOccursOverride(TDCNode node, boolean isAttrib) {
+		int initialOverride;
+		int defaultOccurs = getConfig().getDefaultOccursCount();
+		if (isAttrib) {
+			AttribNode attrib = (AttribNode)node;
+			initialOverride = attrib.isRequired() || defaultOccurs > 0 ? 1 : 0;
+		}
+		else {
+			NonAttribNode nonAttrib = (NonAttribNode)node;
+			initialOverride = defaultOccurs;
+			if (!nonAttrib.isUnbounded() && initialOverride > nonAttrib.getMaxOccurs()) {
+				initialOverride = nonAttrib.getMaxOccurs();
+			}
+			if (initialOverride < nonAttrib.getMinOccurs()) {
+				initialOverride = nonAttrib.getMinOccurs();
+			}
+		}
+		// only output an override number if > 1 (to avoid cluttering the spreadsheet); 
+		// zero and one will be handled by the default (unless manually overriden in the spreadsheet)
+		String initialOverrideStr = initialOverride > 1 ? Integer.toString(initialOverride) : "";
+		getSheet().setCellValue(initialOverrideStr, getNodeRow(node), getDataCol(COL_OCCURS_OVERRIDE));
 	}
 
 	private void formatColumns() {
-		int cols = getFormat().getTreeStructureColumnCount(); 
-		if (cols < maxColOffset + 1) {
-			throw new RuntimeException("TreeStructureColumnCount (" + cols + 
-					") must be at least " + (maxColOffset+1) + " to support this particular model");
+		int allowedColumns = getConfig().getTreeStructureColumnCount(); 
+		if (allowedColumns < maxColumns) {
+			throw new RuntimeException("TreeStructureColumnCount (" + allowedColumns + 
+					") must be at least " + maxColumns + " to support this particular model");
 		}
-		for (int i = 1; i <= cols; i++) {
-			getSheet().setColumnWidth(i, getFormat().getTreeStructureColumnWidth());
-		}
-	}
-	
-	class WriteVisitor implements ModelVisitor {
-		@Override
-		public void visit(AttribNode attribNode) {
-			processAttribNode(attribNode);
-		}
-
-		@Override
-		public void visit(CompositorNode compositorNode) {
-			processCompositorNode(compositorNode);
-		}
-
-		@Override
-		public void visit(ElementNode elementNode) {
-			processElementNode(elementNode);
+		for (int i = 1; i <= allowedColumns; i++) {
+			getSheet().setColumnWidth(i, getConfig().getTreeStructureColumnWidth());
 		}
 	}
 }

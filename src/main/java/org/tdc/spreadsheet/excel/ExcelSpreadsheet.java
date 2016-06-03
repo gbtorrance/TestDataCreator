@@ -1,5 +1,7 @@
 package org.tdc.spreadsheet.excel;
 
+import java.io.FileInputStream;
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -173,5 +175,38 @@ public class ExcelSpreadsheet implements Spreadsheet {
 			poiCellStyle.setFont(font);
 			return poiCellStyle;
 		}
+	}
+	
+	/**
+	 * Static factory method to create an ExcelSpreadsheet from a worksheet in an existing Excel workbook.
+	 *  
+	 * @param path The file to read.
+	 * @param worksheetName The name of the worksheet to read.
+	 * @return ExcelWorkbook file.
+	 */
+	public static ExcelSpreadsheet readExcelSpreadsheetFromPath(Path path, String worksheetName) {
+		XSSFWorkbook xssfWorkbook = readXSSFWorkbook(path);
+		XSSFSheet xssfSheet = xssfWorkbook.getSheet(worksheetName);
+		if (xssfSheet == null) {
+			throw new RuntimeException("Unable to find worksheet '" + worksheetName + "' in Excel Workbook: " + path.toString());
+		}
+		return new ExcelSpreadsheet(xssfSheet);
+	}
+	
+	/**
+	 * Static factory method to read and create an XSSFWorkbook from an existing Excel workbook.
+	 *  
+	 * @param path The file to read.
+	 * @return
+	 */
+	public static XSSFWorkbook readXSSFWorkbook(Path path) {
+		XSSFWorkbook xssfWorkbook = null;
+		try (FileInputStream fis = new FileInputStream(path.toFile())) {
+			xssfWorkbook = new XSSFWorkbook(fis);
+		}
+		catch (Exception ex) {
+			throw new RuntimeException("Unable to read Excel Workbook: " + path.toString(), ex);
+		}
+		return xssfWorkbook;
 	}
 }

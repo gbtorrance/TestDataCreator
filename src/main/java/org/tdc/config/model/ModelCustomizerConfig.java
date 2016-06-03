@@ -1,11 +1,14 @@
-package org.tdc.modelcustomizer;
+package org.tdc.config.model;
+
+import java.nio.file.Path;
 
 import org.tdc.spreadsheet.CellStyle;
 
 /**
- * Defines the information needed for formatting a Model Customizer.
+ * Defines the information needed to configure a Model Customizer.
  */
-public interface ModelCustomizerFormat {
+public interface ModelCustomizerConfig {
+	Path getFilePath();
 	CellStyle getDefaultNodeStyle();
 	CellStyle getParentNodeStyle();
 	CellStyle getAttribNodeStyle();
@@ -13,4 +16,6 @@ public interface ModelCustomizerFormat {
 	CellStyle getChoiceMarkerStyle();
 	int getTreeStructureColumnCount();
 	int getTreeStructureColumnWidth();
+	boolean getAllowMinMaxInvalidOccursCountOverride();
+	int getDefaultOccursCount();
 }

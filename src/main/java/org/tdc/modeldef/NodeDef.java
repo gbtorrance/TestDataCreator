@@ -10,6 +10,8 @@ import org.tdc.model.AbstractTDCNode;
  */
 public abstract class NodeDef extends AbstractTDCNode {
 	
+	private int occursCountOverride = -1;
+	
 	public NodeDef(NonAttribNodeDef parent) {
 		super(parent);
 	}
@@ -35,5 +37,13 @@ public abstract class NodeDef extends AbstractTDCNode {
 	protected void setRowOffset(int rowOffset) {
 		// overriding to allow accessibility to other classes in this package
 		super.setRowOffset(rowOffset);
+	}
+	
+	public int getOccursCountOverride() {
+		return occursCountOverride;
+	}
+	
+	public void setOccursCountOverride(int occursCountOverride) {
+		this.occursCountOverride = occursCountOverride;
 	}
 }

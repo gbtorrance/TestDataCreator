@@ -2,15 +2,11 @@ package org.tdc.config.model;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.tdc.config.XMLConfigWrapper;
 import org.tdc.config.schema.SchemaConfig;
-import org.tdc.modelcustomizer.ModelCustomizerFormat;
-import org.tdc.modelcustomizer.ModelCustomizerFormatImpl;
 import org.tdc.spreadsheet.CellStyle;
 import org.tdc.util.Addr;
 
@@ -37,9 +33,8 @@ public class ModelConfigImpl implements ModelConfig {
 	private String schemaRootElementNamespace;
 	private boolean schemaFailOnParserWarning;
 	private boolean schemaFailOnParserNonFatalError;
-	private ModelCustomizerFormat modelCustomizerFormat;
-	private int defaultOccurrenceDepth;
-	private Map<String, Integer> occurrenceDepthMap = new HashMap<>();
+	private int defaultOccursCount;
+	private ModelCustomizerConfig modelCustomizerConfig;
 	
 	public ModelConfigImpl(SchemaConfig schemaConfig, String name) {
 		this.schemaConfig = schemaConfig;
@@ -89,35 +84,30 @@ public class ModelConfigImpl implements ModelConfig {
 	}
 
 	@Override
-	public boolean isFailOnParserWarning() {
+	public boolean getFailOnParserWarning() {
 		return schemaFailOnParserWarning;
 	}
 
 	@Override
-	public boolean isFailOnParserNonFatalError() {
+	public boolean getFailOnParserNonFatalError() {
 		return schemaFailOnParserNonFatalError;
 	}
 	
 	@Override
-	public ModelCustomizerFormat getModelCustomizerFormat() {
-		return modelCustomizerFormat;
+	public int getDefaultOccursCount() {
+		return defaultOccursCount;
 	}
 	
 	@Override
-	public int getDefaultOccurrenceDepth() {
-		return defaultOccurrenceDepth;
+	public ModelCustomizerConfig getModelCustomizerConfig() {
+		return modelCustomizerConfig;
 	}
-
+	
 	@Override
-	public int getMPathOccurrenceDepth(String mpath) {
-		// TODO cleanup terminology here; not sure I'm happy with the naming
-		int depth = defaultOccurrenceDepth;
-		if (occurrenceDepthMap.containsKey(mpath)) {
-			depth = occurrenceDepthMap.get(mpath).intValue();
-		}
-		return depth;
+	public boolean hasModelCustomizerConfig() {
+		return modelCustomizerConfig != null;
 	}
-
+	
 	private void loadConfig() {
 		XMLConfigWrapper config = new XMLConfigWrapper(modelConfigFile.toFile());
 		loadConfigItems(config);
@@ -129,25 +119,24 @@ public class ModelConfigImpl implements ModelConfig {
 		schemaRootElementNamespace = config.getString("SchemaRootElementNamespace", null, true);
 		schemaFailOnParserWarning = config.getBoolean("SchemaFailOnParserWarning", false , false);
 		schemaFailOnParserNonFatalError = config.getBoolean("SchemaFailOnParserNonFatalError", true, false);
-
-		CellStyle defaultNodeStyle = config.getCellStyle("CustomizerFormat.DefaultNodeStyle", null, true);
-		CellStyle parentNodeStyle = config.getCellStyle("CustomizerFormat.ParentNodeStyle", defaultNodeStyle, false);
-		CellStyle attribNodeStyle = config.getCellStyle("CustomizerFormat.AttribNodeStyle", defaultNodeStyle, false);
-		CellStyle compositorNodeStyle = config.getCellStyle("CustomizerFormat.CompositorNodeStyle", defaultNodeStyle, false);
-		CellStyle choiceMarkerStyle = config.getCellStyle("CustomizerFormat.ChoiceMarkerStyle", defaultNodeStyle, false);
-		int treeStructureColumnCount = config.getInt("CustomizerFormat.TreeStructureColumnCount", 0, true);
-		int treeStructureColumnWidth = config.getInt("CustomizerFormat.TreeStructureColumnWidth", 0, true);
-		modelCustomizerFormat = new ModelCustomizerFormatImpl(
-				defaultNodeStyle, parentNodeStyle, attribNodeStyle,
-				compositorNodeStyle, choiceMarkerStyle, 
-				treeStructureColumnCount, treeStructureColumnWidth);
+		defaultOccursCount = config.getInt("DefaultOccursCount", 5, false);
 		
-		defaultOccurrenceDepth = config.getInt("DefaultOccurrenceDepth", 5, false);
-		for (int i = 0; i < config.getCount("OccurrenceDepth"); i++) {
-			String baseKey = "OccurrenceDepth(" + i + ")";
-			String mpath = config.getString(baseKey, null, true);
-			int depth = config.getInt(baseKey + "[@Depth]", 0, true);
-			occurrenceDepthMap.put(mpath, depth);
+		if (config.hasNode("Customizer")) {
+			String fileName = config.getString("Customizer.FileName", null, true);
+			CellStyle defaultNodeStyle = config.getCellStyle("Customizer.DefaultNodeStyle", null, true);
+			CellStyle parentNodeStyle = config.getCellStyle("Customizer.ParentNodeStyle", defaultNodeStyle, false);
+			CellStyle attribNodeStyle = config.getCellStyle("Customizer.AttribNodeStyle", defaultNodeStyle, false);
+			CellStyle compositorNodeStyle = config.getCellStyle("Customizer.CompositorNodeStyle", defaultNodeStyle, false);
+			CellStyle choiceMarkerStyle = config.getCellStyle("Customizer.ChoiceMarkerStyle", defaultNodeStyle, false);
+			int treeStructureColumnCount = config.getInt("Customizer.TreeStructureColumnCount", 0, true);
+			int treeStructureColumnWidth = config.getInt("Customizer.TreeStructureColumnWidth", 0, true);
+			boolean allowMinMaxInvalidOccursCountOverride = config.getBoolean("Customizer.AllowMinMaxInvalidOccursCountOverride", false, false);
+			modelCustomizerConfig = new ModelCustomizerConfigImpl(
+					modelConfigRoot.resolve(fileName), 
+					defaultNodeStyle, parentNodeStyle, attribNodeStyle,
+					compositorNodeStyle, choiceMarkerStyle, 
+					treeStructureColumnCount, treeStructureColumnWidth, 
+					allowMinMaxInvalidOccursCountOverride, defaultOccursCount);
 		}
 	}
 }

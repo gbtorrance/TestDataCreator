@@ -3,39 +3,9 @@
 	<SchemaRootFile>OldTest.xsd</SchemaRootFile>
 	<SchemaRootElementName>TestRoot</SchemaRootElementName>
 	<SchemaRootElementNamespace>http://com.gurtz.tdc/test</SchemaRootElementNamespace>
+	<SchemaFailOnParserWarning>false</SchemaFailOnParserWarning>
+	<SchemaFailOnParserNonFatalError>true</SchemaFailOnParserNonFatalError>
+	<DefaultOccursCount>5</DefaultOccursCount>
 	
-	<CustomizerFormat>
-		<DefaultNodeStyle>
-			<FontName>Calibri</FontName>
-			<FontHeight>11</FontHeight>
-		</DefaultNodeStyle>
-		<ParentNodeStyle>
-			<FontName>Calibri</FontName>
-			<FontHeight>11</FontHeight>
-			<ColorRGB>0 0 255</ColorRGB> <!-- blue -->
-			<Italic>false</Italic>
-		</ParentNodeStyle>
-		<AttribNodeStyle>
-			<FontName>Calibri</FontName>
-			<FontHeight>11</FontHeight>
-			<ColorRGB>34 97 13</ColorRGB> <!-- green -->
-		</AttribNodeStyle>
-		<CompositorNodeStyle>
-			<FontName>Calibri</FontName>
-			<FontHeight>11</FontHeight>
-			<ColorRGB>64 64 64</ColorRGB> <!-- dark gray -->
-			<Italic>true</Italic>
-		</CompositorNodeStyle>
-		<ChoiceMarkerStyle>
-			<FontName>Calibri</FontName>
-			<FontHeight>11</FontHeight>
-			<ColorRGB>255 0 0</ColorRGB> <!-- red -->
-		</ChoiceMarkerStyle>
-		<TreeStructureColumnCount>12</TreeStructureColumnCount>
-		<TreeStructureColumnWidth>500</TreeStructureColumnWidth>
-	</CustomizerFormat>
-	
-	<DefaultOccurrenceDepth>5</DefaultOccurrenceDepth>
-	<!--OccurrenceDepth Depth="5">/ReturnState/!S/ReturnHeaderState/!S/!S}2/SpecialProgram</OccurrenceDepth --> <!-- max:5 -->
 	
 </Config>

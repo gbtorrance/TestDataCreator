@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import org.tdc.model.CompositorType;
 import org.tdc.model.MPathBuilder;
 import org.tdc.model.MPathIndex;
+import org.tdc.model.NonAttribNode;
 import org.tdc.modeldef.AttribNodeDef;
 import org.tdc.modeldef.CompositorNodeDef;
 import org.tdc.modeldef.ElementNodeDef;
@@ -26,13 +27,15 @@ public class ModelInstBuilderImpl implements ModelInstBuilder {
 	
 	private static final Logger log = LoggerFactory.getLogger(ModelInstBuilderImpl.class);
 
-	private ModelDef modelDef;
+	private final ModelDef modelDef;
+	private final int defaultOccursCount;
 	private int rowOffset;
 	private MPathIndex<NodeInst> mpathIndex; 
 	private MPathBuilder mpathBuilder;
 	
-	public ModelInstBuilderImpl(ModelDef modelDef) {
+	public ModelInstBuilderImpl(ModelDef modelDef, int defaultOccursCount) {
 		this.modelDef = modelDef;
+		this.defaultOccursCount = defaultOccursCount;
 	}
 	
 	@Override
@@ -86,7 +89,7 @@ public class ModelInstBuilderImpl implements ModelInstBuilder {
 		
 		List<ElementNodeInst> occurrenceList = new ArrayList<>();
 		ElementNodeInst elementNodeInst;
-		int occurCount = getOccurDepth(elementNodeDef);
+		int occurCount = getOccursCount(elementNodeDef);
 		for (int i = 0; i < occurCount; i++) {
 			elementNodeInst = buildElement(parentNonAttribNodeInst, elementNodeDef, colOffset, i+1, occurCount);
 			rowOffset++;
@@ -119,7 +122,7 @@ public class ModelInstBuilderImpl implements ModelInstBuilder {
 		
 		List<CompositorNodeInst> occurrenceList = new ArrayList<>();
 		CompositorNodeInst compositorNodeInst;
-		int occurCount = getOccurDepth(compositorNodeDef);
+		int occurCount = getOccursCount(compositorNodeDef);
 		for (int i = 0; i < occurCount; i++) {
 			compositorNodeInst = buildCompositor(parentNonAttribNodeInst, compositorNodeDef, colOffset, i+1, occurCount);
 			rowOffset++;
@@ -146,30 +149,43 @@ public class ModelInstBuilderImpl implements ModelInstBuilder {
 		return compositorNodeInst;
 	}
 	
-	private int getOccurDepth(NonAttribNodeDef nonAttribNodeDef) {
-		// TODO determine a more flexible/configurable way to handle occurrences
-		int configOccurDepth = modelDef.getModelConfig().getMPathOccurrenceDepth(nonAttribNodeDef.getMPath());
-		int occurDepth = 
-				nonAttribNodeDef.isUnbounded() || nonAttribNodeDef.getMaxOccurs() > configOccurDepth ? 
-						configOccurDepth :
-							nonAttribNodeDef.getMaxOccurs();
-		return occurDepth;
-	}
-
 	private void buildAttribs(ElementNodeInst parentElementNodeInst) {
 		ElementNodeDef elementNodeDef = parentElementNodeInst.getNodeDef();
 		if (elementNodeDef.hasAttribute()) {
 			for (AttribNodeDef attribNodeDef : elementNodeDef.getAttributes()) {
-				AttribNodeInst attribNodeInst = buildAttrib(parentElementNodeInst, attribNodeDef, 
-						parentElementNodeInst.getColOffset()+1);
-				rowOffset++;
-				buildPreNotes(attribNodeInst);
-				buildPostNotes(attribNodeInst);
-				parentElementNodeInst.addAttribute(attribNodeInst);
+				if (getOccursCount(attribNodeDef) == 1) {
+					AttribNodeInst attribNodeInst = buildAttrib(parentElementNodeInst, attribNodeDef, 
+							parentElementNodeInst.getColOffset()+1);
+					rowOffset++;
+					buildPreNotes(attribNodeInst);
+					buildPostNotes(attribNodeInst);
+					parentElementNodeInst.addAttribute(attribNodeInst);
+				}
 			}
 		}
 	}
 	
+	private int getOccursCount(NodeDef nodeDef) {
+		int override = nodeDef.getOccursCountOverride();
+		int occursCount = override;
+		if (override == -1) {
+			int maxOccurs = 1;
+			int minOccurs = 0;
+			boolean isUnbounded = false;
+			// above defaults apply to attributes; modify for non-attributes
+			if (nodeDef instanceof NonAttribNode) {
+				NonAttribNode nonAttrib = (NonAttribNode)nodeDef;
+				maxOccurs = nonAttrib.getMaxOccurs();
+				minOccurs = nonAttrib.getMinOccurs();
+				isUnbounded = nonAttrib.isUnbounded();
+			}
+			occursCount = defaultOccursCount;
+			occursCount = isUnbounded ? occursCount : Integer.min(maxOccurs, occursCount);
+			occursCount = Integer.max(minOccurs, occursCount);
+		}
+		return occursCount;
+	}
+
 	private AttribNodeInst buildAttrib(
 			ElementNodeInst parentElementNodeInst, AttribNodeDef attribNodeDef, int colOffset) {
 		

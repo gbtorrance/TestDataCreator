@@ -66,19 +66,25 @@ public class XMLConfigWrapper {
 		return result;
 	}
 
+	public boolean getBoolean(String key, boolean defaultValue, boolean required) {
+		boolean found = validateRequired(key, required);
+		boolean result = config.getBoolean(key, defaultValue);
+		logKeyValue(key, Boolean.toString(result), !found);
+		return result;
+	}
+	
+	public boolean hasNode(String key) {
+		// returns whether a node exists, regardless of whether there is a value associated with that node;
+		// suitable for detecting whether a parent node exists
+		return config.configurationsAt(key).size() > 0;
+	}
+	
 	public int getMaxIndex(String key) {
 		return config.getMaxIndex(key);
 	}
 	
 	public int getCount(String key) {
 		return config.getMaxIndex(key) + 1;
-	}
-	
-	public boolean getBoolean(String key, boolean defaultValue, boolean required) {
-		boolean found = validateRequired(key, required);
-		boolean result = config.getBoolean(key, defaultValue);
-		logKeyValue(key, Boolean.toString(result), !found);
-		return result;
 	}
 	
 	public CellStyle getCellStyle(String key, CellStyle defaultValue, boolean required) {

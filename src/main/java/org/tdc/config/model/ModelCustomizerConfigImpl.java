@@ -1,12 +1,15 @@
-package org.tdc.modelcustomizer;
+package org.tdc.config.model;
+
+import java.nio.file.Path;
 
 import org.tdc.spreadsheet.CellStyle;
 
 /**
- * A {@link ModelCustomizerFormat} implementation.
+ * A {@link ModelCustomizerConfig} implementation.
  */
-public class ModelCustomizerFormatImpl implements ModelCustomizerFormat {
+public class ModelCustomizerConfigImpl implements ModelCustomizerConfig {
 	
+	private final Path filePath;
 	private final CellStyle defaultNodeStyle;
 	private final CellStyle parentNodeStyle;
 	private final CellStyle attribNodeStyle;
@@ -14,12 +17,17 @@ public class ModelCustomizerFormatImpl implements ModelCustomizerFormat {
 	private final CellStyle choiceMarkerStyle;
 	private final int treeStructureColumnCount;
 	private final int treeStructureColumnWidth;
+	private final boolean allowMinMaxInvalidOccursCountOverride;
+	private final int defaultOccursCount;
 	
-	public ModelCustomizerFormatImpl(
+	public ModelCustomizerConfigImpl(
+			Path filePath,
 			CellStyle defaultNodeStyle, CellStyle parentNodeStyle, 
 			CellStyle attribNodeStyle, CellStyle compositorNodeStyle, CellStyle choiceMarkerStyle,
-			int treeStructureColumnCount, int treeStructureColumnWidth) {
+			int treeStructureColumnCount, int treeStructureColumnWidth, 
+			boolean allowMinMaxInvalidOccursCountOverride, int defaultOccursCount) {
 		
+		this.filePath = filePath;
 		this.defaultNodeStyle = defaultNodeStyle;
 		this.parentNodeStyle = parentNodeStyle;
 		this.attribNodeStyle = attribNodeStyle;
@@ -27,6 +35,13 @@ public class ModelCustomizerFormatImpl implements ModelCustomizerFormat {
 		this.choiceMarkerStyle = choiceMarkerStyle;
 		this.treeStructureColumnCount = treeStructureColumnCount;
 		this.treeStructureColumnWidth = treeStructureColumnWidth;
+		this.allowMinMaxInvalidOccursCountOverride = allowMinMaxInvalidOccursCountOverride;
+		this.defaultOccursCount = defaultOccursCount;
+	}
+	
+	@Override
+	public Path getFilePath() {
+		return filePath;
 	}
 	
 	@Override
@@ -62,5 +77,15 @@ public class ModelCustomizerFormatImpl implements ModelCustomizerFormat {
 	@Override
 	public int getTreeStructureColumnWidth() {
 		return treeStructureColumnWidth;
+	}
+	
+	@Override
+	public boolean getAllowMinMaxInvalidOccursCountOverride() {
+		return allowMinMaxInvalidOccursCountOverride;
+	}
+	
+	@Override
+	public int getDefaultOccursCount() {
+		return defaultOccursCount;
 	}
 }
