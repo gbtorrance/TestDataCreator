@@ -17,22 +17,22 @@
 	
 	<Page>
 		<PageName>Page1</PageName>
-		<ModelAddress>/ignore/model/address1</ModelAddress>
+		<ModelAddress>/ConfigTest/SchemaConfigTest/ModelConfigTest</ModelAddress>
 		<DocTypeName>DocType1</DocTypeName>
 	</Page>	
 	<Page>
 		<PageName>Page2</PageName>
-		<ModelAddress>/ignore/model/address2</ModelAddress>
+		<ModelAddress>/ConfigTest/SchemaConfigTest/ModelConfigTest</ModelAddress>
 		<DocTypeName>DocType2</DocTypeName>
 	</Page>
 	<Page>
 		<PageName>Page3</PageName>
-		<ModelAddress>/ignore/model/address3</ModelAddress>
+		<ModelAddress>/ConfigTest/SchemaConfigTest/ModelConfigTest</ModelAddress>
 		<DocTypeName>DocType3</DocTypeName>
 	</Page>	
 	<Page>
 		<PageName>Page4</PageName>
-		<ModelAddress>/ignore/model/address4</ModelAddress>
+		<ModelAddress>/ConfigTest/SchemaConfigTest/ModelConfigTest</ModelAddress>
 		<DocTypeName>DocType1</DocTypeName> <!-- use one that was used before -->
 	</Page>	
 	

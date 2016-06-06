@@ -4,6 +4,8 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.tdc.config.XMLConfigWrapper;
+import org.tdc.config.model.ModelConfig;
+import org.tdc.config.model.ModelConfigFactory;
 import org.tdc.util.Addr;
 
 /**
@@ -14,12 +16,12 @@ import org.tdc.util.Addr;
 public class PageConfigImpl implements PageConfig {
 	
 	private final String pageName;
-	private final Addr modelAddr;
+	private final ModelConfig modelConfig;
 	private final DocTypeConfig docTypeConfig;
 	
 	private PageConfigImpl(PageConfigBuilder builder) {
 		this.pageName = builder.pageName;
-		this.modelAddr = builder.modelAddr;
+		this.modelConfig = builder.modelConfig;
 		this.docTypeConfig = builder.docTypeConfig;
 	}
 
@@ -29,8 +31,8 @@ public class PageConfigImpl implements PageConfig {
 	}
 
 	@Override
-	public Addr getModelAddr() {
-		return modelAddr;
+	public ModelConfig getModelConfig() {
+		return modelConfig;
 	}
 	
 	@Override
@@ -45,12 +47,15 @@ public class PageConfigImpl implements PageConfig {
 		private final Map<String, DocTypeConfig> docTypeConfigs;
 
 		private String pageName;
-		private Addr modelAddr;
+		private ModelConfig modelConfig;
 		private DocTypeConfig docTypeConfig;
+		private ModelConfigFactory modelConfigFactory;
 		
-		public PageConfigBuilder(XMLConfigWrapper config, Map<String, DocTypeConfig> docTypeConfigs) {
+		public PageConfigBuilder(XMLConfigWrapper config, 
+				Map<String, DocTypeConfig> docTypeConfigs, ModelConfigFactory modelConfigFactory) {
 			this.config = config;
 			this.docTypeConfigs = docTypeConfigs;
+			this.modelConfigFactory = modelConfigFactory;
 		}
 		
 		public Map<String, PageConfig> buildAll() {
@@ -66,7 +71,16 @@ public class PageConfigImpl implements PageConfig {
 		private PageConfig build(int index) {
 			String indexPrefix = CONFIG_PREFIX + "(" + index + ").";
 			pageName = config.getString(indexPrefix + "PageName", null, true);
-			modelAddr = new Addr(config.getString(indexPrefix + "ModelAddress", null, true));
+			
+			Addr modelAddr = new Addr(config.getString(indexPrefix + "ModelAddress", null, true));
+			try {
+				modelConfig = modelConfigFactory.getModelConfig(modelAddr);
+			}
+			catch (Exception ex) {
+				throw new IllegalStateException("Unable to locate ModelConfig '" + 
+						modelAddr.toString() + "' for Page '" + pageName + "'", ex);
+			}
+			
 			String docTypeName = config.getString(indexPrefix + "DocTypeName", null, true);
 			docTypeConfig = docTypeConfigs.get(docTypeName);
 			if (docTypeConfig == null) {

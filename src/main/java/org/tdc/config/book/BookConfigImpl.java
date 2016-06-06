@@ -8,6 +8,7 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.tdc.config.XMLConfigWrapper;
+import org.tdc.config.model.ModelConfigFactory;
 import org.tdc.util.Addr;
 
 /**
@@ -62,6 +63,7 @@ public class BookConfigImpl implements BookConfig {
 		private static final String CONFIG_FILE = "TDCBookConfig.xml";
 		
 		private final XMLConfigWrapper config;
+		private final ModelConfigFactory modelConfigFactory;
 		private final Path booksConfigRoot;
 		private final Addr addr;
 		private final Path bookConfigRoot;
@@ -69,7 +71,7 @@ public class BookConfigImpl implements BookConfig {
 		private Map<String, DocTypeConfig> docTypeConfigs;
 		private Map<String, PageConfig> pageConfigs;
 		
-		public BookConfigBuilder(Path booksConfigRoot, Addr addr) {
+		public BookConfigBuilder(Path booksConfigRoot, Addr addr, ModelConfigFactory modelConfigFactory) {
 			log.info("Creating BookConfig: {}", addr);
 			this.booksConfigRoot = booksConfigRoot;
 			this.addr = addr;
@@ -79,11 +81,12 @@ public class BookConfigImpl implements BookConfig {
 			}
 			Path bookConfigFile = bookConfigRoot.resolve(CONFIG_FILE);
 			this.config = new XMLConfigWrapper(bookConfigFile);
+			this.modelConfigFactory = modelConfigFactory;
 		}
 
 		public BookConfig build() {
 			docTypeConfigs = new DocTypeConfigImpl.DocTypeConfigBuilder(config).buildAll();
-			pageConfigs = new PageConfigImpl.PageConfigBuilder(config, docTypeConfigs).buildAll();
+			pageConfigs = new PageConfigImpl.PageConfigBuilder(config, docTypeConfigs, modelConfigFactory).buildAll();
 			return new BookConfigImpl(this);
 		}
 	}

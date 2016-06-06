@@ -9,7 +9,7 @@
 	
 	<Page>
 		<PageName>Page1</PageName>
-		<ModelAddress>/ignore/model/address1</ModelAddress>
+		<ModelAddress>/ConfigTest/SchemaConfigTest/ModelConfigTest</ModelAddress>
 		<DocTypeName>DocTypeNotInConfig</DocTypeName>
 	</Page>	
 	

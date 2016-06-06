@@ -10,12 +10,19 @@ import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import org.tdc.config.model.ModelConfigFactory;
+import org.tdc.config.model.ModelConfigFactoryImpl;
+import org.tdc.config.schema.SchemaConfigFactory;
+import org.tdc.config.schema.SchemaConfigFactoryImpl;
 import org.tdc.util.Addr;
 
 /**
  * Unit tests for {@link BookConfig} an its related classes.
  */
 public class BookConfigTest {
+	private static Path schemasConfigRoot;
+	private static SchemaConfigFactory schemaConfigFactory;
+	private static ModelConfigFactory modelConfigFactory;
 	private static Path booksConfigRoot;
 	private static BookConfigFactory bookConfigFactory;
 	private static Addr bookAddr;
@@ -25,8 +32,12 @@ public class BookConfigTest {
 	
 	@BeforeClass
 	public static void setup() {
+		schemasConfigRoot = Paths.get("testfiles/TDCFiles/Schemas");
+		schemaConfigFactory = new SchemaConfigFactoryImpl(schemasConfigRoot);
+		modelConfigFactory = new ModelConfigFactoryImpl(schemaConfigFactory);
+
 		booksConfigRoot = Paths.get("testfiles/TDCFiles/Books");
-		bookConfigFactory = new BookConfigFactoryImpl(booksConfigRoot);
+		bookConfigFactory = new BookConfigFactoryImpl(booksConfigRoot, modelConfigFactory);
 		bookAddr = new Addr("/ConfigTest/BookConfigTest");
 	}
 	
@@ -61,19 +72,19 @@ public class BookConfigTest {
 		Map<String, PageConfig> pageConfigs = bookConfig.getPageConfigs();
 		PageConfig pConfig1 = pageConfigs.get("Page1");
 		assertThat(pConfig1.getPageName()).isEqualTo("Page1");
-		assertThat(pConfig1.getModelAddr()).isEqualTo(new Addr("/ignore/model/address1"));
+		assertThat(pConfig1.getModelConfig().getAddr()).isEqualTo(new Addr("/ConfigTest/SchemaConfigTest/ModelConfigTest"));
 		assertThat(pConfig1.getDocTypeConfig()).isEqualTo(dtConfig1);
 		PageConfig pConfig2 = pageConfigs.get("Page2");
 		assertThat(pConfig2.getPageName()).isEqualTo("Page2");
-		assertThat(pConfig2.getModelAddr()).isEqualTo(new Addr("/ignore/model/address2"));
+		assertThat(pConfig2.getModelConfig().getAddr()).isEqualTo(new Addr("/ConfigTest/SchemaConfigTest/ModelConfigTest"));
 		assertThat(pConfig2.getDocTypeConfig()).isEqualTo(dtConfig2);
 		PageConfig pConfig3 = pageConfigs.get("Page3");
 		assertThat(pConfig3.getPageName()).isEqualTo("Page3");
-		assertThat(pConfig3.getModelAddr()).isEqualTo(new Addr("/ignore/model/address3"));
+		assertThat(pConfig3.getModelConfig().getAddr()).isEqualTo(new Addr("/ConfigTest/SchemaConfigTest/ModelConfigTest"));
 		assertThat(pConfig3.getDocTypeConfig()).isEqualTo(dtConfig3);
 		PageConfig pConfig4 = pageConfigs.get("Page4");
 		assertThat(pConfig4.getPageName()).isEqualTo("Page4");
-		assertThat(pConfig4.getModelAddr()).isEqualTo(new Addr("/ignore/model/address4"));
+		assertThat(pConfig4.getModelConfig().getAddr()).isEqualTo(new Addr("/ConfigTest/SchemaConfigTest/ModelConfigTest"));
 		assertThat(pConfig4.getDocTypeConfig()).isEqualTo(dtConfig1); // intentionally use one that was used before
 	}
 	
