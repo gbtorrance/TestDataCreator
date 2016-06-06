@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Config>
+
+	<DocType>
+		<DocTypeName>DocType1</DocTypeName>
+		<MinPerTestCase>0</MinPerTestCase>
+		<MaxPerTestCase>2</MaxPerTestCase>
+	</DocType>
+	<DocType>
+		<DocTypeName>DocType2</DocTypeName>
+		<MinPerTestCase>0</MinPerTestCase>
+		<MaxPerTestCase>1</MaxPerTestCase>
+	</DocType>
+	<DocType>
+		<DocTypeName>DocType3</DocTypeName>
+	</DocType>
+	
+	<Page>
+		<PageName>Page1</PageName>
+		<ModelAddress>/ignore/model/address1</ModelAddress>
+		<DocTypeName>DocType1</DocTypeName>
+	</Page>	
+	<Page>
+		<PageName>Page2</PageName>
+		<ModelAddress>/ignore/model/address2</ModelAddress>
+		<DocTypeName>DocType2</DocTypeName>
+	</Page>
+	<Page>
+		<PageName>Page3</PageName>
+		<ModelAddress>/ignore/model/address3</ModelAddress>
+		<DocTypeName>DocType3</DocTypeName>
+	</Page>	
+	<Page>
+		<PageName>Page4</PageName>
+		<ModelAddress>/ignore/model/address4</ModelAddress>
+		<DocTypeName>DocType1</DocTypeName> <!-- use one that was used before -->
+	</Page>	
+	
+</Config>

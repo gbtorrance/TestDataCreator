@@ -13,7 +13,7 @@ import org.tdc.evaluator.result.ValuePlusStyleResult;
 import org.tdc.evaluator.result.ValueResult;
 
 /**
- * Unit tests for {@link Evaluator} an its related classes.
+ * Unit tests for {@link Evaluator} and its related classes.
  */
 public class EvaluatorTest {
 	
@@ -22,7 +22,7 @@ public class EvaluatorTest {
 	@BeforeClass
 	public static void beforeClass() {
 		ClassLoader classLoader = EvaluatorTest.class.getClassLoader();
-		File file = new File(classLoader.getResource("EvaluatorTestConfig.xml").getFile());
+		File file = new File(classLoader.getResource("EvaluatorConfigTest.xml").getFile());
 		config = new XMLConfigWrapper(file);
 	}
 	

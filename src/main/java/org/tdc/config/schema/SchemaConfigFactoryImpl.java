@@ -28,7 +28,7 @@ public class SchemaConfigFactoryImpl implements SchemaConfigFactory {
 	public SchemaConfig getSchemaConfig(Addr addr) {
 		SchemaConfig schemaConfig = cache.get(addr);
 		if (schemaConfig == null) {
-			schemaConfig = new SchemaConfigImpl(schemasConfigRoot, addr);
+			schemaConfig = new SchemaConfigImpl.SchemaConfigBuilder(schemasConfigRoot, addr).build();
 			cache.put(addr, schemaConfig);
 		}
 		else {

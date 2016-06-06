@@ -31,7 +31,7 @@ public class ModelConfigFactoryImpl implements ModelConfigFactory {
 		ModelConfig modelConfig = cache.get(addr);
 		if (modelConfig == null) {
 			SchemaConfig schemaConfig = schemaConfigFactory.getSchemaConfig(addr.getParentAddr());
-			modelConfig = new ModelConfigImpl(schemaConfig, addr.getName());
+			modelConfig = new ModelConfigImpl.ModelConfigBuilder(schemaConfig, addr.getName()).build();
 			cache.put(addr, modelConfig);
 		}
 		else {

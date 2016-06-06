@@ -2,6 +2,7 @@ package org.tdc.config;
 
 import java.awt.Color;
 import java.io.File;
+import java.nio.file.Path;
 import java.util.NoSuchElementException;
 
 import org.apache.commons.configuration.ConfigurationException;
@@ -28,17 +29,20 @@ public class XMLConfigWrapper {
 	
 	private final XMLConfiguration config;
 	
+	public XMLConfigWrapper(Path path) {
+		this(path.toFile());
+	}
+	
 	public XMLConfigWrapper(File file) {
+		if (!file.exists()) {
+			throw new IllegalStateException("Configuration file does not exist: " + file); 
+		}
 		try {
 			this.config = new XMLConfiguration(file);
 		} 
 		catch (ConfigurationException e) {
 			throw new IllegalStateException("Unable to read configuration file: " + file, e);
 		}
-	}
-	
-	public XMLConfigWrapper(XMLConfiguration config) {
-		this.config = config;
 	}
 	
 	public XMLConfiguration getXMLConfiguration() {
@@ -59,7 +63,7 @@ public class XMLConfigWrapper {
 		return result;
 	}
 	
-	public double getDouble(String key, int defaultValue, boolean required) {
+	public double getDouble(String key, double defaultValue, boolean required) {
 		boolean found = validateRequired(key, required);
 		double result = config.getDouble(key, defaultValue);
 		logKeyValue(key, Double.toString(result), !found);

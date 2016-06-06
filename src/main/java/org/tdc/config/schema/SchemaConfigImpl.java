@@ -16,24 +16,17 @@ import org.tdc.util.Addr;
 public class SchemaConfigImpl implements SchemaConfig {
 	
 	private static final Logger log = LoggerFactory.getLogger(SchemaConfigImpl.class);
-	private static final String CONFIG_FILE = "TDCSchemaConfig.xml";
 
-	private Path schemasConfigRoot;
-	private Addr addr;
-	private Path schemaConfigRoot;
-	private Path schemaConfigFile;
-	private Path schemaFilesRoot;
+	private final Path schemasConfigRoot;
+	private final Addr addr;
+	private final Path schemaConfigRoot;
+	private final Path schemaFilesRoot;
 	
-	public SchemaConfigImpl(Path schemasConfigRoot, Addr addr) {
-		log.info("Creating SchemaConfigImpl: {}", addr);
-		this.schemasConfigRoot = schemasConfigRoot;
-		this.addr = addr;
-		this.schemaConfigRoot = schemasConfigRoot.resolve(addr.getPath());
-		if (!Files.isDirectory(schemaConfigRoot)) {
-			throw new IllegalStateException("Schema config root dir does not exist: " + schemaConfigRoot.toString());
-		}
-		this.schemaConfigFile = schemaConfigRoot.resolve(CONFIG_FILE);
-		loadConfig();
+	private SchemaConfigImpl(SchemaConfigBuilder builder) {
+		this.schemasConfigRoot = builder.schemasConfigRoot;
+		this.addr = builder.addr;
+		this.schemaConfigRoot = builder.schemaConfigRoot;
+		this.schemaFilesRoot = builder.schemaFilesRoot;
 	}
 	
 	@Override
@@ -56,15 +49,34 @@ public class SchemaConfigImpl implements SchemaConfig {
 		return schemaFilesRoot;
 	}
 
-	private void loadConfig() {
-		XMLConfigWrapper config = new XMLConfigWrapper(schemaConfigFile.toFile());
-		loadConfigItems(config);
-	}
+	public static class SchemaConfigBuilder {
+		private static final String CONFIG_FILE = "TDCSchemaConfig.xml";
+		
+		private final XMLConfigWrapper config;
+		private final Path schemasConfigRoot;
+		private final Addr addr;
+		private final Path schemaConfigRoot;
+		
+		private Path schemaFilesRoot;
+		
+		public SchemaConfigBuilder(Path schemasConfigRoot, Addr addr) {
+			log.info("Creating SchemaConfig: {}", addr);
+			this.schemasConfigRoot = schemasConfigRoot;
+			this.addr = addr;
+			this.schemaConfigRoot = schemasConfigRoot.resolve(addr.getPath());
+			if (!Files.isDirectory(schemaConfigRoot)) {
+				throw new IllegalStateException("SchemaConfig root dir does not exist: " + schemaConfigRoot.toString());
+			}
+			Path schemaConfigFile = schemaConfigRoot.resolve(CONFIG_FILE);
+			this.config = new XMLConfigWrapper(schemaConfigFile);
+		}
 
-	private void loadConfigItems(XMLConfigWrapper config) {
-		schemaFilesRoot = this.schemaConfigRoot.resolve(config.getString("SchemaFilesRoot", null, true));
-		if (!Files.isDirectory(schemaFilesRoot)) {
-			throw new IllegalStateException("Schema files root dir does not exist: " + schemaFilesRoot.toString());
+		public SchemaConfig build() {
+			schemaFilesRoot = schemaConfigRoot.resolve(config.getString("SchemaFilesRoot", null, true));
+			if (!Files.isDirectory(schemaFilesRoot)) {
+				throw new IllegalStateException("Schema files root dir does not exist: " + schemaFilesRoot.toString());
+			}
+			return new SchemaConfigImpl(this);
 		}
 	}
 }

@@ -27,7 +27,7 @@ import org.tdc.spreadsheet.excel.ExcelSpreadsheet;
 import org.tdc.util.Addr;
 
 /**
- * Unit tests for {@link ModelCustomizerWriter} and {@link ModelCustomizerReader}..
+ * Unit tests for {@link ModelCustomizerWriter} and {@link ModelCustomizerReader}.
  */
 public class ModelCustomizerTest {
 	
