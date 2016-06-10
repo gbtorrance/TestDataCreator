@@ -41,7 +41,7 @@ public class PageConfigImpl implements PageConfig {
 	}
 	
 	public static class PageConfigBuilder {
-		private static final String CONFIG_PREFIX = "Page";
+		private static final String CONFIG_PREFIX = "Pages.Page";
 
 		private final XMLConfigWrapper config;
 		private final Map<String, DocTypeConfig> docTypeConfigs;

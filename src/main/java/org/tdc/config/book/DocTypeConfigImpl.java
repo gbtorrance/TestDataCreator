@@ -38,7 +38,7 @@ public class DocTypeConfigImpl implements DocTypeConfig {
 	}
 	
 	public static class DocTypeConfigBuilder {
-		private static final String CONFIG_PREFIX = "DocType";
+		private static final String CONFIG_PREFIX = "DocTypes.DocType";
 
 		private final XMLConfigWrapper config;
 

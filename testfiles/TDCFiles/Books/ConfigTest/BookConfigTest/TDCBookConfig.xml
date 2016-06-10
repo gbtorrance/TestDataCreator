@@ -1,39 +1,43 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Config>
 
-	<DocType>
-		<DocTypeName>DocType1</DocTypeName>
-		<MinPerTestCase>0</MinPerTestCase>
-		<MaxPerTestCase>2</MaxPerTestCase>
-	</DocType>
-	<DocType>
-		<DocTypeName>DocType2</DocTypeName>
-		<MinPerTestCase>0</MinPerTestCase>
-		<MaxPerTestCase>1</MaxPerTestCase>
-	</DocType>
-	<DocType>
-		<DocTypeName>DocType3</DocTypeName>
-	</DocType>
+	<DocTypes>
+		<DocType>
+			<DocTypeName>DocType1</DocTypeName>
+			<MinPerTestCase>0</MinPerTestCase>
+			<MaxPerTestCase>2</MaxPerTestCase>
+		</DocType>
+		<DocType>
+			<DocTypeName>DocType2</DocTypeName>
+			<MinPerTestCase>0</MinPerTestCase>
+			<MaxPerTestCase>1</MaxPerTestCase>
+		</DocType>
+		<DocType>
+			<DocTypeName>DocType3</DocTypeName>
+		</DocType>
+	</DocTypes>
 	
-	<Page>
-		<PageName>Page1</PageName>
-		<ModelAddress>/ConfigTest/SchemaConfigTest/ModelConfigTest</ModelAddress>
-		<DocTypeName>DocType1</DocTypeName>
-	</Page>	
-	<Page>
-		<PageName>Page2</PageName>
-		<ModelAddress>/ConfigTest/SchemaConfigTest/ModelConfigTest</ModelAddress>
-		<DocTypeName>DocType2</DocTypeName>
-	</Page>
-	<Page>
-		<PageName>Page3</PageName>
-		<ModelAddress>/ConfigTest/SchemaConfigTest/ModelConfigTest</ModelAddress>
-		<DocTypeName>DocType3</DocTypeName>
-	</Page>	
-	<Page>
-		<PageName>Page4</PageName>
-		<ModelAddress>/ConfigTest/SchemaConfigTest/ModelConfigTest</ModelAddress>
-		<DocTypeName>DocType1</DocTypeName> <!-- use one that was used before -->
-	</Page>	
+	<Pages>
+		<Page>
+			<PageName>Page1</PageName>
+			<ModelAddress>/ConfigTest/SchemaConfigTest/ModelConfigTest</ModelAddress>
+			<DocTypeName>DocType1</DocTypeName>
+		</Page>	
+		<Page>
+			<PageName>Page2</PageName>
+			<ModelAddress>/ConfigTest/SchemaConfigTest/ModelConfigTest</ModelAddress>
+			<DocTypeName>DocType2</DocTypeName>
+		</Page>
+		<Page>
+			<PageName>Page3</PageName>
+			<ModelAddress>/ConfigTest/SchemaConfigTest/ModelConfigTest</ModelAddress>
+			<DocTypeName>DocType3</DocTypeName>
+		</Page>	
+		<Page>
+			<PageName>Page4</PageName>
+			<ModelAddress>/ConfigTest/SchemaConfigTest/ModelConfigTest</ModelAddress>
+			<DocTypeName>DocType1</DocTypeName> <!-- use one that was used before -->
+		</Page>	
+	</Pages>
 	
 </Config>
