@@ -10,7 +10,7 @@ import org.tdc.model.NonAttribNode;
 import org.tdc.model.TDCNode;
 import org.tdc.modeldef.ElementNodeDef;
 import org.tdc.modeldef.NodeDef;
-import org.tdc.spreadsheet.Spreadsheet;
+import org.tdc.spreadsheet.SpreadsheetFile;
 
 /**
  * Implementation of class with functionality for reading an existing customizer spreadsheet
@@ -20,11 +20,15 @@ public class ModelCustomizerReader extends AbstractModelCustomizer {
 
 	private static final Logger log = LoggerFactory.getLogger(ModelCustomizerReader.class);
 
-	public ModelCustomizerReader(ElementNodeDef rootElement, ModelCustomizerConfig config, Spreadsheet sheet) {
-		super(rootElement, config, sheet);
+	public ModelCustomizerReader(ElementNodeDef rootElement, ModelCustomizerConfig config, 
+			SpreadsheetFile spreadsheetFile) {
+		super(rootElement, config, spreadsheetFile);
 	}
 	
 	public void readCustomizer() {
+		if (getSpreadsheetFile().getSpreadsheet(CUSTOMIZER_SHEET_NAME) == null) {
+			throw new IllegalStateException("Customizer is missing required '" + CUSTOMIZER_SHEET_NAME + "' worksheet");
+		}
 		processTree();
 	}
 	
@@ -55,7 +59,7 @@ public class ModelCustomizerReader extends AbstractModelCustomizer {
 		int row = getNodeRow(node);
 		int col = getNodeCol(node);
 		String expectedValue = node.getDispName();
-		String actualValue = getSheet().getCellValue(row, col);
+		String actualValue = getCustomizerSheet().getCellValue(row, col);
 		if (!actualValue.equals(expectedValue)) {
 			exception(row, col, "Invalid node name", actualValue, "expected '" + expectedValue + "'");
 		}
@@ -65,7 +69,7 @@ public class ModelCustomizerReader extends AbstractModelCustomizer {
 		int row = getNodeRow(node);
 		int col = getDataCol(COL_OCCURS);
 		String expectedValue = node.getDispOccurs();
-		String actualValue = getSheet().getCellValue(row, col);
+		String actualValue = getCustomizerSheet().getCellValue(row, col);
 		if (!actualValue.equals(expectedValue)) {
 			exception(row, col, "Invalid Occurs value", actualValue, "expected '" + expectedValue + "'");
 		}
@@ -74,7 +78,7 @@ public class ModelCustomizerReader extends AbstractModelCustomizer {
 	private void readOccursCountOverride(TDCNode node, boolean isAttrib) {
 		int row = getNodeRow(node);
 		int col = getDataCol(COL_OCCURS_OVERRIDE);
-		String overrideStr = getSheet().getCellValue(row, col).trim();
+		String overrideStr = getCustomizerSheet().getCellValue(row, col).trim();
 		int override = -1;
 		if (overrideStr.length() > 0) {
 			boolean allowInvalid = getConfig().getAllowMinMaxInvalidOccursCountOverride();

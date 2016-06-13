@@ -63,6 +63,10 @@ public class PageConfigImpl implements PageConfig {
 			int count = config.getCount(CONFIG_PREFIX);
 			for (int i = 0; i < count; i++) {
 				PageConfig pageConfig = build(i);
+				if (map.containsKey(pageConfig.getPageName())) {
+					throw new IllegalStateException("Page with name '" + pageConfig.getPageName() + 
+							"' already exists in this Book");
+				}
 				map.put(pageConfig.getPageName(), pageConfig);
 			}
 			return map;
@@ -84,7 +88,8 @@ public class PageConfigImpl implements PageConfig {
 			String docTypeName = config.getString(indexPrefix + "DocTypeName", null, true);
 			docTypeConfig = docTypeConfigs.get(docTypeName);
 			if (docTypeConfig == null) {
-				throw new IllegalStateException("Unable to locate DocType '" + docTypeName + "' for Page '" + pageName + "'");
+				throw new IllegalStateException("Unable to locate DocType '" + docTypeName + 
+						"' for Page '" + pageName + "'");
 			}
 			return new PageConfigImpl(this);
 		}

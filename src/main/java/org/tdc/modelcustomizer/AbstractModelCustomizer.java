@@ -11,6 +11,7 @@ import org.tdc.model.TDCNode;
 import org.tdc.modeldef.ElementNodeDef;
 import org.tdc.modeldef.ModelDef;
 import org.tdc.spreadsheet.Spreadsheet;
+import org.tdc.spreadsheet.SpreadsheetFile;
 
 /**
  * Abstract class containing common functionality for classes responsible for customizer reading and writing.  
@@ -19,27 +20,31 @@ public abstract class AbstractModelCustomizer {
 	
 	private static final Logger log = LoggerFactory.getLogger(AbstractModelCustomizer.class);
 	
+	protected static final String CUSTOMIZER_SHEET_NAME = "Customizer";
 	protected static final int COL_OCCURS = 0;
 	protected static final int COL_OCCURS_OVERRIDE = 1;
 	protected static final int COL_CUSTOM_BASE = 2;
 	
 	private final ElementNodeDef rootElement;
 	private final ModelCustomizerConfig config; 
-	private final Spreadsheet sheet;
+	private final SpreadsheetFile spreadsheetFile;
 	private final int nodeRowStart;
 	private final int dataColStart;
+	
+	private Spreadsheet customizerSheet;
 	
 	/**
 	 * Constructor. 
 	 * 
 	 * @param rootElement Root {@link ElementNodeDef} of the {@link ModelDef} to customize. 
 	 * @param format{@link ModelCustomizerConfig} containing customizer config information (format, style, params).
-	 * @param sheet {@link Spreadsheet} to write to or read from.
+	 * @param spreadsheetFile {@link SpreadsheetFile} to write to or read from.
 	 */
-	public AbstractModelCustomizer(ElementNodeDef rootElement, ModelCustomizerConfig config, Spreadsheet sheet) {
+	public AbstractModelCustomizer(ElementNodeDef rootElement, ModelCustomizerConfig config, 
+			SpreadsheetFile spreadsheetFile) {
 		this.rootElement = rootElement;
 		this.config = config;
-		this.sheet = sheet;
+		this.spreadsheetFile = spreadsheetFile;
 		this.nodeRowStart = 3;
 		this.dataColStart = config.getTreeStructureColumnCount() + 1;
 	}
@@ -48,8 +53,15 @@ public abstract class AbstractModelCustomizer {
 		return rootElement;
 	}
 	
-	protected final Spreadsheet getSheet() {
-		return sheet;
+	protected final SpreadsheetFile getSpreadsheetFile() {
+		return spreadsheetFile;
+	}
+	
+	protected final Spreadsheet getCustomizerSheet() {
+		if (customizerSheet == null) {
+			customizerSheet = spreadsheetFile.getSpreadsheet(CUSTOMIZER_SHEET_NAME);
+		}
+		return customizerSheet;
 	}
 	
 	protected final ModelCustomizerConfig getConfig() {

@@ -3,12 +3,21 @@ package org.tdc.spreadsheet;
 /**
  * Defines core functionality for working with an individual spreadsheet.
  * 
+ * <p>Multiple ExcelSpreadsheets are typically part of a {@link SpreadsheetFile}.
+ * 
  * <p>Does not support multiple spreadsheet pages/tabs -- just a single sheet.
  * Supporting multiple pages/tabs is outside the scope of this interface.
  * 
  * <p>Note that indexes for this interface are 1-based.
  */
 public interface Spreadsheet {
+	
+	/**
+	 * Return Spreadsheet name.
+	 * 
+	 * @return Spreadsheet name
+	 */
+	String getName();
 	
 	/**
 	 * Returns the string value for a particular cell.

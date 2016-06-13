@@ -58,7 +58,7 @@ public class BookConfigImpl implements BookConfig {
 	public Map<String, PageConfig> getPageConfigs() {
 		return pageConfigs;
 	}
-
+	
 	public static class BookConfigBuilder {
 		private static final String CONFIG_FILE = "TDCBookConfig.xml";
 		

@@ -25,6 +25,8 @@ import org.tdc.modelinst.ModelInstFactory;
 import org.tdc.modelinst.ModelInstFactoryImpl;
 import org.tdc.schema.SchemaFactory;
 import org.tdc.schema.SchemaFactoryImpl;
+import org.tdc.spreadsheet.SpreadsheetFileFactory;
+import org.tdc.spreadsheet.excel.ExcelSpreadsheetFileFactory;
 import org.tdc.util.Addr;
 import org.tdc.util.MPathModelWriterForTesting;
 import org.tdc.util.SummaryModelWriterForTesting;
@@ -43,6 +45,8 @@ public class ModelTest {
 	
 	private static final int INDENT_SIZE = 3;
 	
+	private static SpreadsheetFileFactory spreadsheetFileFactory;
+	
 	private static SchemaConfigFactory schemaConfigFactory;
 	private static ModelConfigFactory modelConfigFactory;
 
@@ -51,6 +55,8 @@ public class ModelTest {
 	private static ModelInstFactory modelInstFactory;
 	
 /*
+	 NOTES
+	 
 	 test modelDef = modelDef
 	 test modelInst = modelInst
 	 test mpath modelDef = mpath modelDef
@@ -89,10 +95,6 @@ public class ModelTest {
 	 - root element, complex, 0..2, sequence, 3 simple children
 	 - root element, complex, 0..2, choice, 3 simple children
 	 - root element, complex, 0..2, all, 3 simple children
-	 
-	 
-
-	
 	
 
 		// flatten compositor if:
@@ -106,18 +108,19 @@ public class ModelTest {
 	@BeforeClass
 	public static void setup() {
 		Path schemaRoot = Paths.get("testfiles/TDCFiles/Schemas");
+		
+		spreadsheetFileFactory = new ExcelSpreadsheetFileFactory();
 
 		schemaConfigFactory = new SchemaConfigFactoryImpl(schemaRoot);
 		modelConfigFactory = new ModelConfigFactoryImpl(schemaConfigFactory);
 
 		schemaFactory = new SchemaFactoryImpl();
 		modelDefFactory = new ModelDefFactoryImpl(schemaFactory);
-		modelInstFactory = new ModelInstFactoryImpl(modelDefFactory);
+		modelInstFactory = new ModelInstFactoryImpl(modelDefFactory, spreadsheetFileFactory);
 	}
 	
-	@Test
-	public void
-	test1() {
+//	@Test
+//	public void test1() {
 //		String modelAddr = "Test/TestSchemaV1.0/Model_OldTest";
 //		System.out.println("--------------------------------------------------");
 //		outputModelDefSummary(mdAddr);
@@ -131,53 +134,45 @@ public class ModelTest {
 //		compareModelDefMPath(modelAddr, "ModelDefMPath.txt");
 //		compareModelInstSummary(modelAddr, "ModelInstSummary.txt");
 //		compareModelInstMPath(modelAddr, "ModelInstMPath.txt");
-	}
+//	}
 	
 	@Test
-	public void
-	oldTest_modelDef_structure_created_correctly() {
+	public void oldTestModelDefStructureCreatedCorrectly() {
 		compareModelDefSummary("Test/TestSchemaV1.0/Model_OldTest", "ModelDefSummary.txt");
 	}
 	
 	@Test
-	public void
-	oldTest_modelDef_mpath_created_correctly() {
+	public void oldTestModelDefMpathCreatedCorrectly() {
 		compareModelDefMPath("Test/TestSchemaV1.0/Model_OldTest", "ModelDefMPath.txt");
 	}
 	
 	@Test
-	public void
-	oldTest_modelInst_structure_created_correctly() {
+	public void oldTestModelInstStructureCreatedCorrectly() {
 		compareModelInstSummary("Test/TestSchemaV1.0/Model_OldTest", "ModelInstSummary.txt");
 	}
 	
 	@Test
-	public void
-	oldTest_modelInst_mpath_created_correctly() {
+	public void oldTestModelInstMpathCreatedCorrectly() {
 		compareModelInstMPath("Test/TestSchemaV1.0/Model_OldTest", "ModelInstMPath.txt");
 	}
 
 	@Test
-	public void
-	oldTest_modelDef_Customized_structure_created_correctly() {
+	public void oldTestModelDefCustomizedStructureCreatedCorrectly() {
 		compareModelDefSummary("Test/TestSchemaV1.0/Model_OldTest_Customized", "ModelDefSummary.txt");
 	}
 	
 	@Test
-	public void
-	oldTest_modelDef_Customized_mpath_created_correctly() {
+	public void oldTestModelDefCustomizedMpathCreatedCorrectly() {
 		compareModelDefMPath("Test/TestSchemaV1.0/Model_OldTest_Customized", "ModelDefMPath.txt");
 	}
 	
 	@Test
-	public void
-	oldTest_modelInst_Customized_structure_created_correctly() {
+	public void oldTestModelInstCustomizedStructureCreatedCorrectly() {
 		compareModelInstSummary("Test/TestSchemaV1.0/Model_OldTest_Customized", "ModelInstSummary_Customized.txt");
 	}
 	
 	@Test
-	public void
-	oldTest_modelInst_Customized_mpath_created_correctly() {
+	public void oldTestModelInstCustomizedMpathCreatedCorrectly() {
 		compareModelInstMPath("Test/TestSchemaV1.0/Model_OldTest_Customized", "ModelInstMPath_Customized.txt");
 	}
 

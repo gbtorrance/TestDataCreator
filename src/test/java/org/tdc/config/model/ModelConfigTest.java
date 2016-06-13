@@ -36,16 +36,14 @@ public class ModelConfigTest {
 	}
 	
 	@Test
-	public void 
-	test_caching_returns_same_config() {
+	public void testCachingReturnsSameConfig() {
 		ModelConfig schemaConfig1 = modelConfigFactory.getModelConfig(modelAddr);
 		ModelConfig schemaConfig2 = modelConfigFactory.getModelConfig(modelAddr);
 		assertThat(schemaConfig1).isEqualTo(schemaConfig2);
 	}
 	
 	@Test
-	public void
-	test_valid_config() {
+	public void testValidConfig() {
 		ModelConfig modelConfig = modelConfigFactory.getModelConfig(modelAddr);
 		SchemaConfig schemaConfig = schemaConfigFactory.getSchemaConfig(new Addr("/ConfigTest/SchemaConfigTest"));
 		assertThat(modelConfig.getSchemaConfig()).isEqualTo(schemaConfig);
@@ -83,8 +81,7 @@ public class ModelConfigTest {
 	}
 	
 	@Test
-	public void
-	test_config_root_does_not_exist() {
+	public void testConfigRootDoesNotExist() {
 		Addr modelAddrConfigRootDoesNotExist = new Addr("/ConfigTest/SchemaConfigTest/ModelConfigTest_DoesNotExit");
 		exception.expect(IllegalStateException.class);
 		exception.expectMessage("ModelConfig root dir does not exist:");
@@ -92,8 +89,7 @@ public class ModelConfigTest {
 	}
 
 	@Test
-	public void
-	test_config_xml_does_not_exist() {
+	public void testConfigXmlDoesNotExist() {
 		Addr modelAddrConfigXMLMissing = new Addr("/ConfigTest/SchemaConfigTest/ModelConfigTest_ConfigXMLMissing");
 		exception.expect(IllegalStateException.class);
 		exception.expectMessage("Configuration file does not exist:");

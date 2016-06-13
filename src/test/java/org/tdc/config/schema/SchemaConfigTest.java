@@ -30,16 +30,14 @@ public class SchemaConfigTest {
 	}
 	
 	@Test
-	public void 
-	test_caching_returns_same_config() {
+	public void testCachingReturnsSameConfig() {
 		SchemaConfig schemaConfig1 = schemaConfigFactory.getSchemaConfig(schemaAddr);
 		SchemaConfig schemaConfig2 = schemaConfigFactory.getSchemaConfig(schemaAddr);
 		assertThat(schemaConfig1).isEqualTo(schemaConfig2);
 	}
 	
 	@Test
-	public void
-	test_valid_config() {
+	public void testValidConfig() {
 		SchemaConfig schemaConfig = schemaConfigFactory.getSchemaConfig(schemaAddr);
 		assertThat(schemaConfig.getSchemasConfigRoot()).isEqualTo(schemasConfigRoot);
 		assertThat(schemaConfig.getAddr()).isEqualTo(schemaAddr);
@@ -48,8 +46,7 @@ public class SchemaConfigTest {
 	}
 	
 	@Test
-	public void
-	test_config_root_does_not_exist() {
+	public void testConfigRootDoesNotExist() {
 		Addr schemaAddrConfigRootDoesNotExist = new Addr("/ConfigTest/SchemaConfigTest_DoesNotExit");
 		exception.expect(IllegalStateException.class);
 		exception.expectMessage("SchemaConfig root dir does not exist:");
@@ -57,8 +54,7 @@ public class SchemaConfigTest {
 	}
 
 	@Test
-	public void
-	test_config_xml_does_not_exist() {
+	public void testConfigXmlDoesNotExist() {
 		Addr schemaAddrConfigXMLMissing = new Addr("/ConfigTest/SchemaConfigTest_ConfigXMLMissing");
 		exception.expect(IllegalStateException.class);
 		exception.expectMessage("Configuration file does not exist:");
@@ -66,8 +62,7 @@ public class SchemaConfigTest {
 	}
 
 	@Test
-	public void
-	test_schema_files_dir_does_not_exist() {
+	public void testSchemaFilesDirDoesNotExist() {
 		Addr schemaAddrSchemaFilesDirMissing = new Addr("/ConfigTest/SchemaConfigTest_SchemaFilesDirMissing");
 		exception.expect(IllegalStateException.class);
 		exception.expectMessage("Schema files root dir does not exist:");

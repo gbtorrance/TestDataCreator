@@ -10,7 +10,7 @@ import org.tdc.model.NonAttribNode;
 import org.tdc.model.TDCNode;
 import org.tdc.modeldef.ElementNodeDef;
 import org.tdc.spreadsheet.CellStyle;
-import org.tdc.spreadsheet.Spreadsheet;
+import org.tdc.spreadsheet.SpreadsheetFile;
 
 /**
  * Implementation of class with functionality for creating an initial customizer spreadsheet.
@@ -21,12 +21,14 @@ public class ModelCustomizerWriter extends AbstractModelCustomizer {
 
 	private int maxColumns;
 	
-	public ModelCustomizerWriter(ElementNodeDef rootElement, ModelCustomizerConfig config, Spreadsheet sheet) {
-		super(rootElement, config, sheet);
+	public ModelCustomizerWriter(ElementNodeDef rootElement, ModelCustomizerConfig config, 
+			SpreadsheetFile spreadsheetFile) {
+		super(rootElement, config, spreadsheetFile);
 	}
 	
 	public void writeCustomizer() {
-		getSheet().setDefaultCellStyle(getConfig().getDefaultNodeStyle());
+		getSpreadsheetFile().createSpreadsheet(CUSTOMIZER_SHEET_NAME);
+		getCustomizerSheet().setDefaultCellStyle(getConfig().getDefaultNodeStyle());
 		maxColumns = 0;
 		processTree();
 		formatColumns();
@@ -77,15 +79,15 @@ public class ModelCustomizerWriter extends AbstractModelCustomizer {
 	}
 	
 	private void outputChoiceMarker(NonAttribNode node, CellStyle cellStyle) {
-		getSheet().setCellValue(">", getNodeRow(node), getNodeCol(node) - 1, cellStyle);
+		getCustomizerSheet().setCellValue(">", getNodeRow(node), getNodeCol(node) - 1, cellStyle);
 	}
 
 	private void outputNodeName(TDCNode node, CellStyle cellStyle) {
-		getSheet().setCellValue(node.getDispName(), getNodeRow(node), getNodeCol(node), cellStyle);
+		getCustomizerSheet().setCellValue(node.getDispName(), getNodeRow(node), getNodeCol(node), cellStyle);
 	}
 	
 	private void outputOccurs(TDCNode node) {
-		getSheet().setCellValue(node.getDispOccurs(), getNodeRow(node), getDataCol(COL_OCCURS)); 
+		getCustomizerSheet().setCellValue(node.getDispOccurs(), getNodeRow(node), getDataCol(COL_OCCURS)); 
 	}
 	
 	private void outputOccursOverride(TDCNode node, boolean isAttrib) {
@@ -108,7 +110,7 @@ public class ModelCustomizerWriter extends AbstractModelCustomizer {
 		// only output an override number if > 1 (to avoid cluttering the spreadsheet); 
 		// zero and one will be handled by the default (unless manually overriden in the spreadsheet)
 		String initialOverrideStr = initialOverride > 1 ? Integer.toString(initialOverride) : "";
-		getSheet().setCellValue(initialOverrideStr, getNodeRow(node), getDataCol(COL_OCCURS_OVERRIDE));
+		getCustomizerSheet().setCellValue(initialOverrideStr, getNodeRow(node), getDataCol(COL_OCCURS_OVERRIDE));
 	}
 
 	private void formatColumns() {
@@ -118,7 +120,7 @@ public class ModelCustomizerWriter extends AbstractModelCustomizer {
 					") must be at least " + maxColumns + " to support this particular model");
 		}
 		for (int i = 1; i <= allowedColumns; i++) {
-			getSheet().setColumnWidth(i, getConfig().getTreeStructureColumnWidth());
+			getCustomizerSheet().setColumnWidth(i, getConfig().getTreeStructureColumnWidth());
 		}
 	}
 }

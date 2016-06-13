@@ -1,8 +1,7 @@
 package org.tdc.spreadsheet.excel;
 
-import java.io.FileInputStream;
-import java.nio.file.Path;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.apache.poi.xssf.usermodel.XSSFCell;
@@ -19,6 +18,8 @@ import org.tdc.spreadsheet.Spreadsheet;
 /**
  * A {@link Spreadsheet} implementation for Excel worksheets.
  * 
+ * <p>Multiple ExcelSpreadsheets are typically part of an {@link ExcelSpreadsheetFile}.
+ * 
  * <p>Note that row and column index values are 1-based. 
  * (Internally, though, the Apache POI libraries use 0-based indexes.)
  */
@@ -30,8 +31,13 @@ public class ExcelSpreadsheet implements Spreadsheet {
 	
 	private POICellStyleLookup poiCellStyleLookup = new POICellStyleLookup();
 	
-	public ExcelSpreadsheet(XSSFSheet xssfSheet) {
-		this.xssfSheet = xssfSheet;
+	private ExcelSpreadsheet(SpreadsheetBuilder builder) {
+		this.xssfSheet = builder.xssfSheet;
+	}
+	
+	@Override
+	public String getName() {
+		return xssfSheet.getSheetName();
 	}
 	
 	@Override 
@@ -177,36 +183,35 @@ public class ExcelSpreadsheet implements Spreadsheet {
 		}
 	}
 	
-	/**
-	 * Static factory method to create an ExcelSpreadsheet from a worksheet in an existing Excel workbook.
-	 *  
-	 * @param path The file to read.
-	 * @param worksheetName The name of the worksheet to read.
-	 * @return ExcelWorkbook file.
-	 */
-	public static ExcelSpreadsheet readExcelSpreadsheetFromPath(Path path, String worksheetName) {
-		XSSFWorkbook xssfWorkbook = readXSSFWorkbook(path);
-		XSSFSheet xssfSheet = xssfWorkbook.getSheet(worksheetName);
-		if (xssfSheet == null) {
-			throw new RuntimeException("Unable to find worksheet '" + worksheetName + "' in Excel Workbook: " + path.toString());
+	public static class SpreadsheetBuilder {
+		private final XSSFWorkbook workbook;
+		
+		private XSSFSheet xssfSheet;
+		
+		public SpreadsheetBuilder(XSSFWorkbook workbook) {
+			this.workbook = workbook;
 		}
-		return new ExcelSpreadsheet(xssfSheet);
-	}
-	
-	/**
-	 * Static factory method to read and create an XSSFWorkbook from an existing Excel workbook.
-	 *  
-	 * @param path The file to read.
-	 * @return
-	 */
-	public static XSSFWorkbook readXSSFWorkbook(Path path) {
-		XSSFWorkbook xssfWorkbook = null;
-		try (FileInputStream fis = new FileInputStream(path.toFile())) {
-			xssfWorkbook = new XSSFWorkbook(fis);
+		
+		public Spreadsheet build(String name) {
+			if (workbook.getSheet(name) != null) {
+				throw new IllegalStateException("An Excel file with the name '" + name + "' already exists");
+			}
+			return build(workbook.createSheet(name));
 		}
-		catch (Exception ex) {
-			throw new RuntimeException("Unable to read Excel Workbook: " + path.toString(), ex);
+		
+		public Map<String, Spreadsheet> buildAll() {
+			Map<String, Spreadsheet> spreadsheets = new LinkedHashMap<>();
+			int sheetCount = workbook.getNumberOfSheets();
+			for (int i = 0; i < sheetCount; i++) {
+				Spreadsheet spreadsheet = build(workbook.getSheetAt(i));
+				spreadsheets.put(spreadsheet.getName(), spreadsheet);
+			}
+			return spreadsheets;
 		}
-		return xssfWorkbook;
+		
+		private Spreadsheet build(XSSFSheet xssfSheet) {
+			this.xssfSheet = xssfSheet;
+			return new ExcelSpreadsheet(this);
+		}
 	}
 }

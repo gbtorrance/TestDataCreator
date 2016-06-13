@@ -17,5 +17,4 @@ public class SchemaImpl implements Schema {
 		log.info("Creating SchemaImpl: {}", config.getAddr());
 		this.config = config;
 	}
-
 }

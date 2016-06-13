@@ -42,16 +42,14 @@ public class BookConfigTest {
 	}
 	
 	@Test
-	public void 
-	test_caching_returns_same_config() {
+	public void testCachingReturnsSameConfig() {
 		BookConfig bookConfig1 = bookConfigFactory.getBookConfig(bookAddr);
 		BookConfig bookConfig2 = bookConfigFactory.getBookConfig(bookAddr);
 		assertThat(bookConfig1).isEqualTo(bookConfig2);
 	}
 	
 	@Test
-	public void
-	test_valid_config() {
+	public void testValidConfig() {
 		BookConfig bookConfig = bookConfigFactory.getBookConfig(bookAddr);
 		assertThat(bookConfig.getBooksConfigRoot()).isEqualTo(booksConfigRoot);
 		assertThat(bookConfig.getAddr()).isEqualTo(bookAddr);
@@ -89,8 +87,7 @@ public class BookConfigTest {
 	}
 	
 	@Test
-	public void
-	test_doc_type_not_found() {
+	public void testDocTypeNotFound() {
 		Addr bookAddrDocTypeMissing = new Addr("/ConfigTest/BookConfigTest_DocTypeMissing");
 		exception.expect(IllegalStateException.class);
 		exception.expectMessage("Unable to locate DocType 'DocTypeNotInConfig' for Page 'Page1'");
@@ -98,8 +95,7 @@ public class BookConfigTest {
 	}
 
 	@Test
-	public void
-	test_config_root_does_not_exist() {
+	public void testConfigRootDoesNotExist() {
 		Addr bookAddrConfigRootDoesNotExist = new Addr("/ConfigTest/BookConfigTest_DoesNotExit");
 		exception.expect(IllegalStateException.class);
 		exception.expectMessage("BookConfig root dir does not exist:");
@@ -107,8 +103,7 @@ public class BookConfigTest {
 	}
 
 	@Test
-	public void
-	test_config_xml_does_not_exist() {
+	public void testConfigXmlDoesNotExist() {
 		Addr bookAddrConfigXMLMissing = new Addr("/ConfigTest/BookConfigTest_ConfigXMLMissing");
 		exception.expect(IllegalStateException.class);
 		exception.expectMessage("Configuration file does not exist:");

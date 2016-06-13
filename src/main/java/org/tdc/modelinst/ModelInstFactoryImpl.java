@@ -10,6 +10,9 @@ import org.tdc.config.model.ModelCustomizerConfig;
 import org.tdc.modelcustomizer.ModelCustomizerReader;
 import org.tdc.modeldef.ModelDef;
 import org.tdc.modeldef.ModelDefFactory;
+import org.tdc.spreadsheet.Spreadsheet;
+import org.tdc.spreadsheet.SpreadsheetFile;
+import org.tdc.spreadsheet.SpreadsheetFileFactory;
 import org.tdc.spreadsheet.excel.ExcelSpreadsheet;
 import org.tdc.util.Addr;
 import org.tdc.util.Cache;
@@ -30,9 +33,11 @@ public class ModelInstFactoryImpl implements ModelInstFactory {
 	
 	private Cache<ModelInst> cache = new CacheImpl<>();
 	private ModelDefFactory modelDefFactory;
+	private SpreadsheetFileFactory spreadsheetFileFactory;
 	
-	public ModelInstFactoryImpl(ModelDefFactory modelDefFactory) {
+	public ModelInstFactoryImpl(ModelDefFactory modelDefFactory, SpreadsheetFileFactory spreadsheetFileFactory) {
 		this.modelDefFactory = modelDefFactory;
+		this.spreadsheetFileFactory = spreadsheetFileFactory;
 	}
 	
 	@Override
@@ -59,8 +64,9 @@ public class ModelInstFactoryImpl implements ModelInstFactory {
 		if (!Files.isRegularFile(path)) {
 			throw new IllegalStateException("Unable to locate or read customizer spreadsheet file: " + path.toString());
 		}
-		ExcelSpreadsheet sheet = ExcelSpreadsheet.readExcelSpreadsheetFromPath(path, "Customizer");
-		ModelCustomizerReader reader = new ModelCustomizerReader(modelDef.getRootElement(), config.getModelCustomizerConfig(), sheet);
+		SpreadsheetFile spreadsheetFile = spreadsheetFileFactory.getSpreadsheetFileFromPath(path);
+		ModelCustomizerReader reader = new ModelCustomizerReader(modelDef.getRootElement(), 
+				config.getModelCustomizerConfig(), spreadsheetFile);
 		reader.readCustomizer();
 	}
 	
