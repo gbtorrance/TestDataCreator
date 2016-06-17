@@ -194,7 +194,7 @@ public class ExcelSpreadsheet implements Spreadsheet {
 		
 		public Spreadsheet build(String name) {
 			if (workbook.getSheet(name) != null) {
-				throw new IllegalStateException("An Excel file with the name '" + name + "' already exists");
+				throw new IllegalStateException("A worksheet with the name '" + name + "' already exists");
 			}
 			return build(workbook.createSheet(name));
 		}

@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Config>
+
+	<DocTypes>
+		<DocType>
+			<DocTypeName>TaxReturn</DocTypeName>
+			<MinPerTestCase>1</MinPerTestCase>
+			<MaxPerTestCase>1</MaxPerTestCase>
+		</DocType>
+		<DocType>
+			<DocTypeName>Manifest</DocTypeName>
+			<MinPerTestCase>0</MinPerTestCase>
+			<MaxPerTestCase>1</MaxPerTestCase>
+		</DocType>
+	</DocTypes>
+	
+	<Pages>
+		<Page>
+			<PageName>1040A</PageName>
+			<ModelAddress>/Tax/efile1040x_2012v3.0/Model_1040A</ModelAddress>
+			<DocTypeName>TaxReturn</DocTypeName>
+		</Page>	
+		<Page>
+			<PageName>1040EZ</PageName>
+			<ModelAddress>/Tax/efile1040x_2012v3.0/Model_1040EZ</ModelAddress>
+			<DocTypeName>TaxReturn</DocTypeName>
+		</Page>
+		<Page>
+			<PageName>Manifest</PageName>
+			<ModelAddress>/Tax/efile1040x_2012v3.0/Model_Manifest</ModelAddress>
+			<DocTypeName>Manifest</DocTypeName>
+		</Page>
+	</Pages>
+	
+	<DefaultNodeStyle>
+		<FontName>Calibri</FontName>
+		<FontHeight>11</FontHeight>
+	</DefaultNodeStyle>
+	<ParentNodeStyle>
+		<FontName>Calibri</FontName>
+		<FontHeight>11</FontHeight>
+		<ColorRGB>0 0 255</ColorRGB> <!-- blue -->
+	</ParentNodeStyle>
+	<AttribNodeStyle>
+		<FontName>Calibri</FontName>
+		<FontHeight>11</FontHeight>
+		<ColorRGB>34 97 13</ColorRGB> <!-- green -->
+	</AttribNodeStyle>
+	<CompositorNodeStyle>
+		<FontName>Calibri</FontName>
+		<FontHeight>11</FontHeight>
+		<ColorRGB>64 64 64</ColorRGB> <!-- dark gray -->
+		<Italic>true</Italic>
+	</CompositorNodeStyle>
+	<ChoiceMarkerStyle>
+		<FontName>Calibri</FontName>
+		<FontHeight>11</FontHeight>
+		<ColorRGB>255 0 0</ColorRGB>  <!-- red -->
+	</ChoiceMarkerStyle>
+	<OccurMarkerStyle>
+		<FontName>Calibri</FontName>
+		<FontHeight>10</FontHeight>
+		<ColorRGB>107 36 12</ColorRGB> <!-- brown -->
+	</OccurMarkerStyle>
+	<TreeStructureColumnCount>25</TreeStructureColumnCount>
+	<TreeStructureColumnWidth>500</TreeStructureColumnWidth>
+	
+</Config>

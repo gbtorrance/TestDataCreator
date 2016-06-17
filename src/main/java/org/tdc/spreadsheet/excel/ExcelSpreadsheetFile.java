@@ -53,6 +53,15 @@ public class ExcelSpreadsheetFile implements SpreadsheetFile {
 		save(path);
 	}
 	
+	@Override
+	public void setSpreadsheetHidden(String name, boolean hide) {
+		int index = workbook.getSheetIndex(name);
+		if (index == -1) {
+			throw new IllegalStateException("Unable to hide worksheet '" + name + "'; does not exist");
+		}
+		workbook.setSheetHidden(index, hide);
+	}
+
 	public static class SpreadsheetFileBuilder {
 		private final XSSFWorkbook workbook;
 		

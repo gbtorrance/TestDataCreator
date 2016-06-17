@@ -1,5 +1,7 @@
 package org.tdc.book;
 
+import org.tdc.modelinst.ModelInst;
+
 /**
  * Defines core functionality for a Page.
  * 
@@ -8,4 +10,5 @@ package org.tdc.book;
  */
 public interface Page {
 	String getName();
+	ModelInst getModelInst();
 }

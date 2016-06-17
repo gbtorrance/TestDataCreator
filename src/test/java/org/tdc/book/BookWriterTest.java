@@ -60,15 +60,32 @@ public class BookWriterTest {
 	
 	@Test
 	public void testWriteBook() {
-		Addr bookAddr = new Addr("/ConfigTest/BookConfigTest");
+		Addr bookAddr = new Addr("/Tax/IndividualIncome2012v1");
 		BookConfig bookConfig = bookConfigFactory.getBookConfig(bookAddr);
 		Book book = bookFactory.getBook(bookConfig);
 		SpreadsheetFile bookFile = spreadsheetFileFactory.getSpreadsheetFile();
 		
-		BookWriter bookWriter =  new BookWriterImpl(book);
-		bookWriter.write(bookFile);
+		BookWriter bookWriter =  new BookWriterImpl(book, bookFile);
+		bookWriter.write();
 		
 		Path bookFilePath = Paths.get("testfiles/Temp/TestBook.xlsx");
 		bookFile.save(bookFilePath);
 	}
+	
+//	@Test
+//	public void initCustomizer() {
+//		Addr modelAddr = new Addr("Tax/efile1040x_2012v3.0/Model_1040EZ");
+//		ModelConfig config = modelConfigFactory.getModelConfig(modelAddr);
+//		ModelDef modelDef = modelDefFactory.getModelDef(config);
+//		
+//		ExcelSpreadsheetFileFactory factory = new ExcelSpreadsheetFileFactory();
+//		SpreadsheetFile spreadsheetFile = factory.getSpreadsheetFile();
+//		
+//		ModelCustomizerWriter writer = new ModelCustomizerWriter(
+//				modelDef.getRootElement(), config.getModelCustomizerConfig(), spreadsheetFile);
+//		writer.writeCustomizer();
+//		
+//		Path path = Paths.get("testfiles/TDCFiles/Schemas/Tax/efile1040x_2012v3.0/Model_1040EZ/Customizer.xlsx");
+//		spreadsheetFile.save(path);
+//	}
 }

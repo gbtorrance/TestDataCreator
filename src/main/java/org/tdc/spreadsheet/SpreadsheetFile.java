@@ -11,4 +11,5 @@ public interface SpreadsheetFile {
 	Spreadsheet createSpreadsheet(String name);
 	void save(Path path);
 	void saveAsNew(Path path);
+	void setSpreadsheetHidden(String name, boolean hide);
 }

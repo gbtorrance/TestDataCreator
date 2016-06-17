@@ -3,6 +3,7 @@ package org.tdc.config.book;
 import java.nio.file.Path;
 import java.util.Map;
 
+import org.tdc.spreadsheet.CellStyle;
 import org.tdc.util.Addr;
 
 /**
@@ -14,4 +15,17 @@ public interface BookConfig {
 	Path getBookConfigRoot();
 	Map<String, DocTypeConfig> getDocTypeConfigs();
 	Map<String, PageConfig> getPageConfigs();
+	String getConfigSheetName();
+	int getConfigSheetBookAddrRow();
+	int getConfigSheetBookAddrCol();
+	CellStyle getDefaultNodeStyle();
+	CellStyle getParentNodeStyle();
+	CellStyle getAttribNodeStyle();
+	CellStyle getCompositorNodeStyle();
+	CellStyle getChoiceMarkerStyle();
+	CellStyle getOccurMarkerStyle();
+	int getTreeStructureColumnCount();
+	int getTreeStructureColumnWidth();
+	int getNodeRowStart();
+	int getDataColStart();
 }

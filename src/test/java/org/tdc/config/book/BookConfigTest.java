@@ -2,6 +2,7 @@ package org.tdc.config.book;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.awt.Color;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Map;
@@ -54,6 +55,24 @@ public class BookConfigTest {
 		assertThat(bookConfig.getBooksConfigRoot()).isEqualTo(booksConfigRoot);
 		assertThat(bookConfig.getAddr()).isEqualTo(bookAddr);
 		assertThat(bookConfig.getBookConfigRoot()).isEqualTo(booksConfigRoot.resolve(bookAddr.toString()));
+		assertThat(bookConfig.getDefaultNodeStyle().getFontName()).isEqualTo("Calibri");
+		assertThat(bookConfig.getDefaultNodeStyle().getFontHeight()).isEqualTo(11);
+		assertThat(bookConfig.getParentNodeStyle().getFontName()).isEqualTo("Arial");
+		assertThat(bookConfig.getParentNodeStyle().getFontHeight()).isEqualTo(12);
+		assertThat(bookConfig.getParentNodeStyle().getColor()).isEqualTo(new Color(0, 0, 255));
+		assertThat(bookConfig.getParentNodeStyle().getItalic()).isEqualTo(false);
+		assertThat(bookConfig.getAttribNodeStyle().getFontName()).isEqualTo("Calibri");
+		assertThat(bookConfig.getAttribNodeStyle().getFontHeight()).isEqualTo(13);
+		assertThat(bookConfig.getAttribNodeStyle().getColor()).isEqualTo(new Color(34, 97, 13));
+		assertThat(bookConfig.getCompositorNodeStyle().getFontName()).isEqualTo("Times New Roman");
+		assertThat(bookConfig.getCompositorNodeStyle().getFontHeight()).isEqualTo(14);
+		assertThat(bookConfig.getCompositorNodeStyle().getColor()).isEqualTo(new Color(64, 64, 64));
+		assertThat(bookConfig.getCompositorNodeStyle().getItalic()).isEqualTo(true);
+		assertThat(bookConfig.getChoiceMarkerStyle().getFontName()).isEqualTo("Calibri");
+		assertThat(bookConfig.getChoiceMarkerStyle().getFontHeight()).isEqualTo(15);
+		assertThat(bookConfig.getChoiceMarkerStyle().getColor()).isEqualTo(new Color(255, 0, 0));
+		assertThat(bookConfig.getTreeStructureColumnCount()).isEqualTo(12);
+		assertThat(bookConfig.getTreeStructureColumnWidth()).isEqualTo(500);
 		Map<String, DocTypeConfig> docTypeConfigs = bookConfig.getDocTypeConfigs();
 		DocTypeConfig dtConfig1 = docTypeConfigs.get("DocType1");
 		assertThat(dtConfig1.getDocTypeName()).isEqualTo("DocType1");

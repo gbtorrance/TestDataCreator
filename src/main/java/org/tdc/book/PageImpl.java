@@ -5,6 +5,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.tdc.config.book.PageConfig;
+import org.tdc.modelinst.ModelInst;
 import org.tdc.modelinst.ModelInstFactory;
 
 /**
@@ -23,6 +24,15 @@ public class PageImpl implements Page {
 	@Override
 	public String getName() {
 		return config.getPageName();
+	}
+	
+	@Override
+	public ModelInst getModelInst() {
+		// intentionally not storing a reference to the actual ModelInst;
+		// that way we can keep Books/Pages in memory without necessarily
+		// keeping the very heavy-weight ModelInsts in memory all the time;
+		// allows for better memory management
+		return modelInstFactory.getModelInst(config.getModelConfig());
 	}
 	
 	public static class PageBuilder {
