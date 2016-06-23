@@ -12,8 +12,8 @@ public abstract class NodeDef extends AbstractTDCNode {
 	
 	private int occursCountOverride = -1;
 	
-	public NodeDef(NonAttribNodeDef parent) {
-		super(parent);
+	public NodeDef(NonAttribNodeDef parent, ModelDefSharedState sharedState) {
+		super(parent, sharedState);
 	}
 	
 	@Override
@@ -22,28 +22,25 @@ public abstract class NodeDef extends AbstractTDCNode {
 	}
 
 	@Override
-	protected void setMPath(String mpath) {
-		// overriding to allow accessibility to other classes in this package
-		super.setMPath(mpath);
+	public ModelDefSharedState getSharedState() {
+		return (ModelDefSharedState)super.getSharedState();
 	}
 
-	@Override
-	protected void setColOffset(int colOffset) {
-		// overriding to allow accessibility to other classes in this package
-		super.setColOffset(colOffset);
-	}
-	
-	@Override
-	protected void setRowOffset(int rowOffset) {
-		// overriding to allow accessibility to other classes in this package
-		super.setRowOffset(rowOffset);
-	}
-	
 	public int getOccursCountOverride() {
 		return occursCountOverride;
 	}
 	
 	public void setOccursCountOverride(int occursCountOverride) {
+		getSharedState().throwExceptionIfImmutable("setOccursCountOverride");
 		this.occursCountOverride = occursCountOverride;
+	}
+	
+	@Override
+	public String getVariable(String name) {
+		return getSharedState().getVariable(name, this);
+	}
+	
+	public void setVariable(String name, String value) {
+		getSharedState().setVariable(name, this, value);
 	}
 }

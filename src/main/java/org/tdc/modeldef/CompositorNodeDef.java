@@ -12,10 +12,10 @@ import org.tdc.model.NonAttribNode;
  */
 public class CompositorNodeDef extends NonAttribNodeDef implements CompositorNode {
 	
-	private CompositorType compositorType;
+	private final CompositorType compositorType;
 
-	public CompositorNodeDef(NonAttribNodeDef parent, CompositorType compositorType) {
-		super(parent);
+	public CompositorNodeDef(NonAttribNodeDef parent, ModelDefSharedState sharedState, CompositorType compositorType) {
+		super(parent, sharedState);
 		this.compositorType = compositorType;
 	}
 	
@@ -29,11 +29,6 @@ public class CompositorNodeDef extends NonAttribNodeDef implements CompositorNod
 		return "[" + compositorType + "]";
 	}
 
-	@Override
-	public String getDispType() {
-		return "";
-	}
-	
 	@Override
 	public void accept(ModelVisitor visitor) {
 		visitor.visit(this);

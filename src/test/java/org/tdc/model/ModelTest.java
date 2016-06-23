@@ -115,8 +115,8 @@ public class ModelTest {
 		modelConfigFactory = new ModelConfigFactoryImpl(schemaConfigFactory);
 
 		schemaFactory = new SchemaFactoryImpl();
-		modelDefFactory = new ModelDefFactoryImpl(schemaFactory);
-		modelInstFactory = new ModelInstFactoryImpl(modelDefFactory, spreadsheetFileFactory);
+		modelDefFactory = new ModelDefFactoryImpl(schemaFactory, spreadsheetFileFactory);
+		modelInstFactory = new ModelInstFactoryImpl(modelDefFactory);
 	}
 	
 //	@Test

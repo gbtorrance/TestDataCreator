@@ -23,8 +23,8 @@ public abstract class NonAttribNodeDef extends NodeDef implements NonAttribNode 
 	
 	private List<NonAttribNodeDef> children = new ArrayList<>();
 	
-	protected NonAttribNodeDef(NonAttribNodeDef parent) {
-		super(parent);
+	protected NonAttribNodeDef(NonAttribNodeDef parent, ModelDefSharedState sharedState) {
+		super(parent, sharedState);
 	}
 	
 	@Override
@@ -32,8 +32,8 @@ public abstract class NonAttribNodeDef extends NodeDef implements NonAttribNode 
 		return minOccurs;
 	}
 
-	// intentionally package level
-	void setMinOccurs(int minOccurs) {
+	public void setMinOccurs(int minOccurs) {
+		getSharedState().throwExceptionIfImmutable("setMinOccurs");
 		this.minOccurs = minOccurs;
 	}
 
@@ -42,8 +42,8 @@ public abstract class NonAttribNodeDef extends NodeDef implements NonAttribNode 
 		return maxOccurs;
 	}
 	
-	// intentionally package level
-	void setMaxOccurs(int maxOccurs) {
+	public void setMaxOccurs(int maxOccurs) {
+		getSharedState().throwExceptionIfImmutable("setMaxOccurs");
 		this.maxOccurs = maxOccurs;
 	}
 
@@ -62,8 +62,8 @@ public abstract class NonAttribNodeDef extends NodeDef implements NonAttribNode 
 		return children.size() > 0;
 	}
 	
-	// intentionally package level
-	void addChild(NonAttribNodeDef child) {
+	public void addChild(NonAttribNodeDef child) {
+		getSharedState().throwExceptionIfImmutable("addChild");
 		children.add(child);
 	}
 	

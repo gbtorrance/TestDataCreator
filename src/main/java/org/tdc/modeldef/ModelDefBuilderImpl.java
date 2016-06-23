@@ -9,8 +9,14 @@ import org.apache.xerces.xs.XSModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.tdc.config.model.ModelConfig;
+import org.tdc.config.model.ModelCustomizerConfig;
 import org.tdc.model.MPathIndex;
+import org.tdc.modelcustomizer.ModelCustomizerReader;
 import org.tdc.schema.Schema;
+import org.tdc.schemaparse.ModelDefDOMErrorHandler;
+import org.tdc.schemaparse.ModelDefSchemaParser;
+import org.tdc.spreadsheet.SpreadsheetFile;
+import org.tdc.spreadsheet.SpreadsheetFileFactory;
 import org.w3c.dom.DOMErrorHandler;
 import org.w3c.dom.bootstrap.DOMImplementationRegistry;
 
@@ -27,26 +33,46 @@ public class ModelDefBuilderImpl implements ModelDefBuilder {
 
 	private static final Logger log = LoggerFactory.getLogger(ModelDefBuilderImpl.class);
 	
-	private ModelConfig config;
-	private Schema schema;
-	private DOMImplementationRegistry domRegistry;
+	private final ModelConfig config;
+	private final Schema schema;
+	private final SpreadsheetFileFactory spreadsheetFileFactory;
 	
-	public ModelDefBuilderImpl(ModelConfig config, Schema schema) {
+	private DOMImplementationRegistry domRegistry;
+	private MPathIndex<NodeDef> mpathIndex;
+	private ModelDefSharedState sharedState;
+	
+	public ModelDefBuilderImpl(ModelConfig config, Schema schema, SpreadsheetFileFactory spreadsheetFileFactory) {
 		this.config = config;
 		this.schema = schema;
+		this.spreadsheetFileFactory = spreadsheetFileFactory;
 		initDOMRegistry();
 	}
 	
 	@Override
 	public ModelDef build() {
-		// TODO possibly building from zipped schemas?
-
+		// TODO possibly add ability to build from zipped schemas?
+		ElementNodeDef rootElement = buildNodeTree();
+		if (config.hasModelCustomizerConfig()) {
+			customizeModelDefTree(rootElement);
+		}
+		return new ModelDefImpl(config, schema, rootElement, mpathIndex, sharedState);
+	}
+	
+	public ElementNodeDef buildNodeTree() {
+		log.debug("Start building ModelDef tree");
+		mpathIndex = new MPathIndex<>();
+		sharedState = new ModelDefSharedState();
 		Path rootSchemaFile = config.getSchemaRootFileFullPath();
 		if (!Files.isReadable(rootSchemaFile)) {
 			throw new IllegalStateException("Unable to read root schema file: " + rootSchemaFile.toString());
 		}
 		XSModel xsModel = buildXSModelFromSchemas(rootSchemaFile);
-		return buildModelDefFromXSModel(xsModel, config.getSchemaRootElementName(), config.getSchemaRootElementNamespace());
+		ModelDefSchemaParser modelDefSchemaParser = 
+				new ModelDefSchemaParser(xsModel, mpathIndex, sharedState, config.getSchemaExtractors());
+		ElementNodeDef rootElement = modelDefSchemaParser.buildModelDefTreeFromSchema(
+				config.getSchemaRootElementName(), config.getSchemaRootElementNamespace());
+		log.debug("Finish building ModelDef tree: rootElementDef: {}", rootElement.getName());
+		return rootElement;
 	}
 	
 	private XSModel buildXSModelFromSchemas(Path rootSchemaFile) {
@@ -59,17 +85,20 @@ public class ModelDefBuilderImpl implements ModelDefBuilder {
 		return xsModel;
 	}
 	
-	private ModelDef buildModelDefFromXSModel(XSModel xsModel, String rootElementName, String rootElementNamespace) {
-		MPathIndex<NodeDef> mpathIndex = new MPathIndex<>();
-		ModelDefSchemaParser modelDefSchemaParser = new ModelDefSchemaParser(xsModel, mpathIndex);
-		
-		log.debug("Start building ModelDef tree");
-		ElementNodeDef rootElementDef = modelDefSchemaParser.buildModelDefTreeFromSchema(rootElementName, rootElementNamespace);
-		log.debug("Finish building ModelDef tree: rootElementDef: {}", rootElementDef.getName());
-		
-		return new ModelDefImpl(config, schema, rootElementDef, mpathIndex);
+	private void customizeModelDefTree(ElementNodeDef rootElement) {
+		log.debug("Start customizing ModelDef tree");
+		ModelCustomizerConfig customizerConfig = config.getModelCustomizerConfig();
+		Path path = customizerConfig.getFilePath();
+		if (!Files.isRegularFile(path)) {
+			throw new IllegalStateException("Unable to locate or read customizer spreadsheet file: " + path.toString());
+		}
+		SpreadsheetFile spreadsheetFile = spreadsheetFileFactory.getSpreadsheetFileFromPath(path);
+		ModelCustomizerReader reader = new ModelCustomizerReader(rootElement, 
+				config.getModelCustomizerConfig(), spreadsheetFile);
+		reader.readCustomizer();
+		log.debug("Finish customizing ModelDef tree: rootElementDef: {}", rootElement.getName());
 	}
-
+	
 	private void initDOMRegistry() {
 		System.setProperty(DOMImplementationRegistry.PROPERTY, "org.apache.xerces.dom.DOMXSImplementationSourceImpl");
 		try {

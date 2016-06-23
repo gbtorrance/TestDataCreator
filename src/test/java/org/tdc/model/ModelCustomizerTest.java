@@ -9,13 +9,15 @@ import org.junit.Test;
 import org.tdc.config.model.ModelConfig;
 import org.tdc.config.model.ModelConfigFactory;
 import org.tdc.config.model.ModelConfigFactoryImpl;
+import org.tdc.config.model.ModelCustomizerConfig;
+import org.tdc.config.schema.SchemaConfig;
 import org.tdc.config.schema.SchemaConfigFactory;
 import org.tdc.config.schema.SchemaConfigFactoryImpl;
 import org.tdc.modelcustomizer.ModelCustomizerReader;
 import org.tdc.modelcustomizer.ModelCustomizerWriter;
-import org.tdc.modeldef.ModelDef;
-import org.tdc.modeldef.ModelDefFactory;
-import org.tdc.modeldef.ModelDefFactoryImpl;
+import org.tdc.modeldef.ElementNodeDef;
+import org.tdc.modeldef.ModelDefBuilderImpl;
+import org.tdc.schema.Schema;
 import org.tdc.schema.SchemaFactory;
 import org.tdc.schema.SchemaFactoryImpl;
 import org.tdc.spreadsheet.SpreadsheetFile;
@@ -33,54 +35,56 @@ public class ModelCustomizerTest {
 	
 	private static SchemaConfigFactory schemaConfigFactory;
 	private static ModelConfigFactory modelConfigFactory;
-
 	private static SchemaFactory schemaFactory;
-	private static ModelDefFactory modelDefFactory;
 	
 	@BeforeClass
 	public static void setup() {
 		Path schemaRoot = Paths.get("testfiles/TDCFiles/Schemas");
-
 		schemaConfigFactory = new SchemaConfigFactoryImpl(schemaRoot);
 		modelConfigFactory = new ModelConfigFactoryImpl(schemaConfigFactory);
-
 		schemaFactory = new SchemaFactoryImpl();
-		modelDefFactory = new ModelDefFactoryImpl(schemaFactory);
 	}
 	
 	@Test
 	public void testCustomizerWriteThenRead() throws IOException {
-		writeCustomizer();
-		readCustomizer();
+		// build ModelDef tree;
+		// normally a factory would be used for this 
+		// (i.e. just build the ModelDef using the factory and then get the tree from it);
+		// however, due to the immutability of ModelDefs, it is too late once
+		// the ModelDef is created to use a customizer on it;
+		// need to get around that by just creating the tree without the ModelDef;
+		// in normal circumstances the factory will take care of 'customizing' the model
+		Addr modelAddr = new Addr("Test/TestSchemaV1.0/Model_OldTest_Customized");
+		ModelConfig modelConfig = modelConfigFactory.getModelConfig(modelAddr);
+		SchemaConfig schemaConfig = modelConfig.getSchemaConfig();
+		Schema schema = schemaFactory.getSchema(schemaConfig);
+		ModelDefBuilderImpl builder = new ModelDefBuilderImpl(modelConfig, schema, null);
+		ElementNodeDef rootElement = builder.buildNodeTree();		
+		
+		// write customizer based on tree; then read it back again
+		writeCustomizer(rootElement, modelConfig.getModelCustomizerConfig());
+		readCustomizer(rootElement, modelConfig.getModelCustomizerConfig());
 	}
 	
-	private void writeCustomizer() {
-		Addr modelAddr = new Addr("Test/TestSchemaV1.0/Model_OldTest_Customized");
-		ModelConfig config = modelConfigFactory.getModelConfig(modelAddr);
-		ModelDef modelDef = modelDefFactory.getModelDef(config);
-		
+	private void writeCustomizer(ElementNodeDef rootElement, ModelCustomizerConfig customizerConfig) {
 		ExcelSpreadsheetFileFactory factory = new ExcelSpreadsheetFileFactory();
 		SpreadsheetFile spreadsheetFile = factory.getSpreadsheetFile();
 		
 		ModelCustomizerWriter writer = new ModelCustomizerWriter(
-				modelDef.getRootElement(), config.getModelCustomizerConfig(), spreadsheetFile);
+				rootElement, customizerConfig, spreadsheetFile);
 		writer.writeCustomizer();
 		
 		Path path = Paths.get("testfiles/Temp/TestModelCustomizer.xlsx");
 		spreadsheetFile.save(path);
 	}
 	
-	private void readCustomizer() {
-		Addr modelAddr = new Addr("Test/TestSchemaV1.0/Model_OldTest_Customized");
-		ModelConfig config = modelConfigFactory.getModelConfig(modelAddr);
-		ModelDef modelDef = modelDefFactory.getModelDef(config);
-		
+	private void readCustomizer(ElementNodeDef rootElement, ModelCustomizerConfig customizerConfig) {
 		Path path = Paths.get("testfiles/Temp/TestModelCustomizer.xlsx");
 		ExcelSpreadsheetFileFactory factory = new ExcelSpreadsheetFileFactory();
 		SpreadsheetFile spreadsheetFile = factory.getSpreadsheetFileFromPath(path);
 		
 		ModelCustomizerReader reader = new ModelCustomizerReader(
-				modelDef.getRootElement(), config.getModelCustomizerConfig(), spreadsheetFile);
+				rootElement, customizerConfig, spreadsheetFile);
 		reader.readCustomizer();
 	}
 }

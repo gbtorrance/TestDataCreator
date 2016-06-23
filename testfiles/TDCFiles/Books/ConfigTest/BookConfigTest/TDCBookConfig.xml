@@ -36,7 +36,7 @@
 		<Page>
 			<PageName>Page4</PageName>
 			<ModelAddress>/ConfigTest/SchemaConfigTest/ModelConfigTest</ModelAddress>
-			<DocTypeName>DocType1</DocTypeName> <!-- use one that was used before -->
+			<DocTypeName>DocType1</DocTypeName>  <!-- use one that was used before --> 
 		</Page>	
 	</Pages>
 	

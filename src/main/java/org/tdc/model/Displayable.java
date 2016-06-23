@@ -5,6 +5,5 @@ package org.tdc.model;
  */
 public interface Displayable {
 	String getDispName();
-	String getDispType();
 	String getDispOccurs();
 }

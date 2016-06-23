@@ -1,7 +1,8 @@
-package org.tdc.modeldef;
+package org.tdc.schemaparse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.tdc.modeldef.ModelDefBuilderImpl;
 import org.w3c.dom.DOMError;
 import org.w3c.dom.DOMErrorHandler;
 
@@ -13,8 +14,8 @@ public class ModelDefDOMErrorHandler implements DOMErrorHandler {
 
 	private static final Logger log = LoggerFactory.getLogger(ModelDefDOMErrorHandler.class);
 	
-	private boolean failOnParserWarning;
-	private boolean failOnParserNonFatalError;
+	private static boolean failOnParserWarning;
+	private static boolean failOnParserNonFatalError;
 
 	public ModelDefDOMErrorHandler(boolean failOnParserWarning, boolean failOnParserNonFatalError) {
 		this.failOnParserWarning = failOnParserWarning;

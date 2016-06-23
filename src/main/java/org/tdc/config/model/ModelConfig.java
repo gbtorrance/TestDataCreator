@@ -1,8 +1,10 @@
 package org.tdc.config.model;
 
 import java.nio.file.Path;
+import java.util.List;
 
 import org.tdc.config.schema.SchemaConfig;
+import org.tdc.schemaparse.extractor.SchemaExtractor;
 import org.tdc.util.Addr;
 
 /**
@@ -11,10 +13,8 @@ import org.tdc.util.Addr;
  */
 public interface ModelConfig {
 	SchemaConfig getSchemaConfig();
-
 	Addr getAddr();
 	Path getModelConfigRoot();
-	
 	String getSchemaRootFile();
 	Path getSchemaRootFileFullPath();
 	String getSchemaRootElementName();
@@ -22,6 +22,7 @@ public interface ModelConfig {
 	boolean getFailOnParserWarning();
 	boolean getFailOnParserNonFatalError();
 	int getDefaultOccursCount();
+	List<SchemaExtractor> getSchemaExtractors();
 	ModelCustomizerConfig getModelCustomizerConfig();
 	boolean hasModelCustomizerConfig();
 }

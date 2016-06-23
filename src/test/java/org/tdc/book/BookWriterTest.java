@@ -53,8 +53,8 @@ public class BookWriterTest {
 		spreadsheetFileFactory = new ExcelSpreadsheetFileFactory();
 		
 		schemaFactory = new SchemaFactoryImpl();
-		modelDefFactory = new ModelDefFactoryImpl(schemaFactory);
-		modelInstFactory = new ModelInstFactoryImpl(modelDefFactory, spreadsheetFileFactory);
+		modelDefFactory = new ModelDefFactoryImpl(schemaFactory, spreadsheetFileFactory);
+		modelInstFactory = new ModelInstFactoryImpl(modelDefFactory);
 		bookFactory = new BookFactoryImpl(modelInstFactory);
 	}
 	

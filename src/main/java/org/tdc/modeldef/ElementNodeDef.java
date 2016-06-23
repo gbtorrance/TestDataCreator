@@ -15,15 +15,10 @@ import org.tdc.model.NonAttribNode;
 public class ElementNodeDef extends NonAttribNodeDef implements ElementNode {
 	
 	private String name;
-	private String dataType;
 	private List<AttribNodeDef> attributes = new ArrayList<>();
 	
-	private String lineNum;     // TODO make generic; MeF specific
-	private String formNum;     // TODO make generic; MeF specific
-	private String description; // TODO make generic; MeF specific
-	
-	public ElementNodeDef(NonAttribNodeDef parent) {
-		super(parent);
+	public ElementNodeDef(NonAttribNodeDef parent, ModelDefSharedState sharedState) {
+		super(parent, sharedState);
 	}
 	
 	@Override
@@ -31,19 +26,9 @@ public class ElementNodeDef extends NonAttribNodeDef implements ElementNode {
 		return name;
 	}
 
-	// intentionally package level
-	void setName(String name) {
+	public void setName(String name) {
+		getSharedState().throwExceptionIfImmutable("setName");
 		this.name = name;
-	}
-	
-	@Override
-	public String getDataType() {
-		return dataType;
-	}
-	
-	// intentionally package level
-	void setDataType(String dataType) {
-		this.dataType = dataType;
 	}
 	
 	@Override
@@ -56,19 +41,14 @@ public class ElementNodeDef extends NonAttribNodeDef implements ElementNode {
 		return attributes.size() > 0;
 	}
 	
-	// intentionally package level
-	void addAttribute(AttribNodeDef attribute) {
+	public void addAttribute(AttribNodeDef attribute) {
+		getSharedState().throwExceptionIfImmutable("addAttribute");
 		attributes.add(attribute);
 	}
 	
 	@Override
 	public String getDispName() {
 		return name;
-	}
-
-	@Override
-	public String getDispType() {
-		return dataType;
 	}
 
 	@Override
@@ -80,25 +60,5 @@ public class ElementNodeDef extends NonAttribNodeDef implements ElementNode {
 		for (NonAttribNode nonAttrib : getChildren()) {
 			nonAttrib.accept(visitor);
 		}
-	}
-	
-	// TODO make generic; MeF specific
-	public String getLineNum() {
-		return lineNum;
-	}
-	public void setLineNum(String lineNum) {
-		this.lineNum = lineNum;
-	}
-	public String getFormNum() {
-		return formNum;
-	}
-	public void setFormNum(String formNum) {
-		this.formNum = formNum;
-	}
-	public String getDescription() {
-		return description;
-	}
-	public void setDescription(String description) {
-		this.description = description;
 	}
 }

@@ -15,17 +15,23 @@ public class ModelDefImpl implements ModelDef {
 
 	private static final Logger log = LoggerFactory.getLogger(ModelDefImpl.class);
 
-	private ModelConfig config;
-	private Schema schema;
-	private ElementNodeDef rootElement;
-	private MPathIndex<NodeDef> mpathIndex;
+	private final ModelConfig config;
+	private final Schema schema;
+	private final ElementNodeDef rootElement;
+	private final MPathIndex<NodeDef> mpathIndex;
+	private final ModelDefSharedState sharedState;
 	
-	public ModelDefImpl(ModelConfig config, Schema schema, ElementNodeDef rootElement, MPathIndex<NodeDef> mpathIndex) {
+	public ModelDefImpl(
+			ModelConfig config, Schema schema, ElementNodeDef rootElement, 
+			MPathIndex<NodeDef> mpathIndex, ModelDefSharedState sharedState) {
+		
 		log.info("Creating ModelDefImpl: {}", config.getAddr());
 		this.config = config;
 		this.schema = schema;
 		this.rootElement = rootElement;
 		this.mpathIndex = mpathIndex;
+		this.sharedState = sharedState;
+		sharedState.setImmutable();
 	}
 	
 	@Override

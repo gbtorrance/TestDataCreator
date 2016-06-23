@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.tdc.config.model.ModelConfig;
 import org.tdc.schema.Schema;
 import org.tdc.schema.SchemaFactory;
+import org.tdc.spreadsheet.SpreadsheetFileFactory;
 import org.tdc.util.Addr;
 import org.tdc.util.Cache;
 import org.tdc.util.CacheImpl;
@@ -22,15 +23,17 @@ public class ModelDefFactoryImpl implements ModelDefFactory {
 
 	private static final Logger log = LoggerFactory.getLogger(ModelDefFactoryImpl.class);
 
-	private Cache<ModelDef> cache = new CacheImpl<>();
-	private SchemaFactory schemaFactory;
+	private final Cache<ModelDef> cache = new CacheImpl<>();
+	private final SchemaFactory schemaFactory;
+	private final SpreadsheetFileFactory spreadsheetFileFactory;
 	
-	public ModelDefFactoryImpl(SchemaFactory schemaFactory) {
+	public ModelDefFactoryImpl(SchemaFactory schemaFactory, SpreadsheetFileFactory spreadsheetFileFactory) {
 		this.schemaFactory = schemaFactory;
+		this.spreadsheetFileFactory = spreadsheetFileFactory;
 	}
 	
 	@Override
-	public ModelDef getModelDef(ModelConfig config) {
+	public synchronized ModelDef getModelDef(ModelConfig config) {
 		Addr addr = config.getAddr();
 		ModelDef modelDef = cache.get(addr);
 		if (modelDef == null) {
@@ -47,7 +50,7 @@ public class ModelDefFactoryImpl implements ModelDefFactory {
 	private ModelDef buildNewModelDef(ModelConfig config, Schema schema) {
 		// TODO possibly support building from serialized object;
 		//      factory to make determination based on info in config
-		ModelDefBuilder modelDefBuilder = new ModelDefBuilderImpl(config, schema);
+		ModelDefBuilder modelDefBuilder = new ModelDefBuilderImpl(config, schema, spreadsheetFileFactory);
 		return modelDefBuilder.build();
 	}
 }

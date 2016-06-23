@@ -29,9 +29,11 @@ public class ModelInstBuilderImpl implements ModelInstBuilder {
 
 	private final ModelDef modelDef;
 	private final int defaultOccursCount;
+	
 	private int rowOffset;
 	private MPathIndex<NodeInst> mpathIndex; 
 	private MPathBuilder mpathBuilder;
+	private ModelInstSharedState sharedState;
 	
 	public ModelInstBuilderImpl(ModelDef modelDef, int defaultOccursCount) {
 		this.modelDef = modelDef;
@@ -41,13 +43,14 @@ public class ModelInstBuilderImpl implements ModelInstBuilder {
 	@Override
 	public ModelInst build() {
 		log.debug("Start building ModelInst tree");
+		mpathIndex = new MPathIndex<>();
+		sharedState = new ModelInstSharedState();
 		ElementNodeInst rootElementInst = buildRootElementInst(modelDef.getRootElement());
 		log.debug("Finish building ModelInst tree: rootElementInst: {}", rootElementInst.getName()); 
-		return new ModelInstImpl(modelDef, rootElementInst, mpathIndex);
+		return new ModelInstImpl(modelDef, rootElementInst, mpathIndex, sharedState);
 	}
 	
 	private ElementNodeInst buildRootElementInst(ElementNodeDef rootElementNodeDef) {
-		mpathIndex = new MPathIndex<>();
 		mpathBuilder = new MPathBuilder();
 		rowOffset = 0;
 		List<? extends NonAttribNodeInst> list;
@@ -108,7 +111,7 @@ public class ModelInstBuilderImpl implements ModelInstBuilder {
 			NonAttribNodeInst parentNonAttribNodeInst, ElementNodeDef elementNodeDef, 
 			int colOffset, int occurNum, int occurCount) {
 		
-		ElementNodeInst elementNodeInst = new ElementNodeInst(parentNonAttribNodeInst, elementNodeDef);
+		ElementNodeInst elementNodeInst = new ElementNodeInst(parentNonAttribNodeInst, sharedState, elementNodeDef);
 		elementNodeInst.setRowOffset(rowOffset);
 		elementNodeInst.setColOffset(colOffset);
 		elementNodeInst.setOccurNum(occurNum);
@@ -140,7 +143,7 @@ public class ModelInstBuilderImpl implements ModelInstBuilder {
 			NonAttribNodeInst parentNonAttribNodeInst, CompositorNodeDef compositorNodeDef, 
 			int colOffset, int occurNum, int occurCount) {
 		
-		CompositorNodeInst compositorNodeInst = new CompositorNodeInst(parentNonAttribNodeInst, compositorNodeDef);
+		CompositorNodeInst compositorNodeInst = new CompositorNodeInst(parentNonAttribNodeInst, sharedState, compositorNodeDef);
 		compositorNodeInst.setRowOffset(rowOffset);
 		compositorNodeInst.setColOffset(colOffset);
 		compositorNodeInst.setOccurNum(occurNum);
@@ -189,7 +192,7 @@ public class ModelInstBuilderImpl implements ModelInstBuilder {
 	private AttribNodeInst buildAttrib(
 			ElementNodeInst parentElementNodeInst, AttribNodeDef attribNodeDef, int colOffset) {
 		
-		AttribNodeInst attribNodeInst = new AttribNodeInst(parentElementNodeInst, attribNodeDef);
+		AttribNodeInst attribNodeInst = new AttribNodeInst(parentElementNodeInst, sharedState, attribNodeDef);
 		attribNodeInst.setRowOffset(rowOffset);
 		attribNodeInst.setColOffset(colOffset);
 		attribNodeInst.setMPath(buildMPath(attribNodeInst, true));

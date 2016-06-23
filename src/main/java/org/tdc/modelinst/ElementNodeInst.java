@@ -17,8 +17,8 @@ public class ElementNodeInst extends NonAttribNodeInst implements ElementNode {
 	
 	private List<AttribNodeInst> attributes = new ArrayList<>();
 	
-	public ElementNodeInst(NonAttribNodeInst parent, ElementNodeDef elementNodeDef) {
-		super(parent, elementNodeDef);
+	public ElementNodeInst(NonAttribNodeInst parent, ModelInstSharedState sharedState, ElementNodeDef elementNodeDef) {
+		super(parent, sharedState, elementNodeDef);
 	}
 	
 	@Override
@@ -31,8 +31,8 @@ public class ElementNodeInst extends NonAttribNodeInst implements ElementNode {
 		return attributes.size() > 0;
 	}
 	
-	// intentionally package level
-	void addAttribute(AttribNodeInst attribute) {
+	public void addAttribute(AttribNodeInst attribute) {
+		getSharedState().throwExceptionIfImmutable("addAttribute");
 		attributes.add(attribute);
 	}
 	
@@ -46,11 +46,6 @@ public class ElementNodeInst extends NonAttribNodeInst implements ElementNode {
 		return getNodeDef().getName();
 	}
 	
-	@Override
-	public String getDataType() {
-		return getNodeDef().getDataType();
-	}
-
 	@Override
 	public void accept(ModelVisitor visitor) {
 		visitor.visit(this);

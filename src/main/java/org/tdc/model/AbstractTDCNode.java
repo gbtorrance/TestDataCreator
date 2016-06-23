@@ -6,13 +6,15 @@ package org.tdc.model;
 public abstract class AbstractTDCNode implements TDCNode {
 
 	private final TDCNode parent;
+	private final ModelSharedState sharedState;
 	
 	private String mpath;
 	private int colOffset = -1;
 	private int rowOffset = -1;
 
-	public AbstractTDCNode(TDCNode parent) {
+	public AbstractTDCNode(TDCNode parent, ModelSharedState sharedState) {
 		this.parent = parent;
+		this.sharedState = sharedState;
 	}
 
 	@Override
@@ -25,7 +27,8 @@ public abstract class AbstractTDCNode implements TDCNode {
 		return mpath;
 	}
 	
-	protected void setMPath(String mpath) {
+	public void setMPath(String mpath) {
+		getSharedState().throwExceptionIfImmutable("setMPath");
 		this.mpath = mpath;
 	}
 	
@@ -34,7 +37,8 @@ public abstract class AbstractTDCNode implements TDCNode {
 		return colOffset;
 	}
 	
-	protected void setColOffset(int colOffset) {
+	public void setColOffset(int colOffset) {
+		getSharedState().throwExceptionIfImmutable("setColOffset");
 		this.colOffset = colOffset;
 	}
 	
@@ -43,14 +47,19 @@ public abstract class AbstractTDCNode implements TDCNode {
 		return rowOffset;
 	}
 	
-	protected void setRowOffset(int rowOffset) {
+	public void setRowOffset(int rowOffset) {
+		getSharedState().throwExceptionIfImmutable("setRowOffset");
 		this.rowOffset = rowOffset;
 	}
 
 	@Override
 	public String toString() {
 		return getClass().getSimpleName() + "@" + Integer.toHexString(hashCode()) +
-				", name: " + getDispName() + ", type: " + getDispType() + ", occurs: " + getDispOccurs() +
+				", name: " + getDispName() + ", occurs: " + getDispOccurs() +
 				", rowOffset: " + rowOffset + ", colOffset: " + colOffset;
+	}
+
+	protected ModelSharedState getSharedState() {
+		return sharedState;
 	}
 }

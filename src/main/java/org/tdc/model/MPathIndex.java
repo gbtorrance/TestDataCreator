@@ -49,7 +49,7 @@ import java.util.Map;
  */
 public class MPathIndex<T extends AbstractTDCNode> {
 	
-	private Map<String, T> map = new HashMap<>();
+	private final Map<String, T> map = new HashMap<>();
 	
 	public void addMPath(String mpath, T node) {
 		map.put(mpath,  node);

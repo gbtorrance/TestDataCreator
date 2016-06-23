@@ -1,18 +1,13 @@
-package org.tdc.modeldef;
+package org.tdc.schemaparse;
 
+import java.util.List;
 import java.util.ListIterator;
 
-import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathExpressionException;
-import javax.xml.xpath.XPathFactory;
-
-import org.apache.xerces.dom.DocumentImpl;
 import org.apache.xerces.xs.XSAnnotation;
 import org.apache.xerces.xs.XSAttributeDeclaration;
 import org.apache.xerces.xs.XSAttributeUse;
 import org.apache.xerces.xs.XSComplexTypeDefinition;
 import org.apache.xerces.xs.XSElementDeclaration;
-import org.apache.xerces.xs.XSFacet;
 import org.apache.xerces.xs.XSModel;
 import org.apache.xerces.xs.XSModelGroup;
 import org.apache.xerces.xs.XSObjectList;
@@ -26,7 +21,16 @@ import org.slf4j.LoggerFactory;
 import org.tdc.model.CompositorType;
 import org.tdc.model.MPathBuilder;
 import org.tdc.model.MPathIndex;
-import org.w3c.dom.Node;
+import org.tdc.modeldef.AttribNodeDef;
+import org.tdc.modeldef.CompositorNodeDef;
+import org.tdc.modeldef.ElementNodeDef;
+import org.tdc.modeldef.ModelDef;
+import org.tdc.modeldef.ModelDefSharedState;
+import org.tdc.modeldef.NodeDef;
+import org.tdc.modeldef.NonAttribNodeDef;
+import org.tdc.schemaparse.extractor.SchemaAnnotationExtractor;
+import org.tdc.schemaparse.extractor.SchemaDataTypeExtractor;
+import org.tdc.schemaparse.extractor.SchemaExtractor;
 
 /**
  * Parser that takes an Apache Xerces {@link XSModel} representation of a Schema, and
@@ -36,14 +40,19 @@ public class ModelDefSchemaParser {
 
 	private static final Logger log = LoggerFactory.getLogger(ModelDefSchemaParser.class);
 
-	private XSModel xsModel;
-	private MPathIndex<NodeDef> mpathIndex; 
-	private MPathBuilder mpathBuilder = new MPathBuilder();
+	private final XSModel xsModel;
+	private final MPathIndex<NodeDef> mpathIndex; 
+	private final MPathBuilder mpathBuilder = new MPathBuilder();
+	private final ModelDefSharedState sharedState;
+	private final List<SchemaExtractor> schemaExtractors;
+	
 	private int rowOffset;
 
-	public ModelDefSchemaParser(XSModel xsModel, MPathIndex<NodeDef> mpathIndex) {
+	public ModelDefSchemaParser(XSModel xsModel, MPathIndex<NodeDef> mpathIndex, ModelDefSharedState sharedState, List<SchemaExtractor> schemaExtractors) {
 		this.xsModel = xsModel;
 		this.mpathIndex = mpathIndex;
+		this.sharedState = sharedState;
+		this.schemaExtractors = schemaExtractors;
 	}
 	
 	public ElementNodeDef buildModelDefTreeFromSchema(String rootElementName, String rootElementNamespace) {
@@ -51,7 +60,7 @@ public class ModelDefSchemaParser {
 		XSElementDeclaration ed = xsModel.getElementDeclaration(rootElementName, rootElementNamespace);
 
 		// create root element with no parent
-		ElementNodeDef rootElementNodeDef = new ElementNodeDef(null);
+		ElementNodeDef rootElementNodeDef = new ElementNodeDef(null, sharedState);
 		rootElementNodeDef.setMinOccurs(1); // root element must always occur once and only once
 		rootElementNodeDef.setMaxOccurs(1); // root element must always occur once and only once
 
@@ -87,19 +96,18 @@ public class ModelDefSchemaParser {
 			// should *never* occur; throw unchecked exception to indicate failure to properly understand XSD model
 			throw new UnsupportedOperationException("Unknown element type definition: " + xsTypeDef.getName());
 		}
-		processAnnotation(xsElementDecl, elementNodeDef);
+		processElementAnnotation(xsElementDecl, elementNodeDef);
 
 		colOffset--;
 		mpathBuilder.zoomOut();
 	}
 	
 	private void processSimpleTypeDefinition(XSSimpleTypeDefinition xsSimpleTypeDef, ElementNodeDef elementNodeDef) {
-		elementNodeDef.setDataType(getDataType(xsSimpleTypeDef));
+		processDataType(xsSimpleTypeDef, elementNodeDef);
 		// TODO Anything to do for restriction/list/union ... or restriction/extension? 
 	}
 	
 	private void processComplexTypeDefinition(XSComplexTypeDefinition xsComplexTypeDef, ElementNodeDef elementNodeDef, int colOffset) {
-		
 		// process attributes
 		processAttributes(xsComplexTypeDef, elementNodeDef, colOffset);
 		
@@ -131,7 +139,7 @@ public class ModelDefSchemaParser {
 
 			// set type
 			// applicable to ELEMENT, MIXED, and EMPTY
-			elementNodeDef.setDataType(getDataType(xsComplexTypeDef));
+			processDataType(xsComplexTypeDef, elementNodeDef);
 
 			// process particle 
 			// applicable to ELEMENT and MIXED only
@@ -160,7 +168,7 @@ public class ModelDefSchemaParser {
 			// but not when it's part of a complex type model (typedef particle)
 			
 			// create new element (with current element as parent)
-			ElementNodeDef newElementNodeDef = new ElementNodeDef(nonAttribNodeDef);
+			ElementNodeDef newElementNodeDef = new ElementNodeDef(nonAttribNodeDef, sharedState);
 			newElementNodeDef.setMinOccurs(xsParticle.getMinOccurs());
 			newElementNodeDef.setMaxOccurs(xsParticle.getMaxOccursUnbounded() ? NonAttribNodeDef.MAX_UNBOUNDED : xsParticle.getMaxOccurs());
 			
@@ -228,60 +236,52 @@ public class ModelDefSchemaParser {
 				// loop through attributes associated with this complex type
 				XSAttributeUse attribUse = (XSAttributeUse)xsObjectList.item(i);
 				XSAttributeDeclaration attribDecl = attribUse.getAttrDeclaration();
-				XSSimpleTypeDefinition attribType = attribDecl.getTypeDefinition();
 				// create an attrib node def for each and add to model def collection
-				AttribNodeDef attribNodeDef = new AttribNodeDef(elementNodeDef);
+				AttribNodeDef attribNodeDef = new AttribNodeDef(elementNodeDef, sharedState);
 				attribNodeDef.setName(attribDecl.getName());
 				attribNodeDef.setMPath(buildMPath(attribNodeDef));
 				attribNodeDef.setColOffset(colOffset);
 				attribNodeDef.setRowOffset(rowOffset++);
-				attribNodeDef.setDataType(getDataType(attribType));
 				attribNodeDef.setRequired(attribUse.getRequired());
+				XSSimpleTypeDefinition attribType = attribDecl.getTypeDefinition();
+				processDataType(attribType, attribNodeDef);
+				processAttribAnnotation(attribDecl, attribNodeDef);
 				elementNodeDef.addAttribute(attribNodeDef);
 			}
 		}
 	}
 	
-	private void processAnnotation(XSElementDeclaration xsElementDecl, ElementNodeDef elementNodeDef) {
-		
-		// TODO can attributes have annotations? what about compositors?
-		
-		// TODO this is a rough solution, but it doesn't:
-		// - properly deal with namespaces; implement something using a NamespaceConext
-		//      http://stackoverflow.com/questions/6390339/how-to-query-xml-using-namespaces-in-java-with-xpath
-		// - isn't generic enough (as far as where it's storing the data)
-		XSAnnotation xsAnnotation = xsElementDecl.getAnnotation();
-		if (xsAnnotation != null) {
-			Node dom = new DocumentImpl();
-			xsAnnotation.writeAnnotation(dom,  XSAnnotation.W3C_DOM_DOCUMENT);
-			XPathFactory xpathFactory = XPathFactory.newInstance();
-			XPath xpath = xpathFactory.newXPath();
-			String xpathExpression = null;
-			try {
-				// hack solution due to namespace issues (see above)
-				xpathExpression = "//*[local-name()='Description'][1]";   //|//*[local-name()='documentation'][1]"; -- consider add for Fed documentation 
-				String description = xpath.evaluate(xpathExpression, dom);
-				elementNodeDef.setDescription(description);
-				
-				xpathExpression = "//*[local-name()='LineNumber'][1]";
-				String lineNum = xpath.evaluate(xpathExpression, dom);
-				elementNodeDef.setLineNum(lineNum);
+	private void processElementAnnotation(XSElementDeclaration xsElementDecl, ElementNodeDef elementNodeDef) {
+		processAnnotation(xsElementDecl.getAnnotation(), elementNodeDef);
+	}
 
-				xpathExpression = "//*[local-name()='FormNumber'][1]";
-				String formNum = xpath.evaluate(xpathExpression, dom);
-				elementNodeDef.setFormNum(formNum);
-			}
-			catch (XPathExpressionException ex) {
-				throw new RuntimeException("Invalid xpath expression : " + xpathExpression, ex);
+	private void processAttribAnnotation(XSAttributeDeclaration xsAttribDecl, AttribNodeDef attribNodeDef) {
+		processAnnotation(xsAttribDecl.getAnnotation(), attribNodeDef);
+	}
+
+	private void processAnnotation(XSAnnotation xsAnnotation, NodeDef nodeDef) {
+		for (SchemaExtractor extractor : schemaExtractors) {
+			if (extractor instanceof SchemaAnnotationExtractor) {
+				SchemaAnnotationExtractor e = (SchemaAnnotationExtractor)extractor;
+				e.extractAnnotation(xsAnnotation, nodeDef);
 			}
 		}
 	}
-
+	
+	private void processDataType(XSTypeDefinition xsTypeDef, NodeDef nodeDef) {
+		for (SchemaExtractor extractor : schemaExtractors) {
+			if (extractor instanceof SchemaDataTypeExtractor) {
+				SchemaDataTypeExtractor e = (SchemaDataTypeExtractor)extractor;
+				e.extractDataType(xsTypeDef, nodeDef);
+			}
+		}
+	}
+	
 	private CompositorNodeDef createCompositorNode(NonAttribNodeDef parent, XSModelGroup mg) {
 		switch(mg.getCompositor()) {
-			case XSModelGroup.COMPOSITOR_SEQUENCE: return new CompositorNodeDef(parent, CompositorType.SEQUENCE);
-			case XSModelGroup.COMPOSITOR_CHOICE: return new CompositorNodeDef(parent, CompositorType.CHOICE);
-			case XSModelGroup.COMPOSITOR_ALL: return new CompositorNodeDef(parent, CompositorType.ALL);
+			case XSModelGroup.COMPOSITOR_SEQUENCE: return new CompositorNodeDef(parent, sharedState, CompositorType.SEQUENCE);
+			case XSModelGroup.COMPOSITOR_CHOICE: return new CompositorNodeDef(parent, sharedState, CompositorType.CHOICE);
+			case XSModelGroup.COMPOSITOR_ALL: return new CompositorNodeDef(parent, sharedState, CompositorType.ALL);
 			// should *never* occur; throw unchecked exception to indicate failure to properly understand XSD model 
 			default: throw new UnsupportedOperationException("Invalid compositor: " + mg.getCompositor());
 		}
@@ -291,21 +291,5 @@ public class ModelDefSchemaParser {
 		String mpath = mpathBuilder.buildMPath(nodeDef);
 		mpathIndex.addMPath(mpath, nodeDef);
 		return mpath;
-	}
-	
-	private String getDataType(XSTypeDefinition xsTypeDef) {
-		// TODO more robust way to handle this?
-		String type = xsTypeDef.getName();
-		if (type == null) {
-			type = getDataType(xsTypeDef.getBaseType());
-		}
-		if (xsTypeDef instanceof XSSimpleTypeDefinition) {
-			XSSimpleTypeDefinition xsSimpleTypeDef = (XSSimpleTypeDefinition)xsTypeDef;
-			XSFacet xsMaxLength = (XSFacet)xsSimpleTypeDef.getFacet(XSSimpleTypeDefinition.FACET_MAXLENGTH);
-			if (xsMaxLength != null) {
-				type = type + " {" + xsMaxLength.getIntFacetValue() + "}";
-			}
-		}
-		return type.equals("anyType") ? "" : type;
 	}
 }

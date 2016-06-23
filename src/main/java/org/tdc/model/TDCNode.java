@@ -5,6 +5,6 @@ package org.tdc.model;
  * 
  * <p>Named with "TDC" prefix to avoid confusion with w3c {@link org.w3c.dom.Node Node} object.
  */
-public interface TDCNode extends CanHaveParent, Addressable, Displayable, Visitable {
+public interface TDCNode extends CanHaveParent, CanHaveVariables, Addressable, Displayable, Visitable {
 
 }

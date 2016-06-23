@@ -15,12 +15,12 @@ public abstract class NodeInst extends AbstractTDCNode {
 	
 	private final NodeDef nodeDef;
 	
-	public NodeInst(NonAttribNodeInst parent) {
-		this(parent, null);
+	public NodeInst(NonAttribNodeInst parent, ModelInstSharedState sharedState) {
+		this(parent, sharedState, null);
 	}
 
-	public NodeInst(NonAttribNodeInst parent, NodeDef nodeDef) {
-		super(parent);
+	public NodeInst(NonAttribNodeInst parent, ModelInstSharedState sharedState, NodeDef nodeDef) {
+		super(parent, sharedState);
 		this.nodeDef = nodeDef;
 	}
 	
@@ -34,21 +34,8 @@ public abstract class NodeInst extends AbstractTDCNode {
 	}
 	
 	@Override
-	protected void setMPath(String mpath) {
-		// overriding to allow accessibility to other classes in this package
-		super.setMPath(mpath);
-	}
-
-	@Override
-	protected void setColOffset(int colOffset) {
-		// overriding to allow accessibility to other classes in this package
-		super.setColOffset(colOffset);
-	}
-	
-	@Override
-	protected void setRowOffset(int rowOffset) {
-		// overriding to allow accessibility to other classes in this package
-		super.setRowOffset(rowOffset);
+	public ModelInstSharedState getSharedState() {
+		return (ModelInstSharedState)super.getSharedState();
 	}
 	
 	@Override
@@ -57,13 +44,14 @@ public abstract class NodeInst extends AbstractTDCNode {
 	}
 
 	@Override
-	public String getDispType() {
-		return nodeDef.getDispType();
-	}
-
-	@Override
 	public String getDispOccurs() {
 		return nodeDef.getDispOccurs();
+	}
+	
+	@Override
+	public String getVariable(String name) {
+		// instance models don't have their own variables; return from def model
+		return nodeDef.getSharedState().getVariable(name, nodeDef);
 	}
 }
 

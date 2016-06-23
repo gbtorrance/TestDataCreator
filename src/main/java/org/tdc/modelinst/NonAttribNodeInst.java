@@ -19,8 +19,8 @@ public abstract class NonAttribNodeInst extends NodeInst implements NonAttribNod
 	private int occurNum;
 	private int occurCount;
 	
-	protected NonAttribNodeInst(NonAttribNodeInst parent, NonAttribNodeDef nonAttribNodeDef) {
-		super(parent, nonAttribNodeDef);
+	protected NonAttribNodeInst(NonAttribNodeInst parent, ModelInstSharedState sharedState, NonAttribNodeDef nonAttribNodeDef) {
+		super(parent, sharedState, nonAttribNodeDef);
 	}
 	
 	@Override
@@ -33,13 +33,13 @@ public abstract class NonAttribNodeInst extends NodeInst implements NonAttribNod
 		return children.size() > 0;
 	}
 	
-	// intentionally package level
-	void addChild(NonAttribNodeInst child) {
+	public void addChild(NonAttribNodeInst child) {
+		getSharedState().throwExceptionIfImmutable("addChild");
 		children.add(child);
 	}
 
-	// intentionally package level
-	void addChildAll(List<? extends NonAttribNodeInst> childList) {
+	public void addChildAll(List<? extends NonAttribNodeInst> childList) {
+		getSharedState().throwExceptionIfImmutable("addChildAll");
 		children.addAll(childList);
 	}
 
@@ -62,8 +62,8 @@ public abstract class NonAttribNodeInst extends NodeInst implements NonAttribNod
 		return occurNum;
 	}
 	
-	// intentionally package level
-	void setOccurNum(int occurNum) {
+	public void setOccurNum(int occurNum) {
+		getSharedState().throwExceptionIfImmutable("setOccurNum");
 		this.occurNum = occurNum;
 	}
 
@@ -71,8 +71,8 @@ public abstract class NonAttribNodeInst extends NodeInst implements NonAttribNod
 		return occurCount;
 	}
 	
-	// intentionally package level
-	void setOccurCount(int occurCount) {
+	public void setOccurCount(int occurCount) {
+		getSharedState().throwExceptionIfImmutable("setOccurCount");
 		this.occurCount = occurCount;
 	}
 	

@@ -28,7 +28,7 @@ public class BookConfigFactoryImpl implements BookConfigFactory {
 	}
 
 	@Override
-	public BookConfig getBookConfig(Addr addr) {
+	public synchronized BookConfig getBookConfig(Addr addr) {
 		BookConfig bookConfig = cache.get(addr);
 		if (bookConfig == null) {
 			bookConfig = new BookConfigImpl.BookConfigBuilder(booksConfigRoot, addr, modelConfigFactory).build();

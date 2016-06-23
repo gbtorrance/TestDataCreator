@@ -3,6 +3,6 @@ package org.tdc.model;
 /**
  * Interface for element nodes. 
  */
-public interface ElementNode extends NonAttribNode, CanHaveAttributes, Nameable, DataTypeable {
+public interface ElementNode extends NonAttribNode, CanHaveAttributes, Nameable {
 
 }

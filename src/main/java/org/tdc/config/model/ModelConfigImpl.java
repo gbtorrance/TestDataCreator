@@ -2,11 +2,15 @@ package org.tdc.config.model;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Collections;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.tdc.config.XMLConfigWrapper;
 import org.tdc.config.schema.SchemaConfig;
+import org.tdc.schemaparse.extractor.SchemaExtractor;
+import org.tdc.schemaparse.extractor.SchemaExtractorFactory;
 import org.tdc.util.Addr;
 
 /**
@@ -27,6 +31,7 @@ public class ModelConfigImpl implements ModelConfig {
 	private final boolean schemaFailOnParserWarning;
 	private final boolean schemaFailOnParserNonFatalError;
 	private final int defaultOccursCount;
+	private final List<SchemaExtractor> schemaExtractors;
 	private final ModelCustomizerConfig modelCustomizerConfig;
 	
 	private ModelConfigImpl(ModelConfigBuilder builder) {
@@ -39,6 +44,7 @@ public class ModelConfigImpl implements ModelConfig {
 		this.schemaFailOnParserWarning = builder.schemaFailOnParserWarning;
 		this.schemaFailOnParserNonFatalError = builder.schemaFailOnParserNonFatalError;
 		this.defaultOccursCount = builder.defaultOccursCount;
+		this.schemaExtractors = Collections.unmodifiableList(builder.schemaExtractors); // unmodifiable
 		this.modelCustomizerConfig = builder.modelCustomizerConfig;
 	}
 	
@@ -93,6 +99,11 @@ public class ModelConfigImpl implements ModelConfig {
 	}
 	
 	@Override
+	public List<SchemaExtractor> getSchemaExtractors() {
+		return schemaExtractors;
+	}
+	
+	@Override
 	public ModelCustomizerConfig getModelCustomizerConfig() {
 		return modelCustomizerConfig;
 	}
@@ -109,6 +120,7 @@ public class ModelConfigImpl implements ModelConfig {
 		private final SchemaConfig schemaConfig;
 		private final Addr addr;
 		private final Path modelConfigRoot;
+		private final SchemaExtractorFactory schemaExtractorFactory;
 
 		private String schemaRootFile;
 		private String schemaRootElementName;
@@ -116,9 +128,10 @@ public class ModelConfigImpl implements ModelConfig {
 		private boolean schemaFailOnParserWarning;
 		private boolean schemaFailOnParserNonFatalError;
 		private int defaultOccursCount;
+		private List<SchemaExtractor> schemaExtractors;
 		private ModelCustomizerConfig modelCustomizerConfig;
 		
-		public ModelConfigBuilder(SchemaConfig schemaConfig, String name) {
+		public ModelConfigBuilder(SchemaConfig schemaConfig, String name, SchemaExtractorFactory schemaExtractorFactory) {
 			this.schemaConfig = schemaConfig;
 			this.addr = schemaConfig.getAddr().resolve(name);
 			log.info("Creating ModelConfigImpl: {}", addr);
@@ -126,6 +139,7 @@ public class ModelConfigImpl implements ModelConfig {
 			if (!Files.isDirectory(modelConfigRoot)) {
 				throw new IllegalStateException("ModelConfig root dir does not exist: " + modelConfigRoot.toString());
 			}
+			this.schemaExtractorFactory = schemaExtractorFactory;
 			Path modelConfigFile = modelConfigRoot.resolve(CONFIG_FILE);
 			this.config = new XMLConfigWrapper(modelConfigFile);
 		}
@@ -137,6 +151,7 @@ public class ModelConfigImpl implements ModelConfig {
 			schemaFailOnParserWarning = config.getBoolean("SchemaFailOnParserWarning", false , false);
 			schemaFailOnParserNonFatalError = config.getBoolean("SchemaFailOnParserNonFatalError", true, false);
 			defaultOccursCount = config.getInt("DefaultOccursCount", 5, false);
+			schemaExtractors = schemaExtractorFactory.createSchemaExtractors(config, "SchemaExtractors");
 			modelCustomizerConfig = new ModelCustomizerConfigImpl.ModelCustomizerConfigBuilder(
 					config, modelConfigRoot, defaultOccursCount).build();
 			return new ModelConfigImpl(this);

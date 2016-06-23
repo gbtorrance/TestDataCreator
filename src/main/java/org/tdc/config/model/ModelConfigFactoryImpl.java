@@ -4,6 +4,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.tdc.config.schema.SchemaConfig;
 import org.tdc.config.schema.SchemaConfigFactory;
+import org.tdc.schemaparse.extractor.SchemaExtractorFactory;
+import org.tdc.schemaparse.extractor.SchemaExtractorFactoryImpl;
 import org.tdc.util.Addr;
 import org.tdc.util.Cache;
 import org.tdc.util.CacheImpl;
@@ -27,11 +29,13 @@ public class ModelConfigFactoryImpl implements ModelConfigFactory {
 	}
 
 	@Override
-	public ModelConfig getModelConfig(Addr addr) {
+	public synchronized ModelConfig getModelConfig(Addr addr) {
 		ModelConfig modelConfig = cache.get(addr);
 		if (modelConfig == null) {
 			SchemaConfig schemaConfig = schemaConfigFactory.getSchemaConfig(addr.getParentAddr());
-			modelConfig = new ModelConfigImpl.ModelConfigBuilder(schemaConfig, addr.getName()).build();
+			SchemaExtractorFactory schemaExtractorFactory = new SchemaExtractorFactoryImpl();
+			modelConfig = new ModelConfigImpl.ModelConfigBuilder(
+					schemaConfig, addr.getName(), schemaExtractorFactory).build();
 			cache.put(addr, modelConfig);
 		}
 		else {

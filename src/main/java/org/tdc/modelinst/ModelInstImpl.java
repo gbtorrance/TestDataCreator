@@ -16,15 +16,21 @@ public class ModelInstImpl implements ModelInst {
 
 	private static final Logger log = LoggerFactory.getLogger(ModelInstImpl.class);
 
-	private ModelDef modelDef;
-	private ElementNodeInst rootElement;
-	private MPathIndex<NodeInst> mpathIndex;
+	private final ModelDef modelDef;
+	private final ElementNodeInst rootElement;
+	private final MPathIndex<NodeInst> mpathIndex;
+	private final ModelInstSharedState sharedState;
 	
-	public ModelInstImpl(ModelDef modelDef, ElementNodeInst rootElement, MPathIndex<NodeInst> mpathIndex) {
+	public ModelInstImpl(
+			ModelDef modelDef, ElementNodeInst rootElement, 
+			MPathIndex<NodeInst> mpathIndex, ModelInstSharedState sharedState) {
+		
 		log.info("Creating ModelInstImpl: {}", modelDef.getModelConfig().getAddr());
 		this.modelDef = modelDef;
 		this.rootElement = rootElement;
 		this.mpathIndex = mpathIndex;
+		this.sharedState = sharedState;
+		sharedState.setImmutable();
 	}
 	
 	@Override

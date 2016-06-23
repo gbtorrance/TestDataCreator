@@ -9,11 +9,10 @@ import org.tdc.model.ModelVisitor;
 public class AttribNodeDef extends NodeDef implements AttribNode {
 	
 	private String name;
-	private String dataType;
 	private boolean isRequired;
 	
-	public AttribNodeDef(ElementNodeDef parent) {
-		super(parent);
+	public AttribNodeDef(ElementNodeDef parent, ModelDefSharedState sharedState) {
+		super(parent, sharedState);
 	}
 	
 	@Override
@@ -21,19 +20,9 @@ public class AttribNodeDef extends NodeDef implements AttribNode {
 		return name;
 	}
 
-	// intentionally package level
-	void setName(String name) {
+	public void setName(String name) {
+		getSharedState().throwExceptionIfImmutable("setName");
 		this.name = name;
-	}
-	
-	@Override
-	public String getDataType() {
-		return dataType;
-	}
-	
-	// intentionally package level
-	void setDataType(String dataType) {
-		this.dataType = dataType;
 	}
 	
 	@Override
@@ -41,8 +30,8 @@ public class AttribNodeDef extends NodeDef implements AttribNode {
 		return isRequired;
 	}
 	
-	// intentionally package level
-	void setRequired(boolean isRequired) {
+	public void setRequired(boolean isRequired) {
+		getSharedState().throwExceptionIfImmutable("setRequired");
 		this.isRequired = isRequired;
 	}
 
@@ -54,11 +43,6 @@ public class AttribNodeDef extends NodeDef implements AttribNode {
 	@Override
 	public String getDispName() {
 		return "@" + getName();
-	}
-	
-	@Override
-	public String getDispType() {
-		return dataType;
 	}
 	
 	@Override 

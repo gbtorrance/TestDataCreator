@@ -13,8 +13,8 @@ import org.tdc.modeldef.CompositorNodeDef;
  */
 public class CompositorNodeInst extends NonAttribNodeInst implements CompositorNode {
 	
-	public CompositorNodeInst(NonAttribNodeInst parent, CompositorNodeDef compositorNodeDef) {
-		super(parent, compositorNodeDef);
+	public CompositorNodeInst(NonAttribNodeInst parent, ModelInstSharedState sharedState, CompositorNodeDef compositorNodeDef) {
+		super(parent, sharedState, compositorNodeDef);
 	}
 
 	@Override

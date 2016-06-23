@@ -14,7 +14,7 @@ public class GeneralEvaluatorFactoryImpl implements GeneralEvaluatorFactory {
 	private final Map<String, TypeEvaluatorFactory> typeFactoryMap = new HashMap<>();
 	
 	@Override
-	public Evaluator createEvaluator(XMLConfigWrapper config, String configKey) {
+	public synchronized Evaluator createEvaluator(XMLConfigWrapper config, String configKey) {
 		String type = EvaluatorFactoryUtil.getEvaluatorType(config, configKey);
 		TypeEvaluatorFactory factory = typeFactoryMap.get(type);
 		if (factory == null) {
@@ -23,7 +23,7 @@ public class GeneralEvaluatorFactoryImpl implements GeneralEvaluatorFactory {
 		return factory.createEvaluator(config, configKey);
 	}
 
-	public void setTypeSpecificFactory(TypeEvaluatorFactory evaluatorFactory) {
+	public synchronized void setTypeSpecificFactory(TypeEvaluatorFactory evaluatorFactory) {
 		typeFactoryMap.put(evaluatorFactory.getType(), evaluatorFactory);
 	}
 	

@@ -9,8 +9,8 @@ import org.tdc.modeldef.AttribNodeDef;
  */
 public class AttribNodeInst extends NodeInst implements AttribNode {
 	
-	public AttribNodeInst(ElementNodeInst parent, AttribNodeDef attribNodeDef) {
-		super(parent, attribNodeDef);
+	public AttribNodeInst(ElementNodeInst parent, ModelInstSharedState sharedState, AttribNodeDef attribNodeDef) {
+		super(parent, sharedState, attribNodeDef);
 	}
 	
 	@Override
@@ -23,11 +23,6 @@ public class AttribNodeInst extends NodeInst implements AttribNode {
 		return getNodeDef().getName();
 	}
 	
-	@Override
-	public String getDataType() {
-		return getNodeDef().getDataType();
-	}
-
 	@Override
 	public boolean isRequired() {
 		return getNodeDef().isRequired();

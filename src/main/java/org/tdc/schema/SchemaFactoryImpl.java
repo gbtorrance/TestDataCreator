@@ -19,7 +19,7 @@ public class SchemaFactoryImpl implements SchemaFactory {
 	private Cache<Schema> cache = new CacheImpl<>();
 	
 	@Override
-	public Schema getSchema(SchemaConfig config) {
+	public synchronized Schema getSchema(SchemaConfig config) {
 		Addr addr = config.getAddr();
 		Schema schema = cache.get(addr);
 		if (schema == null) {

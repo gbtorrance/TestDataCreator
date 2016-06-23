@@ -32,8 +32,6 @@ public class SummaryModelWriterForTesting extends AbstractModelWriterForTesting 
 		sb.append(node.getDispName());
 		if (node instanceof AttribNode) {
 			AttribNode attribNode = (AttribNode)node;
-			sb.append(", type:");
-			sb.append(attribNode.getDataType());
 			sb.append(", req:");
 			sb.append(attribNode.isRequired());
 		}
@@ -47,8 +45,6 @@ public class SummaryModelWriterForTesting extends AbstractModelWriterForTesting 
 		}
 		else if (node instanceof ElementNode) {
 			ElementNode elementNode = (ElementNode)node;
-			sb.append(", type:");
-			sb.append(elementNode.getDataType());
 			sb.append(", minOccurs:");
 			sb.append(elementNode.getMinOccurs());
 			sb.append(", maxOccurs:");

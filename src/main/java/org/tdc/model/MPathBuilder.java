@@ -22,7 +22,7 @@ public class MPathBuilder {
 	
 	// TODO why depend on NodeDef objects??? likely due to flattened/missing objects in inst model; consider moving to modeldef package
 	
-	private Deque<MPathState> state = new ArrayDeque<>();
+	private final Deque<MPathState> state = new ArrayDeque<>();
 	
 	public MPathBuilder() {
 		state.addLast(new MPathState(null));
