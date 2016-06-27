@@ -14,8 +14,8 @@ public class ModelDefDOMErrorHandler implements DOMErrorHandler {
 
 	private static final Logger log = LoggerFactory.getLogger(ModelDefDOMErrorHandler.class);
 	
-	private static boolean failOnParserWarning;
-	private static boolean failOnParserNonFatalError;
+	private final boolean failOnParserWarning;
+	private final boolean failOnParserNonFatalError;
 
 	public ModelDefDOMErrorHandler(boolean failOnParserWarning, boolean failOnParserNonFatalError) {
 		this.failOnParserWarning = failOnParserWarning;

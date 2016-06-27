@@ -17,8 +17,8 @@ public class SchemaConfigFactoryImpl implements SchemaConfigFactory {
 
 	private static final Logger log = LoggerFactory.getLogger(SchemaConfigFactoryImpl.class);
 
-	private Cache<SchemaConfig> cache = new CacheImpl<>();
-	private Path schemasConfigRoot;
+	private final Cache<SchemaConfig> cache = new CacheImpl<>();
+	private final Path schemasConfigRoot;
 	
 	public SchemaConfigFactoryImpl(Path schemasConfigRoot) {
 		this.schemasConfigRoot = schemasConfigRoot;

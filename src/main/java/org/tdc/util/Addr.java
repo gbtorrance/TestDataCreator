@@ -8,7 +8,7 @@ import java.nio.file.Paths;
  */
 public class Addr {
 	
-	private Path addrPath;
+	private final Path addrPath;
 	
 	public Addr(String addr) {
 		this.addrPath = standardizeAddrPath(addr);

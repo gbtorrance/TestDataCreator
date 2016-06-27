@@ -11,7 +11,7 @@ public class SchemaImpl implements Schema {
 	
 	private static final Logger log = LoggerFactory.getLogger(SchemaImpl.class);
 	
-	private SchemaConfig config;
+	private final SchemaConfig config;
 	
 	public SchemaImpl(SchemaConfig config) {
 		log.info("Creating SchemaImpl: {}", config.getAddr());

@@ -20,8 +20,8 @@ import org.tdc.model.TDCNode;
  */
 public abstract class AbstractModelWriterForTesting {
 	
-	private TDCNode rootNode;
-	private int indentSize;
+	private final TDCNode rootNode;
+	private final int indentSize;
 	
 	public AbstractModelWriterForTesting(TDCNode rootNode, int indentSize) {
 		this.rootNode = rootNode;

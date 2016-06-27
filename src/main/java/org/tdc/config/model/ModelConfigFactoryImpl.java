@@ -23,8 +23,8 @@ public class ModelConfigFactoryImpl implements ModelConfigFactory {
 
 	private static final Logger log = LoggerFactory.getLogger(ModelConfigFactoryImpl.class);
 
-	private Cache<ModelConfig> cache = new CacheImpl<>();
-	private SchemaConfigFactory schemaConfigFactory;
+	private final Cache<ModelConfig> cache = new CacheImpl<>();
+	private final SchemaConfigFactory schemaConfigFactory;
 
 	public ModelConfigFactoryImpl(SchemaConfigFactory schemaConfigFactory) {
 		this.schemaConfigFactory = schemaConfigFactory;

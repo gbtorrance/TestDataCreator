@@ -18,7 +18,7 @@ public class BookConfigFactoryImpl implements BookConfigFactory {
 
 	private static final Logger log = LoggerFactory.getLogger(BookConfigFactoryImpl.class);
 
-	private Cache<BookConfig> cache = new CacheImpl<>();
+	private final Cache<BookConfig> cache = new CacheImpl<>();
 	private final Path booksConfigRoot;
 	private final ModelConfigFactory modelConfigFactory;
 	

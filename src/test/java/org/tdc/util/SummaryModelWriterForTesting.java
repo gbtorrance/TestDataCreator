@@ -15,7 +15,7 @@ import org.tdc.util.Util;
  */
 public class SummaryModelWriterForTesting extends AbstractModelWriterForTesting {
 	
-	StringBuilder sb = new StringBuilder();
+	private final StringBuilder sb = new StringBuilder();
 
 	public SummaryModelWriterForTesting(TDCNode rootNode, int indentSize) {
 		super(rootNode, indentSize);

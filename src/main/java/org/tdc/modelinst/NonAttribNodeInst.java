@@ -15,7 +15,8 @@ import org.tdc.modeldef.NonAttribNodeDef;
  */
 public abstract class NonAttribNodeInst extends NodeInst implements NonAttribNode {
 	
-	private List<NonAttribNodeInst> children = new ArrayList<>();
+	private final List<NonAttribNodeInst> children = new ArrayList<>();
+	
 	private int occurNum;
 	private int occurCount;
 	

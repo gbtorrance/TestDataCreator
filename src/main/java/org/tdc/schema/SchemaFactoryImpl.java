@@ -16,7 +16,7 @@ public class SchemaFactoryImpl implements SchemaFactory {
 
 	private static final Logger log = LoggerFactory.getLogger(SchemaFactoryImpl.class);
 	
-	private Cache<Schema> cache = new CacheImpl<>();
+	private final Cache<Schema> cache = new CacheImpl<>();
 	
 	@Override
 	public synchronized Schema getSchema(SchemaConfig config) {

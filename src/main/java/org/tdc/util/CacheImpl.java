@@ -13,7 +13,7 @@ public class CacheImpl<T> implements Cache<T> {
 	
 	private static final Logger log = LoggerFactory.getLogger(CacheImpl.class);
 	
-	private Map<Addr, T> cache = new HashMap<>();
+	private final Map<Addr, T> cache = new HashMap<>();
 
 	@Override
 	public T get(Addr addr) {

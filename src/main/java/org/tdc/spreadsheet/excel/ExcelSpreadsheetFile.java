@@ -15,7 +15,7 @@ import org.tdc.spreadsheet.SpreadsheetFile;
 public class ExcelSpreadsheetFile implements SpreadsheetFile {
 	
 	private final XSSFWorkbook workbook;
-	private Map<String, Spreadsheet> spreadsheets;
+	private final Map<String, Spreadsheet> spreadsheets;
 	
 	private ExcelSpreadsheetFile(SpreadsheetFileBuilder builder) {
 		this.workbook = builder.workbook;

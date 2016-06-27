@@ -29,8 +29,7 @@ public class ExcelSpreadsheet implements Spreadsheet {
 	private static final Logger log = LoggerFactory.getLogger(ExcelSpreadsheet.class);
 
 	private final XSSFSheet xssfSheet;
-	
-	private POICellStyleLookup poiCellStyleLookup = new POICellStyleLookup();
+	private final POICellStyleLookup poiCellStyleLookup = new POICellStyleLookup();
 	
 	private ExcelSpreadsheet(SpreadsheetBuilder builder) {
 		this.xssfSheet = builder.xssfSheet;

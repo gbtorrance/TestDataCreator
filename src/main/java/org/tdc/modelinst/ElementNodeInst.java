@@ -15,7 +15,7 @@ import org.tdc.modeldef.ElementNodeDef;
  */
 public class ElementNodeInst extends NonAttribNodeInst implements ElementNode {
 	
-	private List<AttribNodeInst> attributes = new ArrayList<>();
+	private final List<AttribNodeInst> attributes = new ArrayList<>();
 	
 	public ElementNodeInst(NonAttribNodeInst parent, ModelInstSharedState sharedState, ElementNodeDef elementNodeDef) {
 		super(parent, sharedState, elementNodeDef);
