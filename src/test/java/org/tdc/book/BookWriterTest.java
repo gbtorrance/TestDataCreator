@@ -8,10 +8,13 @@ import org.junit.Test;
 import org.tdc.config.book.BookConfig;
 import org.tdc.config.book.BookConfigFactory;
 import org.tdc.config.book.BookConfigFactoryImpl;
+import org.tdc.config.model.ModelConfig;
 import org.tdc.config.model.ModelConfigFactory;
 import org.tdc.config.model.ModelConfigFactoryImpl;
 import org.tdc.config.schema.SchemaConfigFactory;
 import org.tdc.config.schema.SchemaConfigFactoryImpl;
+import org.tdc.modelcustomizer.ModelCustomizerWriter;
+import org.tdc.modeldef.ModelDef;
 import org.tdc.modeldef.ModelDefFactory;
 import org.tdc.modeldef.ModelDefFactoryImpl;
 import org.tdc.modelinst.ModelInstFactory;
@@ -72,20 +75,58 @@ public class BookWriterTest {
 		bookFile.save(bookFilePath);
 	}
 	
+	@Test
+	public void initCustomizer() {
+		Addr modelAddr = new Addr("Tax/efile1040x_2012v3.0/Model_1040A");
+		ModelConfig config = modelConfigFactory.getModelConfig(modelAddr);
+		ModelDef modelDef = modelDefFactory.getModelDef(config);
+		
+		ExcelSpreadsheetFileFactory factory = new ExcelSpreadsheetFileFactory();
+		SpreadsheetFile spreadsheetFile = factory.getSpreadsheetFile();
+		
+		ModelCustomizerWriter writer = new ModelCustomizerWriter(
+				modelDef.getRootElement(), config.getModelCustomizerConfig(), spreadsheetFile, null);
+		writer.writeCustomizer();
+		
+		Path path = Paths.get("testfiles/TDCFiles/Schemas/Tax/efile1040x_2012v3.0/Model_1040A/Customizer2.xlsx");
+		spreadsheetFile.save(path);
+	}
+
+	@Test
+	public void initCustomizerFromPrevious() {
+		Addr modelAddr = new Addr("Tax/efile1040x_2012v3.0/Model_1040A");
+		ModelConfig config = modelConfigFactory.getModelConfig(modelAddr);
+		ModelDef modelDef = modelDefFactory.getModelDef(config);
+
+		Addr prevModelAddr = new Addr("Tax/efile1040x_2011v3.0/Model_1040A");
+		ModelConfig prevConfig = modelConfigFactory.getModelConfig(prevModelAddr);
+		ModelDef prevModelDef = modelDefFactory.getModelDef(prevConfig);
+
+		ExcelSpreadsheetFileFactory factory = new ExcelSpreadsheetFileFactory();
+		SpreadsheetFile spreadsheetFile = factory.getSpreadsheetFile();
+		
+		ModelCustomizerWriter writer = new ModelCustomizerWriter(
+				modelDef.getRootElement(), config.getModelCustomizerConfig(), spreadsheetFile, prevModelDef.getMPathIndex());
+		writer.writeCustomizer();
+		
+		Path path = Paths.get("testfiles/TDCFiles/Schemas/Tax/efile1040x_2012v3.0/Model_1040A/Customizer3.xlsx");
+		spreadsheetFile.save(path);
+	}
+
 //	@Test
-//	public void initCustomizer() {
-//		Addr modelAddr = new Addr("Tax/efile1040x_2012v3.0/Model_1040EZ");
+//	public void initCustomizer2011() {
+//		Addr modelAddr = new Addr("Tax/efile1040x_2011v3.0/Model_1040A");
 //		ModelConfig config = modelConfigFactory.getModelConfig(modelAddr);
-//		ModelDef modelDef = modelDefFactory.getModelDef(config);
+//		ModelDef modelDef = modelDefFactory.getModelDefSkipCustomization(config);
 //		
 //		ExcelSpreadsheetFileFactory factory = new ExcelSpreadsheetFileFactory();
 //		SpreadsheetFile spreadsheetFile = factory.getSpreadsheetFile();
 //		
 //		ModelCustomizerWriter writer = new ModelCustomizerWriter(
-//				modelDef.getRootElement(), config.getModelCustomizerConfig(), spreadsheetFile);
+//				modelDef.getRootElement(), config.getModelCustomizerConfig(), spreadsheetFile, null);
 //		writer.writeCustomizer();
 //		
-//		Path path = Paths.get("testfiles/TDCFiles/Schemas/Tax/efile1040x_2012v3.0/Model_1040EZ/Customizer.xlsx");
+//		Path path = Paths.get("testfiles/TDCFiles/Schemas/Tax/efile1040x_2011v3.0/Model_1040A/Customizer.xlsx");
 //		spreadsheetFile.save(path);
 //	}
 }

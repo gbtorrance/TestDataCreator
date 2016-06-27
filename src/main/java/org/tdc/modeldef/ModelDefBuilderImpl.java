@@ -58,6 +58,12 @@ public class ModelDefBuilderImpl implements ModelDefBuilder {
 		return new ModelDefImpl(config, schema, rootElement, mpathIndex, sharedState);
 	}
 	
+	@Override
+	public ModelDef buildSkipCustomization() {
+		ElementNodeDef rootElement = buildNodeTree();
+		return new ModelDefImpl(config, schema, rootElement, mpathIndex, sharedState);
+	}
+	
 	public ElementNodeDef buildNodeTree() {
 		log.debug("Start building ModelDef tree");
 		mpathIndex = new MPathIndex<>();

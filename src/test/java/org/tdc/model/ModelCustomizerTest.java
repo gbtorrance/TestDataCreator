@@ -71,7 +71,7 @@ public class ModelCustomizerTest {
 		SpreadsheetFile spreadsheetFile = factory.getSpreadsheetFile();
 		
 		ModelCustomizerWriter writer = new ModelCustomizerWriter(
-				rootElement, customizerConfig, spreadsheetFile);
+				rootElement, customizerConfig, spreadsheetFile, null);
 		writer.writeCustomizer();
 		
 		Path path = Paths.get("testfiles/Temp/TestModelCustomizer.xlsx");

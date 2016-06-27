@@ -19,7 +19,7 @@ public class ValuePlusStyleEvaluatorFactory implements TypeEvaluatorFactory {
 	}
 
 	@Override
-	public Evaluator createEvaluator(XMLConfigWrapper config, String configKey) {
+	public Evaluator createEvaluator(XMLConfigWrapper config, String configKey, CellStyle defaultStyle) {
 		EvaluatorFactoryUtil.ensureCorrectEvalatorType(config, configKey, TYPE);
 		String evaluatorKey = configKey + ".Evaluator";
 		String styleKey = configKey + ".Style";
@@ -31,8 +31,8 @@ public class ValuePlusStyleEvaluatorFactory implements TypeEvaluatorFactory {
 			throw new RuntimeException("ValuePlusStyle element '" + configKey + "' expected to contain exactly 1 Style");
 		}
 		
-		Evaluator evaluator = generalEvaluatorFactory.createEvaluator(config, evaluatorKey);
-		CellStyle style = config.getCellStyle(styleKey, null, true);
+		Evaluator evaluator = generalEvaluatorFactory.createEvaluator(config, evaluatorKey, defaultStyle);
+		CellStyle style = config.getCellStyle(styleKey, defaultStyle, true);
 
 		return new ValuePlusStyleEvaluator(evaluator, style);
 	}

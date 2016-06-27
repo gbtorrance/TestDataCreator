@@ -9,6 +9,7 @@ import org.tdc.evaluator.IfEvaluator;
 import org.tdc.evaluator.operator.EqualsOperator;
 import org.tdc.evaluator.operator.NotEqualsOperator;
 import org.tdc.evaluator.operator.Operator;
+import org.tdc.spreadsheet.CellStyle;
 
 /**
  * A {@link TypeEvaluatorFactory} implementation to create {@link IfEvaluator} objects.
@@ -25,7 +26,7 @@ public class IfEvaluatorFactory implements TypeEvaluatorFactory {
 	}
 
 	@Override
-	public Evaluator createEvaluator(XMLConfigWrapper config, String configKey) {
+	public Evaluator createEvaluator(XMLConfigWrapper config, String configKey, CellStyle defaultStyle) {
 		EvaluatorFactoryUtil.ensureCorrectEvalatorType(config, configKey, TYPE);
 		String operatorKey = configKey + "[@operator]";
 		String ifKey = configKey + ".If.Evaluator";
@@ -45,12 +46,12 @@ public class IfEvaluatorFactory implements TypeEvaluatorFactory {
 		
 		String operatorType = config.getString(operatorKey, null, true);
 		Operator operator = getOperator(operatorType);
-		Evaluator operand1 = generalEvaluatorFactory.createEvaluator(config, ifKey + "(" + 0 + ")");
-		Evaluator operand2 = generalEvaluatorFactory.createEvaluator(config, ifKey + "(" + 1 + ")");
-		Evaluator thenEval = generalEvaluatorFactory.createEvaluator(config, thenKey);
+		Evaluator operand1 = generalEvaluatorFactory.createEvaluator(config, ifKey + "(" + 0 + ")", defaultStyle);
+		Evaluator operand2 = generalEvaluatorFactory.createEvaluator(config, ifKey + "(" + 1 + ")", defaultStyle);
+		Evaluator thenEval = generalEvaluatorFactory.createEvaluator(config, thenKey, defaultStyle);
 		Evaluator elseEval = null; 
 		if (elseCount > 0) {
-			elseEval =  generalEvaluatorFactory.createEvaluator(config, elseKey);
+			elseEval =  generalEvaluatorFactory.createEvaluator(config, elseKey, defaultStyle);
 		}
 
 		return new IfEvaluator(operator, operand1, operand2, thenEval, elseEval);

@@ -1,6 +1,7 @@
 package org.tdc.modeldef;
 
 import org.tdc.config.model.ModelConfig;
+import org.tdc.model.MPathIndex;
 import org.tdc.schema.Schema;
 
 /**
@@ -31,4 +32,5 @@ public interface ModelDef {
 	ModelConfig getModelConfig();
 	Schema getSchema();
 	ElementNodeDef getRootElement();
+	MPathIndex<NodeDef> getMPathIndex();
 }

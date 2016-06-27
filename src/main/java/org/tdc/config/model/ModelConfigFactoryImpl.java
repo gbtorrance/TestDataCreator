@@ -4,6 +4,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.tdc.config.schema.SchemaConfig;
 import org.tdc.config.schema.SchemaConfigFactory;
+import org.tdc.evaluator.factory.GeneralEvaluatorFactory;
+import org.tdc.evaluator.factory.GeneralEvaluatorFactoryImpl;
 import org.tdc.schemaparse.extractor.SchemaExtractorFactory;
 import org.tdc.schemaparse.extractor.SchemaExtractorFactoryImpl;
 import org.tdc.util.Addr;
@@ -34,8 +36,9 @@ public class ModelConfigFactoryImpl implements ModelConfigFactory {
 		if (modelConfig == null) {
 			SchemaConfig schemaConfig = schemaConfigFactory.getSchemaConfig(addr.getParentAddr());
 			SchemaExtractorFactory schemaExtractorFactory = new SchemaExtractorFactoryImpl();
+			GeneralEvaluatorFactory evaluatorFactory = GeneralEvaluatorFactoryImpl.createWithDefaultTypeEvaluators();
 			modelConfig = new ModelConfigImpl.ModelConfigBuilder(
-					schemaConfig, addr.getName(), schemaExtractorFactory).build();
+					schemaConfig, addr.getName(), schemaExtractorFactory, evaluatorFactory).build();
 			cache.put(addr, modelConfig);
 		}
 		else {

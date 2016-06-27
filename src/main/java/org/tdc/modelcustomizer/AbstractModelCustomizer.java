@@ -45,7 +45,7 @@ public abstract class AbstractModelCustomizer {
 		this.rootElement = rootElement;
 		this.config = config;
 		this.spreadsheetFile = spreadsheetFile;
-		this.nodeRowStart = 3;
+		this.nodeRowStart = config.getHeaderRowCount() + 1;
 		this.dataColStart = config.getTreeStructureColumnCount() + 1;
 	}
 	

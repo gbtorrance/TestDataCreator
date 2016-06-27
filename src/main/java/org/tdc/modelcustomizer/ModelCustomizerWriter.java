@@ -1,11 +1,17 @@
 package org.tdc.modelcustomizer;
 
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.tdc.config.model.ModelCustomizerColumnConfig;
 import org.tdc.config.model.ModelCustomizerConfig;
+import org.tdc.evaluator.result.ValuePlusStyleResult;
+import org.tdc.evaluator.result.ValueResult;
 import org.tdc.model.AttribNode;
 import org.tdc.model.CompositorNode;
 import org.tdc.model.ElementNode;
+import org.tdc.model.MPathIndex;
 import org.tdc.model.NonAttribNode;
 import org.tdc.model.TDCNode;
 import org.tdc.modeldef.ElementNodeDef;
@@ -18,12 +24,15 @@ import org.tdc.spreadsheet.SpreadsheetFile;
 public class ModelCustomizerWriter extends AbstractModelCustomizer {
 
 	private static final Logger log = LoggerFactory.getLogger(ModelCustomizerWriter.class);
+	
+	private final MPathIndex prevModelMPathIndex;
 
 	private int maxColumns;
 	
 	public ModelCustomizerWriter(ElementNodeDef rootElement, ModelCustomizerConfig config, 
-			SpreadsheetFile spreadsheetFile) {
+			SpreadsheetFile spreadsheetFile, MPathIndex prevModelMPathIndex) {
 		super(rootElement, config, spreadsheetFile);
+		this.prevModelMPathIndex = prevModelMPathIndex;
 	}
 	
 	public void writeCustomizer() {
@@ -32,6 +41,7 @@ public class ModelCustomizerWriter extends AbstractModelCustomizer {
 		maxColumns = 0;
 		processTree();
 		formatColumns();
+		writeHeaderLabels();
 	}
 	
 	@Override
@@ -41,6 +51,7 @@ public class ModelCustomizerWriter extends AbstractModelCustomizer {
 		outputNodeName(node, getConfig().getAttribNodeStyle());
 		outputOccurs(node);
 		outputOccursOverride(node, true);
+		outputCustomColumns(node);
 	}
 
 	@Override
@@ -54,6 +65,7 @@ public class ModelCustomizerWriter extends AbstractModelCustomizer {
 		outputNodeName(node, getConfig().getCompositorNodeStyle());
 		outputOccurs(node);
 		outputOccursOverride(node, false);
+		outputCustomColumns(node);
 	}
 	
 	@Override
@@ -72,6 +84,7 @@ public class ModelCustomizerWriter extends AbstractModelCustomizer {
 		outputNodeName(node, cellStyle);
 		outputOccurs(node);
 		outputOccursOverride(node, false);
+		outputCustomColumns(node);
 	}
 	
 	private void trackMaxColumns(TDCNode node) {
@@ -112,6 +125,31 @@ public class ModelCustomizerWriter extends AbstractModelCustomizer {
 		String initialOverrideStr = initialOverride > 1 ? Integer.toString(initialOverride) : "";
 		getCustomizerSheet().setCellValue(initialOverrideStr, getNodeRow(node), getDataCol(COL_OCCURS_OVERRIDE));
 	}
+	
+	private void outputCustomColumns(TDCNode node) {
+		List<ModelCustomizerColumnConfig> columns = getConfig().getColumns(); 
+		for (int i = 0; i < columns.size(); i++) {
+			ModelCustomizerColumnConfig column = columns.get(i);
+			CellStyle style = column.getStyle();
+			ValueResult result = null;
+			if (prevModelMPathIndex == null) {
+				result = column.getInitAsNewEvaluator().evaluate(node, null);
+			}
+			else {
+				TDCNode prevNode = lookupPreviousNode(node);
+				result = column.getInitFromPrevEvaluator().evaluate(node, prevNode);
+			}
+			if (result instanceof ValuePlusStyleResult) {
+				style = ((ValuePlusStyleResult)result).getCellStyle();
+			}
+			getCustomizerSheet().setCellValue(result.getValue(), getNodeRow(node), getDataCol(COL_CUSTOM_BASE) + i, style);
+		}
+	}
+
+	private TDCNode lookupPreviousNode(TDCNode node) {
+		String mpathOfCurrentNode = node.getMPath();
+		return prevModelMPathIndex.getNode(mpathOfCurrentNode);
+	}
 
 	private void formatColumns() {
 		int allowedColumns = getConfig().getTreeStructureColumnCount(); 
@@ -122,5 +160,31 @@ public class ModelCustomizerWriter extends AbstractModelCustomizer {
 		for (int i = 1; i <= allowedColumns; i++) {
 			getCustomizerSheet().setColumnWidth(i, getConfig().getTreeStructureColumnWidth());
 		}
+		List<ModelCustomizerColumnConfig> columns = getConfig().getColumns(); 
+		for (int i = 0; i < columns.size(); i++) {
+			ModelCustomizerColumnConfig column = columns.get(i);
+			getCustomizerSheet().setColumnWidth(getDataCol(COL_CUSTOM_BASE) + i, column.getWidth());
+		}
+		getCustomizerSheet().freeze(getConfig().getTreeStructureColumnCount()+1, getConfig().getHeaderRowCount()+1);
+	}
+
+	private void writeHeaderLabels() {
+		int rowCount = getConfig().getHeaderRowCount();
+		CellStyle style = getConfig().getDefaultHeaderStyle();
+		List<ModelCustomizerColumnConfig> columns = getConfig().getColumns(); 
+		for (int row = 1; row <= rowCount; row++) {
+			getCustomizerSheet().setCellValue(
+					getConfig().getTreeStructureHeaderLabel(row), row, 1, style);
+			getCustomizerSheet().setCellValue(
+					getConfig().getOccursHeaderLabel(row), row, getDataCol(COL_OCCURS), style);
+			getCustomizerSheet().setCellValue(
+					getConfig().getOccursOverrideHeaderLabel(row), row, getDataCol(COL_OCCURS_OVERRIDE), style);
+			for (int colIndex = 0; colIndex < columns.size(); colIndex++) {
+				ModelCustomizerColumnConfig column = columns.get(colIndex);
+				getCustomizerSheet().setCellValue(
+						column.getHeaderLabel(row), row, getDataCol(COL_CUSTOM_BASE) + colIndex, style);
+			}
+		}
+		
 	}
 }

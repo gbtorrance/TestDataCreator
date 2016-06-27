@@ -9,6 +9,10 @@
 	
 	<Customizer>
 		<FileName>Customizer.xlsx</FileName>
+		<DefaultStyle>
+			<FontName>Calibri</FontName>
+			<FontHeight>11</FontHeight>
+		</DefaultStyle>
 		<DefaultNodeStyle>
 			<FontName>Calibri</FontName>
 			<FontHeight>11</FontHeight>

@@ -48,4 +48,9 @@ public class ModelDefImpl implements ModelDef {
 	public ElementNodeDef getRootElement() {
 		return rootElement;
 	}
+
+	@Override
+	public MPathIndex<NodeDef> getMPathIndex() {
+		return mpathIndex;
+	}
 }

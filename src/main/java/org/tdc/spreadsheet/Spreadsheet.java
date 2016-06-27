@@ -63,4 +63,12 @@ public interface Spreadsheet {
 	 * @param colWidth Column width in units of 1/256 the width of a character
 	 */
 	void setColumnWidth(int colNum, int colWidth);
+	
+	/**
+	 * Freeze a particular column/row.
+	 * 
+	 * @param colNum Number of column just to the right of freeze (1-based index).
+	 * @param rowNum Number of row just to the right of freeze (1-based index).
+	 */
+	void freeze(int colNum, int rowNum);
 }

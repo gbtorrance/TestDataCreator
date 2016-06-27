@@ -13,5 +13,12 @@ public interface CellStyle {
 	int getColorRed();
 	int getColorGreen();
 	int getColorBlue();
+	Color getFillColor();
+	String getFillColorRGB();
+	int getFillColorRed();
+	int getFillColorGreen();
+	int getFillColorBlue();
 	boolean getItalic();
+	boolean getBold();
+	boolean getShrinkToFit();
 }

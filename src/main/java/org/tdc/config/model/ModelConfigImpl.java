@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.tdc.config.XMLConfigWrapper;
 import org.tdc.config.schema.SchemaConfig;
+import org.tdc.evaluator.factory.GeneralEvaluatorFactory;
 import org.tdc.schemaparse.extractor.SchemaExtractor;
 import org.tdc.schemaparse.extractor.SchemaExtractorFactory;
 import org.tdc.util.Addr;
@@ -121,6 +122,7 @@ public class ModelConfigImpl implements ModelConfig {
 		private final Addr addr;
 		private final Path modelConfigRoot;
 		private final SchemaExtractorFactory schemaExtractorFactory;
+		private final GeneralEvaluatorFactory evaluatorFactory;
 
 		private String schemaRootFile;
 		private String schemaRootElementName;
@@ -131,7 +133,8 @@ public class ModelConfigImpl implements ModelConfig {
 		private List<SchemaExtractor> schemaExtractors;
 		private ModelCustomizerConfig modelCustomizerConfig;
 		
-		public ModelConfigBuilder(SchemaConfig schemaConfig, String name, SchemaExtractorFactory schemaExtractorFactory) {
+		public ModelConfigBuilder(SchemaConfig schemaConfig, String name, 
+				SchemaExtractorFactory schemaExtractorFactory, GeneralEvaluatorFactory evaluatorFactory) {
 			this.schemaConfig = schemaConfig;
 			this.addr = schemaConfig.getAddr().resolve(name);
 			log.info("Creating ModelConfigImpl: {}", addr);
@@ -140,6 +143,7 @@ public class ModelConfigImpl implements ModelConfig {
 				throw new IllegalStateException("ModelConfig root dir does not exist: " + modelConfigRoot.toString());
 			}
 			this.schemaExtractorFactory = schemaExtractorFactory;
+			this.evaluatorFactory = evaluatorFactory;
 			Path modelConfigFile = modelConfigRoot.resolve(CONFIG_FILE);
 			this.config = new XMLConfigWrapper(modelConfigFile);
 		}
@@ -153,7 +157,7 @@ public class ModelConfigImpl implements ModelConfig {
 			defaultOccursCount = config.getInt("DefaultOccursCount", 5, false);
 			schemaExtractors = schemaExtractorFactory.createSchemaExtractors(config, "SchemaExtractors");
 			modelCustomizerConfig = new ModelCustomizerConfigImpl.ModelCustomizerConfigBuilder(
-					config, modelConfigRoot, defaultOccursCount).build();
+					config, modelConfigRoot, defaultOccursCount, evaluatorFactory).build();
 			return new ModelConfigImpl(this);
 		}
 	}

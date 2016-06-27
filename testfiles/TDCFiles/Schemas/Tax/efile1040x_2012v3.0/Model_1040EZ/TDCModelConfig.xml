@@ -9,6 +9,10 @@
 
 	<Customizer>
 		<FileName>Customizer.xlsx</FileName>
+		<DefaultStyle>
+			<FontName>Calibri</FontName>
+			<FontHeight>11</FontHeight>
+		</DefaultStyle>
 		<DefaultNodeStyle>
 			<FontName>Calibri</FontName>
 			<FontHeight>11</FontHeight>
@@ -35,6 +39,7 @@
 			<FontHeight>11</FontHeight>
 			<ColorRGB>255 0 0</ColorRGB> <!-- red -->
 		</ChoiceMarkerStyle>
+		<HeaderRowCount>2</HeaderRowCount>
 		<TreeStructureColumnCount>25</TreeStructureColumnCount>
 		<TreeStructureColumnWidth>500</TreeStructureColumnWidth>
 		<AllowMinMaxInvalidOccursCountOverride>true</AllowMinMaxInvalidOccursCountOverride>

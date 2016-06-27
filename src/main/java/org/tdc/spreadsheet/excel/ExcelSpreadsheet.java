@@ -5,6 +5,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.apache.poi.xssf.usermodel.XSSFCell;
+import org.apache.poi.xssf.usermodel.XSSFCellStyle;
 import org.apache.poi.xssf.usermodel.XSSFColor;
 import org.apache.poi.xssf.usermodel.XSSFFont;
 import org.apache.poi.xssf.usermodel.XSSFRow;
@@ -75,6 +76,15 @@ public class ExcelSpreadsheet implements Spreadsheet {
 		// this method accepts 1-based indexes and converts to 0-based indexes for POI (as necessary)
 		
 		xssfSheet.setColumnWidth(colNum-1, colWidth);
+	}
+
+	@Override
+	public void freeze(int colNum, int rowNum) {
+		// Whereas the public methods in this class use 1-based index values, 
+		// Apache POI libraries use 0-based indexes;
+		// this method accepts 1-based indexes and converts to 0-based indexes for POI (as necessary)
+		
+		xssfSheet.createFreezePane(colNum-1, rowNum-1, colNum-1, rowNum-1);
 	}
 
 	private String getCellValue(XSSFCell cell) {
@@ -175,10 +185,18 @@ public class ExcelSpreadsheet implements Spreadsheet {
 			XSSFFont font = workbook.createFont();
 			font.setFontName(cellStyle.getFontName());
 			font.setFontHeight(cellStyle.getFontHeight());
-			font.setColor(new XSSFColor(cellStyle.getColor()));
+			if (cellStyle.getColor() != null) {
+				font.setColor(new XSSFColor(cellStyle.getColor()));
+			}
 			font.setItalic(cellStyle.getItalic());
-			org.apache.poi.ss.usermodel.CellStyle poiCellStyle = workbook.createCellStyle();
+			font.setBold(cellStyle.getBold());
+			org.apache.poi.xssf.usermodel.XSSFCellStyle poiCellStyle = workbook.createCellStyle();
 			poiCellStyle.setFont(font);
+			poiCellStyle.setShrinkToFit(cellStyle.getShrinkToFit());
+			if (cellStyle.getFillColor() != null) {
+				poiCellStyle.setFillForegroundColor(new XSSFColor(cellStyle.getFillColor()));
+				poiCellStyle.setFillPattern(XSSFCellStyle.SOLID_FOREGROUND);
+			}
 			return poiCellStyle;
 		}
 	}

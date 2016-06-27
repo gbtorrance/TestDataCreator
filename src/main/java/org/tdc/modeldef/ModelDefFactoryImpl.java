@@ -47,10 +47,23 @@ public class ModelDefFactoryImpl implements ModelDefFactory {
 		return modelDef;
 	}
 	
+	@Override
+	public synchronized ModelDef getModelDefSkipCustomization(ModelConfig config) {
+		Addr addr = config.getAddr();
+		Schema schema = schemaFactory.getSchema(config.getSchemaConfig());
+		ModelDef modelDef = buildNewModelDefSkipCustomization(config, schema);
+		return modelDef;
+	}
+	
 	private ModelDef buildNewModelDef(ModelConfig config, Schema schema) {
 		// TODO possibly support building from serialized object;
 		//      factory to make determination based on info in config
 		ModelDefBuilder modelDefBuilder = new ModelDefBuilderImpl(config, schema, spreadsheetFileFactory);
 		return modelDefBuilder.build();
+	}
+
+	private ModelDef buildNewModelDefSkipCustomization(ModelConfig config, Schema schema) {
+		ModelDefBuilder modelDefBuilder = new ModelDefBuilderImpl(config, schema, null);
+		return modelDefBuilder.buildSkipCustomization();
 	}
 }

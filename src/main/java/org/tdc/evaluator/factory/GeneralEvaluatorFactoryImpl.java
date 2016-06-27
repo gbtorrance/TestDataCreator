@@ -5,6 +5,7 @@ import java.util.Map;
 
 import org.tdc.config.XMLConfigWrapper;
 import org.tdc.evaluator.Evaluator;
+import org.tdc.spreadsheet.CellStyle;
 
 /**
  * A {@link GeneralEvaluatorFactory} implementation that can create any type of {@link Evaluator}
@@ -14,13 +15,13 @@ public class GeneralEvaluatorFactoryImpl implements GeneralEvaluatorFactory {
 	private final Map<String, TypeEvaluatorFactory> typeFactoryMap = new HashMap<>();
 	
 	@Override
-	public synchronized Evaluator createEvaluator(XMLConfigWrapper config, String configKey) {
+	public synchronized Evaluator createEvaluator(XMLConfigWrapper config, String configKey, CellStyle defaultStyle) {
 		String type = EvaluatorFactoryUtil.getEvaluatorType(config, configKey);
 		TypeEvaluatorFactory factory = typeFactoryMap.get(type);
 		if (factory == null) {
 			throw new RuntimeException("Unable to locate TypeEvaluatorFactory for '" + configKey + "' with type '" + type + "'");
 		}
-		return factory.createEvaluator(config, configKey);
+		return factory.createEvaluator(config, configKey, defaultStyle);
 	}
 
 	public synchronized void setTypeSpecificFactory(TypeEvaluatorFactory evaluatorFactory) {
@@ -35,6 +36,7 @@ public class GeneralEvaluatorFactoryImpl implements GeneralEvaluatorFactory {
 		factory.setTypeSpecificFactory(new CompoundEvaluatorFactory(factory));
 		factory.setTypeSpecificFactory(new CoalesceEvaluatorFactory(factory));
 		factory.setTypeSpecificFactory(new ValuePlusStyleEvaluatorFactory(factory));
+		factory.setTypeSpecificFactory(new VariableEvaluatorFactory());
 		factory.setTypeSpecificFactory(IfEvaluatorFactory.createWithDefaultOperators(factory));
 		return factory;
 	}

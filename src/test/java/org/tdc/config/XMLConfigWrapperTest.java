@@ -179,13 +179,19 @@ public class XMLConfigWrapperTest {
 
 	@Test
 	public void testCellStyleNotFoundUseDefault() {
-		CellStyle defaultStyle = new CellStyleImpl("Arial", 12, new Color(10, 20, 30), true);
+		CellStyle defaultStyle = new CellStyleImpl("Arial", 12, 
+				new Color(10, 20, 30), new Color(75, 70, 65), true, true, true);
 		CellStyle style = config.getCellStyle("CellStyle_DoesNotExist", defaultStyle, false);
 		assertThat(style.getFontName()).isEqualTo("Arial");
 		assertThat(style.getFontHeight()).isEqualTo(12);
 		assertThat(style.getColorRed()).isEqualTo(10);
 		assertThat(style.getColorGreen()).isEqualTo(20);
 		assertThat(style.getColorBlue()).isEqualTo(30);
+		assertThat(style.getFillColorRed()).isEqualTo(75);
+		assertThat(style.getFillColorGreen()).isEqualTo(70);
+		assertThat(style.getFillColorBlue()).isEqualTo(65);
 		assertThat(style.getItalic()).isEqualTo(true);
+		assertThat(style.getBold()).isEqualTo(true);
+		assertThat(style.getShrinkToFit()).isEqualTo(true);
 	}
 }

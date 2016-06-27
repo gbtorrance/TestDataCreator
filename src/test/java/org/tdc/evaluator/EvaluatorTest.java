@@ -29,7 +29,7 @@ public class EvaluatorTest {
 	@Test
 	public void testEmpty() {
 		GeneralEvaluatorFactory factory = GeneralEvaluatorFactoryImpl.createWithDefaultTypeEvaluators();
-		Evaluator evaluator = factory.createEvaluator(config, "TestEmpty.Evaluator");
+		Evaluator evaluator = factory.createEvaluator(config, "TestEmpty.Evaluator", null);
 		ValueResult result = evaluator.evaluate(null, null);
 		assertThat(result.getValue()).isEqualTo("");
 	}
@@ -37,7 +37,7 @@ public class EvaluatorTest {
 	@Test
 	public void testSpaceDefaultSizeOne() {
 		GeneralEvaluatorFactory factory = GeneralEvaluatorFactoryImpl.createWithDefaultTypeEvaluators();
-		Evaluator evaluator = factory.createEvaluator(config, "TestSpaceDefaultSizeOne.Evaluator");
+		Evaluator evaluator = factory.createEvaluator(config, "TestSpaceDefaultSizeOne.Evaluator", null);
 		ValueResult result = evaluator.evaluate(null, null);
 		assertThat(result.getValue()).isEqualTo(" ");
 	}
@@ -45,7 +45,7 @@ public class EvaluatorTest {
 	@Test
 	public void testSpaceSizeZero() {
 		GeneralEvaluatorFactory factory = GeneralEvaluatorFactoryImpl.createWithDefaultTypeEvaluators();
-		Evaluator evaluator = factory.createEvaluator(config, "TestSpaceSizeZero.Evaluator");
+		Evaluator evaluator = factory.createEvaluator(config, "TestSpaceSizeZero.Evaluator", null);
 		ValueResult result = evaluator.evaluate(null, null);
 		assertThat(result.getValue()).isEqualTo("");
 	}
@@ -53,7 +53,7 @@ public class EvaluatorTest {
 	@Test
 	public void testSpaceSizeOne() {
 		GeneralEvaluatorFactory factory = GeneralEvaluatorFactoryImpl.createWithDefaultTypeEvaluators();
-		Evaluator evaluator = factory.createEvaluator(config, "TestSpaceSizeOne.Evaluator");
+		Evaluator evaluator = factory.createEvaluator(config, "TestSpaceSizeOne.Evaluator", null);
 		ValueResult result = evaluator.evaluate(null, null);
 		assertThat(result.getValue()).isEqualTo(" ");
 	}
@@ -61,7 +61,7 @@ public class EvaluatorTest {
 	@Test
 	public void testSpaceSizeFive() {
 		GeneralEvaluatorFactory factory = GeneralEvaluatorFactoryImpl.createWithDefaultTypeEvaluators();
-		Evaluator evaluator = factory.createEvaluator(config, "TestSpaceSizeFive.Evaluator");
+		Evaluator evaluator = factory.createEvaluator(config, "TestSpaceSizeFive.Evaluator", null);
 		ValueResult result = evaluator.evaluate(null, null);
 		assertThat(result.getValue()).isEqualTo("     ");
 	}
@@ -69,7 +69,7 @@ public class EvaluatorTest {
 	@Test
 	public void testLiteral() {
 		GeneralEvaluatorFactory factory = GeneralEvaluatorFactoryImpl.createWithDefaultTypeEvaluators();
-		Evaluator evaluator = factory.createEvaluator(config, "TestLiteral.Evaluator");
+		Evaluator evaluator = factory.createEvaluator(config, "TestLiteral.Evaluator", null);
 		ValueResult result = evaluator.evaluate(null, null);
 		assertThat(result.getValue()).isEqualTo("Abc123");
 	}
@@ -77,7 +77,7 @@ public class EvaluatorTest {
 	@Test
 	public void testLiteralEmpty() {
 		GeneralEvaluatorFactory factory = GeneralEvaluatorFactoryImpl.createWithDefaultTypeEvaluators();
-		Evaluator evaluator = factory.createEvaluator(config, "TestLiteralEmpty.Evaluator");
+		Evaluator evaluator = factory.createEvaluator(config, "TestLiteralEmpty.Evaluator", null);
 		ValueResult result = evaluator.evaluate(null, null);
 		assertThat(result.getValue()).isEqualTo("");
 	}
@@ -85,7 +85,7 @@ public class EvaluatorTest {
 	@Test
 	public void testCompound() {
 		GeneralEvaluatorFactory factory = GeneralEvaluatorFactoryImpl.createWithDefaultTypeEvaluators();
-		Evaluator evaluator = factory.createEvaluator(config, "TestCompound.Evaluator");
+		Evaluator evaluator = factory.createEvaluator(config, "TestCompound.Evaluator", null);
 		ValueResult result = evaluator.evaluate(null, null);
 		assertThat(result.getValue()).isEqualTo("AbCd - Ef");
 	}
@@ -93,7 +93,7 @@ public class EvaluatorTest {
 	@Test
 	public void testCompoundNoMatch() {
 		GeneralEvaluatorFactory factory = GeneralEvaluatorFactoryImpl.createWithDefaultTypeEvaluators();
-		Evaluator evaluator = factory.createEvaluator(config, "TestCompoundNoMatch.Evaluator");
+		Evaluator evaluator = factory.createEvaluator(config, "TestCompoundNoMatch.Evaluator", null);
 		ValueResult result = evaluator.evaluate(null, null);
 		assertThat(result.getValue()).isEqualTo("");
 	}
@@ -101,7 +101,7 @@ public class EvaluatorTest {
 	@Test
 	public void testCompoundEmpty() {
 		GeneralEvaluatorFactory factory = GeneralEvaluatorFactoryImpl.createWithDefaultTypeEvaluators();
-		Evaluator evaluator = factory.createEvaluator(config, "TestCompoundEmpty.Evaluator");
+		Evaluator evaluator = factory.createEvaluator(config, "TestCompoundEmpty.Evaluator", null);
 		ValueResult result = evaluator.evaluate(null, null);
 		assertThat(result.getValue()).isEqualTo("");
 	}
@@ -109,7 +109,7 @@ public class EvaluatorTest {
 	@Test
 	public void testCoalesce() {
 		GeneralEvaluatorFactory factory = GeneralEvaluatorFactoryImpl.createWithDefaultTypeEvaluators();
-		Evaluator evaluator = factory.createEvaluator(config, "TestCoalesce.Evaluator");
+		Evaluator evaluator = factory.createEvaluator(config, "TestCoalesce.Evaluator", null);
 		ValueResult result = evaluator.evaluate(null, null);
 		assertThat(result.getValue()).isEqualTo("Ab");
 	}
@@ -117,7 +117,7 @@ public class EvaluatorTest {
 	@Test
 	public void testCoalesceNoMatch() {
 		GeneralEvaluatorFactory factory = GeneralEvaluatorFactoryImpl.createWithDefaultTypeEvaluators();
-		Evaluator evaluator = factory.createEvaluator(config, "TestCoalesceNoMatch.Evaluator");
+		Evaluator evaluator = factory.createEvaluator(config, "TestCoalesceNoMatch.Evaluator", null);
 		ValueResult result = evaluator.evaluate(null, null);
 		assertThat(result.getValue()).isEqualTo("");
 	}
@@ -125,7 +125,7 @@ public class EvaluatorTest {
 	@Test
 	public void testCoalesceEmpty() {
 		GeneralEvaluatorFactory factory = GeneralEvaluatorFactoryImpl.createWithDefaultTypeEvaluators();
-		Evaluator evaluator = factory.createEvaluator(config, "TestCoalesceEmpty.Evaluator");
+		Evaluator evaluator = factory.createEvaluator(config, "TestCoalesceEmpty.Evaluator", null);
 		ValueResult result = evaluator.evaluate(null, null);
 		assertThat(result.getValue()).isEqualTo("");
 	}
@@ -133,7 +133,7 @@ public class EvaluatorTest {
 	@Test
 	public void testValuePlusStyle() {
 		GeneralEvaluatorFactory factory = GeneralEvaluatorFactoryImpl.createWithDefaultTypeEvaluators();
-		Evaluator evaluator = factory.createEvaluator(config, "TestValuePlusStyle.Evaluator");
+		Evaluator evaluator = factory.createEvaluator(config, "TestValuePlusStyle.Evaluator", null);
 		ValuePlusStyleResult result = (ValuePlusStyleResult)evaluator.evaluate(null, null);
 		assertThat(result.getValue()).isEqualTo("Abc");
 		assertThat(result.getCellStyle().getFontName()).isEqualTo("Calibri");
@@ -143,7 +143,7 @@ public class EvaluatorTest {
 	@Test
 	public void testValuePlusStyleInsideIf() {
 		GeneralEvaluatorFactory factory = GeneralEvaluatorFactoryImpl.createWithDefaultTypeEvaluators();
-		Evaluator evaluator = factory.createEvaluator(config, "TestValuePlusStyleInsideIf.Evaluator");
+		Evaluator evaluator = factory.createEvaluator(config, "TestValuePlusStyleInsideIf.Evaluator", null);
 		ValuePlusStyleResult result = (ValuePlusStyleResult)evaluator.evaluate(null, null);
 		assertThat(result.getValue()).isEqualTo("Then block");
 		assertThat(result.getCellStyle().getFontName()).isEqualTo("Calibri");
@@ -153,7 +153,7 @@ public class EvaluatorTest {
 	@Test
 	public void testValuePlusStyleInsideCoalesce() {
 		GeneralEvaluatorFactory factory = GeneralEvaluatorFactoryImpl.createWithDefaultTypeEvaluators();
-		Evaluator evaluator = factory.createEvaluator(config, "TestValuePlusStyleInsideCoalesce.Evaluator");
+		Evaluator evaluator = factory.createEvaluator(config, "TestValuePlusStyleInsideCoalesce.Evaluator", null);
 		ValuePlusStyleResult result = (ValuePlusStyleResult)evaluator.evaluate(null, null);
 		assertThat(result.getValue()).isEqualTo("Inside coalesce");
 		assertThat(result.getCellStyle().getFontName()).isEqualTo("Calibri");
@@ -163,7 +163,7 @@ public class EvaluatorTest {
 	@Test
 	public void testIfEqualsOperatorEquals() {
 		GeneralEvaluatorFactory factory = GeneralEvaluatorFactoryImpl.createWithDefaultTypeEvaluators();
-		Evaluator evaluator = factory.createEvaluator(config, "TestIfEqualsOperatorEquals.Evaluator");
+		Evaluator evaluator = factory.createEvaluator(config, "TestIfEqualsOperatorEquals.Evaluator", null);
 		ValueResult result = evaluator.evaluate(null, null);
 		assertThat(result.getValue()).isEqualTo("Then block");
 	}
@@ -171,7 +171,7 @@ public class EvaluatorTest {
 	@Test
 	public void testIfEqualsOperatorNotEquals() {
 		GeneralEvaluatorFactory factory = GeneralEvaluatorFactoryImpl.createWithDefaultTypeEvaluators();
-		Evaluator evaluator = factory.createEvaluator(config, "TestIfEqualsOperatorNotEquals.Evaluator");
+		Evaluator evaluator = factory.createEvaluator(config, "TestIfEqualsOperatorNotEquals.Evaluator", null);
 		ValueResult result = evaluator.evaluate(null, null);
 		assertThat(result.getValue()).isEqualTo("Else block");
 	}
@@ -179,7 +179,7 @@ public class EvaluatorTest {
 	@Test
 	public void testIfNotEqualsOperatorEquals() {
 		GeneralEvaluatorFactory factory = GeneralEvaluatorFactoryImpl.createWithDefaultTypeEvaluators();
-		Evaluator evaluator = factory.createEvaluator(config, "TestIfNotEqualsOperatorEquals.Evaluator");
+		Evaluator evaluator = factory.createEvaluator(config, "TestIfNotEqualsOperatorEquals.Evaluator", null);
 		ValueResult result = evaluator.evaluate(null, null);
 		assertThat(result.getValue()).isEqualTo("Else block");
 	}
@@ -187,7 +187,7 @@ public class EvaluatorTest {
 	@Test
 	public void testIfNotEqualsOperatorNotEquals() {
 		GeneralEvaluatorFactory factory = GeneralEvaluatorFactoryImpl.createWithDefaultTypeEvaluators();
-		Evaluator evaluator = factory.createEvaluator(config, "TestIfNotEqualsOperatorNotEquals.Evaluator");
+		Evaluator evaluator = factory.createEvaluator(config, "TestIfNotEqualsOperatorNotEquals.Evaluator", null);
 		ValueResult result = evaluator.evaluate(null, null);
 		assertThat(result.getValue()).isEqualTo("Then block");
 	}
@@ -195,7 +195,7 @@ public class EvaluatorTest {
 	@Test
 	public void testIfEqualsOperatorNotEqualsAndNoElseBlock() {
 		GeneralEvaluatorFactory factory = GeneralEvaluatorFactoryImpl.createWithDefaultTypeEvaluators();
-		Evaluator evaluator = factory.createEvaluator(config, "TestIfEqualsOperatorNotEqualsAndNoElseBlock.Evaluator");
+		Evaluator evaluator = factory.createEvaluator(config, "TestIfEqualsOperatorNotEqualsAndNoElseBlock.Evaluator", null);
 		ValueResult result = evaluator.evaluate(null, null);
 		assertThat(result.getValue()).isEqualTo("");
 	}
@@ -203,7 +203,7 @@ public class EvaluatorTest {
 	@Test
 	public void testIfInsideIf() {
 		GeneralEvaluatorFactory factory = GeneralEvaluatorFactoryImpl.createWithDefaultTypeEvaluators();
-		Evaluator evaluator = factory.createEvaluator(config, "TestIfInsideIf.Evaluator");
+		Evaluator evaluator = factory.createEvaluator(config, "TestIfInsideIf.Evaluator", null);
 		ValueResult result = evaluator.evaluate(null, null);
 		assertThat(result.getValue()).isEqualTo("Inner Else block");
 	}

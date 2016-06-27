@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Config>
-	<SchemaRootFile>2012v3.0/IndividualIncomeTax/Ind1040A/Return1040A.xsd</SchemaRootFile>
+	<SchemaRootFile>2011v3.0/IndividualIncomeTax/Ind1040A/Return1040A.xsd</SchemaRootFile>
 	<SchemaRootElementName>Return</SchemaRootElementName>
 	<SchemaRootElementNamespace>http://www.irs.gov/efile</SchemaRootElementNamespace>
 	<SchemaFailOnParserWarning>true</SchemaFailOnParserWarning>
