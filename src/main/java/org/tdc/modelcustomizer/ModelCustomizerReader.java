@@ -1,7 +1,10 @@
 package org.tdc.modelcustomizer;
 
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.tdc.config.model.ModelCustomizerColumnConfig;
 import org.tdc.config.model.ModelCustomizerConfig;
 import org.tdc.model.AttribNode;
 import org.tdc.model.CompositorNode;
@@ -36,18 +39,21 @@ public class ModelCustomizerReader extends AbstractModelCustomizer {
 	protected void processAttribNode(AttribNode node) {
 		validateNode(node);
 		readOccursCountOverride(node, true);
+		readCustomColumns(node);
 	}
 
 	@Override
 	protected void processCompositorNode(CompositorNode node) {
 		validateNode(node);
 		readOccursCountOverride(node, false);
+		readCustomColumns(node);
 	}
 	
 	@Override
 	protected void processElementNode(ElementNode node) {
 		validateNode(node);
 		readOccursCountOverride(node, false);
+		readCustomColumns(node);
 	}
 	
 	private void validateNode(TDCNode node) {
@@ -120,6 +126,19 @@ public class ModelCustomizerReader extends AbstractModelCustomizer {
 		}
 		NodeDef nodeDef = (NodeDef)node;
 		nodeDef.setOccursCountOverride(override);
+	}
+	
+	private void readCustomColumns(TDCNode node) {
+		NodeDef nodeDef = (NodeDef)node; // cast so we can set variables;
+		List<ModelCustomizerColumnConfig> columns = getConfig().getColumns(); 
+		for (int i = 0; i < columns.size(); i++) {
+			ModelCustomizerColumnConfig column = columns.get(i);
+			String variable = column.getStoreValueWithVariableName();
+			if (variable != null && !variable.equals("")) {
+				String value = getCustomizerSheet().getCellValue(getNodeRow(node), getDataCol(COL_CUSTOM_BASE) + i).trim();
+				nodeDef.setVariable(variable, value);
+			}
+		}
 	}
 	
 	private void exception(int row, int col, String invalidMsg, String actualValue, String expectedMsg) {
