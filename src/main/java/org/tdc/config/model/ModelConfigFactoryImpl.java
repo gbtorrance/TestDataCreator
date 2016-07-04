@@ -1,5 +1,8 @@
 package org.tdc.config.model;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.tdc.config.schema.SchemaConfig;
@@ -11,6 +14,7 @@ import org.tdc.schemaparse.extractor.SchemaExtractorFactoryImpl;
 import org.tdc.util.Addr;
 import org.tdc.util.Cache;
 import org.tdc.util.CacheImpl;
+import org.tdc.util.ConfigFinder;
 
 /**
  * A {@link ModelConfigFactory} implementation.
@@ -45,5 +49,18 @@ public class ModelConfigFactoryImpl implements ModelConfigFactory {
 			log.debug("Found cached ModelConfig for: {}", addr);
 		}
 		return modelConfig;
+	}
+
+	@Override
+	public List<ModelConfig> getAllModelConfigs() {
+		List<Addr> allConfigAddrs = ConfigFinder.findAllConfigsContainingConfigFile(
+				schemaConfigFactory.getSchemasConfigRoot(), 
+				ModelConfigImpl.CONFIG_FILE);
+		List<ModelConfig> modelConfigs = new ArrayList<>();
+		for (Addr addr : allConfigAddrs) {
+			ModelConfig modelConfig = getModelConfig(addr);
+			modelConfigs.add(modelConfig);
+		}
+		return modelConfigs;
 	}
 }

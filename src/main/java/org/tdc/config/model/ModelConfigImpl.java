@@ -21,6 +21,8 @@ import org.tdc.util.Addr;
  */
 public class ModelConfigImpl implements ModelConfig {
 	
+	public static final String CONFIG_FILE = "TDCModelConfig.xml";
+	
 	private static final Logger log = LoggerFactory.getLogger(ModelConfigImpl.class);
 
 	private final SchemaConfig schemaConfig;
@@ -115,8 +117,6 @@ public class ModelConfigImpl implements ModelConfig {
 	}
 	
 	public static class ModelConfigBuilder {
-		private static final String CONFIG_FILE = "TDCModelConfig.xml";
-		
 		private final XMLConfigWrapper config;
 		private final SchemaConfig schemaConfig;
 		private final Addr addr;

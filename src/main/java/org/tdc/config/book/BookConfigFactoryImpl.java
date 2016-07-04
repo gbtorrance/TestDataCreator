@@ -1,6 +1,8 @@
 package org.tdc.config.book;
 
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -8,6 +10,7 @@ import org.tdc.config.model.ModelConfigFactory;
 import org.tdc.util.Addr;
 import org.tdc.util.Cache;
 import org.tdc.util.CacheImpl;
+import org.tdc.util.ConfigFinder;
 
 /**
  * A {@link BookConfigFactory} implementation.
@@ -38,5 +41,18 @@ public class BookConfigFactoryImpl implements BookConfigFactory {
 			log.debug("Found cached BookConfig for: {}", addr);
 		}
 		return bookConfig;
+	}
+
+	@Override
+	public List<BookConfig> getAllBookConfigs() {
+		List<Addr> allConfigAddrs = ConfigFinder.findAllConfigsContainingConfigFile(
+				booksConfigRoot, 
+				BookConfigImpl.CONFIG_FILE);
+		List<BookConfig> bookConfigs = new ArrayList<>();
+		for (Addr addr : allConfigAddrs) {
+			BookConfig bookConfig = getBookConfig(addr);
+			bookConfigs.add(bookConfig);
+		}
+		return bookConfigs;
 	}
 }

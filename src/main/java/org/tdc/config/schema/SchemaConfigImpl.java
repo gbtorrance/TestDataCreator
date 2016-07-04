@@ -15,6 +15,8 @@ import org.tdc.util.Addr;
  */
 public class SchemaConfigImpl implements SchemaConfig {
 	
+	public static final String CONFIG_FILE = "TDCSchemaConfig.xml";
+	
 	private static final Logger log = LoggerFactory.getLogger(SchemaConfigImpl.class);
 
 	private final Path schemasConfigRoot;
@@ -50,8 +52,6 @@ public class SchemaConfigImpl implements SchemaConfig {
 	}
 
 	public static class SchemaConfigBuilder {
-		private static final String CONFIG_FILE = "TDCSchemaConfig.xml";
-		
 		private final XMLConfigWrapper config;
 		private final Path schemasConfigRoot;
 		private final Addr addr;

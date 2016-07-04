@@ -6,7 +6,7 @@ import java.nio.file.Paths;
 /**
  * Support for standardized naming and addressing of high-level domain objects such as Schema, Model, and BookDef 
  */
-public class Addr {
+public class Addr implements Comparable<Addr> {
 	
 	private final Path addrPath;
 	
@@ -68,27 +68,15 @@ public class Addr {
 		return addrPath.equals(compareAddr.addrPath);
 	}
 	
+	@Override
+	public int compareTo(Addr o) {
+		return addrPath.toString().compareTo(o.addrPath.toString());
+	}
+	
 	private Path standardizeAddrPath(String addr) {
 		// strip any initial slash or back slash, 
 		// and split on any subsequent slash or backslash
 		String[] addrParts = addr.split("/|[\\\\]");
 		return Paths.get("", addrParts);
 	}
-	
-//	public static void main(String[] args) {
-//		Addr a = new Addr("/test1/test2");
-//		Addr b = new Addr("\\test1\\test2");
-//		Addr c = new Addr("test1/test2");
-//		Addr d = new Addr("test1\\test2");
-//		Addr e = new Addr("test1/test2/");
-//		Addr f = new Addr("test1\\test2\\");
-//		Addr g = new Addr("test1/test3");
-//		
-//		System.out.println("equals: " + a.equals(b) + ", " + (a.hashCode() == b.hashCode()));
-//		System.out.println("equals: " + a.equals(c) + ", " + (a.hashCode() == c.hashCode()));
-//		System.out.println("equals: " + a.equals(d) + ", " + (a.hashCode() == d.hashCode()));
-//		System.out.println("equals: " + a.equals(e) + ", " + (a.hashCode() == e.hashCode()));
-//		System.out.println("equals: " + a.equals(f) + ", " + (a.hashCode() == f.hashCode()));
-//		System.out.println("equals: " + a.equals(g) + ", " + (a.hashCode() == g.hashCode()));
-//	}
 }

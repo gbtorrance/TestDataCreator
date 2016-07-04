@@ -1,12 +1,15 @@
 package org.tdc.config.schema;
 
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.tdc.util.Addr;
 import org.tdc.util.Cache;
 import org.tdc.util.CacheImpl;
+import org.tdc.util.ConfigFinder;
 
 /**
  * A {@link SchemaConfigFactory} implementation.
@@ -23,6 +26,10 @@ public class SchemaConfigFactoryImpl implements SchemaConfigFactory {
 	public SchemaConfigFactoryImpl(Path schemasConfigRoot) {
 		this.schemasConfigRoot = schemasConfigRoot;
 	}
+	
+	public Path getSchemasConfigRoot() {
+		return schemasConfigRoot;
+	}
 
 	@Override
 	public synchronized SchemaConfig getSchemaConfig(Addr addr) {
@@ -35,5 +42,18 @@ public class SchemaConfigFactoryImpl implements SchemaConfigFactory {
 			log.debug("Found cached SchemaConfig for: {}", addr);
 		}
 		return schemaConfig;
+	}
+
+	@Override
+	public List<SchemaConfig> getAllSchemaConfigs() {
+		List<Addr> allConfigAddrs = ConfigFinder.findAllConfigsContainingConfigFile(
+				schemasConfigRoot, 
+				SchemaConfigImpl.CONFIG_FILE);
+		List<SchemaConfig> schemaConfigs = new ArrayList<>();
+		for (Addr addr : allConfigAddrs) {
+			SchemaConfig schemaConfig = getSchemaConfig(addr);
+			schemaConfigs.add(schemaConfig);
+		}
+		return schemaConfigs;
 	}
 }

@@ -19,6 +19,8 @@ import org.tdc.util.Addr;
  */
 public class BookConfigImpl implements BookConfig {
 	
+	public static final String CONFIG_FILE = "TDCBookConfig.xml";
+	
 	private static final Logger log = LoggerFactory.getLogger(BookConfigImpl.class);
 	private static final String CONFIG_SHEET_NAME = "_Config";
 	private static final int CONFIG_SHEET_BOOK_ADDR_ROW = 1;
@@ -146,8 +148,6 @@ public class BookConfigImpl implements BookConfig {
 	}
 	
 	public static class BookConfigBuilder {
-		private static final String CONFIG_FILE = "TDCBookConfig.xml";
-		
 		private final XMLConfigWrapper config;
 		private final ModelConfigFactory modelConfigFactory;
 		private final Path booksConfigRoot;

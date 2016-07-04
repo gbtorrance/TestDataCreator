@@ -1,5 +1,7 @@
 package org.tdc.config.book;
 
+import java.util.List;
+
 import org.tdc.util.Addr;
 
 /**
@@ -7,4 +9,5 @@ import org.tdc.util.Addr;
  */
 public interface BookConfigFactory {
 	BookConfig getBookConfig(Addr addr);
+	List<BookConfig> getAllBookConfigs();
 }
