@@ -161,8 +161,6 @@
 									<Evaluator type="literal">]</Evaluator>
 								</Evaluator>
 								<Style>
-									<FontName>Calibri</FontName>
-									<FontHeight>11</FontHeight>
 									<ColorRGB>255 0 0</ColorRGB> <!-- red -->
 								</Style>
 							</Evaluator>
@@ -218,8 +216,6 @@
 									<Evaluator type="literal">]</Evaluator>
 								</Evaluator>
 								<Style>
-									<FontName>Calibri</FontName>
-									<FontHeight>11</FontHeight>
 									<ColorRGB>255 0 0</ColorRGB> <!-- red -->
 								</Style>
 							</Evaluator>
@@ -275,8 +271,6 @@
 									<Evaluator type="literal">]</Evaluator>
 								</Evaluator>
 								<Style>
-									<FontName>Calibri</FontName>
-									<FontHeight>11</FontHeight>
 									<ColorRGB>255 0 0</ColorRGB> <!-- red -->
 								</Style>
 							</Evaluator>
@@ -316,8 +310,6 @@
 									<Evaluator type="literal">]</Evaluator>
 								</Evaluator>
 								<Style>
-									<FontName>Calibri</FontName>
-									<FontHeight>11</FontHeight>
 									<ColorRGB>255 0 0</ColorRGB> <!-- red -->
 								</Style>
 							</Evaluator>
@@ -342,6 +334,96 @@
 				</Read>
 			</Column>
 			
+			<Column>
+				<HeaderLabels>
+					<Label>Occurs</Label>
+				</HeaderLabels>
+				<Width>2000</Width>
+				<InitializeAsNew>
+					<Evaluator type="property" source="current">DispOccurs</Evaluator>
+				</InitializeAsNew>
+				<InitializeFromPrevious>
+					<Evaluator type="if" operator="equals">
+						<If>
+							<Evaluator type="property" source="current">DispOccurs</Evaluator>
+							<Evaluator type="property" source="previous">DispOccurs</Evaluator>
+						</If>
+						<Then>
+							<Evaluator type="property" source="current">DispOccurs</Evaluator>
+						</Then>
+						<Else>
+							<Evaluator type="value-plus-style">
+								<Evaluator type="compound">
+									<Evaluator type="property" source="current">DispOccurs</Evaluator>
+									<Evaluator type="space" size="1"/>
+									<Evaluator type="literal">[prev:</Evaluator>
+									<Evaluator type="space" size="1"/>
+									<Evaluator type="property" source="previous">DispOccurs</Evaluator>
+									<Evaluator type="literal">]</Evaluator>
+								</Evaluator>
+								<Style>
+									<ColorRGB>255 0 0</ColorRGB> <!-- red -->
+								</Style>
+							</Evaluator>
+						</Else>
+					</Evaluator>
+				</InitializeFromPrevious>
+			</Column>
+
+			<Column>
+				<HeaderLabels>
+					<Label>Max Occurs</Label>
+				</HeaderLabels>
+				<Width>2000</Width>
+				<InitializeAsNew>
+					<Evaluator type="property" source="current">MaxOccurs</Evaluator>
+				</InitializeAsNew>
+				<InitializeFromPrevious>
+					<Evaluator type="property" source="current">MaxOccurs</Evaluator>
+				</InitializeFromPrevious>
+			</Column>
+
+			<Column>
+				<HeaderLabels>
+					<Label>Name</Label>
+				</HeaderLabels>
+				<Width>2000</Width>
+				<InitializeAsNew>
+					<Evaluator type="property" source="current">Name</Evaluator>
+				</InitializeAsNew>
+				<InitializeFromPrevious>
+					<Evaluator type="property" source="current">Name</Evaluator>
+				</InitializeFromPrevious>
+			</Column>
+
+			<Column>
+				<HeaderLabels>
+					<Label>Compositor</Label>
+					<Label>Type</Label>
+				</HeaderLabels>
+				<Width>2000</Width>
+				<InitializeAsNew>
+					<Evaluator type="property" source="current">CompositorType</Evaluator>
+				</InitializeAsNew>
+				<InitializeFromPrevious>
+					<Evaluator type="property" source="current">CompositorType</Evaluator>
+				</InitializeFromPrevious>
+			</Column>
+
+			<Column>
+				<HeaderLabels>
+					<Label>Has</Label>
+					<Label>Child</Label>
+				</HeaderLabels>
+				<Width>2000</Width>
+				<InitializeAsNew>
+					<Evaluator type="property" source="current">hasChild</Evaluator>
+				</InitializeAsNew>
+				<InitializeFromPrevious>
+					<Evaluator type="property" source="current">hasChild</Evaluator>
+				</InitializeFromPrevious>
+			</Column>
+
 		</Columns>
 	</Customizer>
 	

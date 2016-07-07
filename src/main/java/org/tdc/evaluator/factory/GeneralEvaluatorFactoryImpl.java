@@ -37,6 +37,7 @@ public class GeneralEvaluatorFactoryImpl implements GeneralEvaluatorFactory {
 		factory.setTypeSpecificFactory(new CoalesceEvaluatorFactory(factory));
 		factory.setTypeSpecificFactory(new ValuePlusStyleEvaluatorFactory(factory));
 		factory.setTypeSpecificFactory(new VariableEvaluatorFactory());
+		factory.setTypeSpecificFactory(new PropertyEvaluatorFactory());
 		factory.setTypeSpecificFactory(IfEvaluatorFactory.createWithDefaultOperators(factory));
 		return factory;
 	}

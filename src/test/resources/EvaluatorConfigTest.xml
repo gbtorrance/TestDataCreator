@@ -217,4 +217,28 @@
 		</Evaluator>
 	</TestIfInsideIf>
 	
+	<TestVariableCurrent>
+		<Evaluator type="variable" source="current">TEST_VARIABLE</Evaluator>
+	</TestVariableCurrent>
+
+	<TestVariablePrevious>
+		<Evaluator type="variable" source="previous">TEST_VARIABLE</Evaluator>
+	</TestVariablePrevious>
+
+	<TestPropertyCurrent>
+		<Evaluator type="property" source="current">MaxOccurs</Evaluator>
+	</TestPropertyCurrent>
+
+	<TestPropertyPrevious>
+		<Evaluator type="property" source="previous">MaxOccurs</Evaluator>
+	</TestPropertyPrevious>
+
+	<TestPropertyFullMethodName>
+		<Evaluator type="property" source="current">getMaxOccurs</Evaluator>
+	</TestPropertyFullMethodName>
+
+	<TestPropertyLowerCaseFirstLetter>
+		<Evaluator type="property" source="current">maxOccurs</Evaluator>
+	</TestPropertyLowerCaseFirstLetter>
+
 </Config>

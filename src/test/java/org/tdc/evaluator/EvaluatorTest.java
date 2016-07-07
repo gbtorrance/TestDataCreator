@@ -11,6 +11,8 @@ import org.tdc.evaluator.factory.GeneralEvaluatorFactory;
 import org.tdc.evaluator.factory.GeneralEvaluatorFactoryImpl;
 import org.tdc.evaluator.result.ValuePlusStyleResult;
 import org.tdc.evaluator.result.ValueResult;
+import org.tdc.modeldef.ElementNodeDef;
+import org.tdc.modeldef.ModelDefSharedState;
 
 /**
  * Unit tests for {@link Evaluator} and its related classes.
@@ -206,5 +208,71 @@ public class EvaluatorTest {
 		Evaluator evaluator = factory.createEvaluator(config, "TestIfInsideIf.Evaluator", null);
 		ValueResult result = evaluator.evaluate(null, null);
 		assertThat(result.getValue()).isEqualTo("Inner Else block");
+	}
+	
+	@Test
+	public void testVariableCurrent() {
+		ModelDefSharedState sharedState = new ModelDefSharedState();
+		ElementNodeDef element = new ElementNodeDef(null, sharedState);
+		element.setVariable("TEST_VARIABLE", "my value");
+		GeneralEvaluatorFactory factory = GeneralEvaluatorFactoryImpl.createWithDefaultTypeEvaluators();
+		Evaluator evaluator = factory.createEvaluator(config, "TestVariableCurrent.Evaluator", null);
+		ValueResult result = evaluator.evaluate(element, null);
+		assertThat(result.getValue()).isEqualTo("my value");
+	}
+
+	@Test
+	public void testVariablePrevious() {
+		ModelDefSharedState sharedState = new ModelDefSharedState();
+		ElementNodeDef element = new ElementNodeDef(null, sharedState);
+		element.setVariable("TEST_VARIABLE", "my value");
+		GeneralEvaluatorFactory factory = GeneralEvaluatorFactoryImpl.createWithDefaultTypeEvaluators();
+		Evaluator evaluator = factory.createEvaluator(config, "TestVariablePrevious.Evaluator", null);
+		ValueResult result = evaluator.evaluate(null, element);
+		assertThat(result.getValue()).isEqualTo("my value");
+	}
+
+	@Test
+	public void testPropertyCurrent() {
+		ModelDefSharedState sharedState = new ModelDefSharedState();
+		ElementNodeDef element = new ElementNodeDef(null, sharedState);
+		element.setMaxOccurs(125);
+		GeneralEvaluatorFactory factory = GeneralEvaluatorFactoryImpl.createWithDefaultTypeEvaluators();
+		Evaluator evaluator = factory.createEvaluator(config, "TestPropertyCurrent.Evaluator", null);
+		ValueResult result = evaluator.evaluate(element, null);
+		assertThat(result.getValue()).isEqualTo("125");
+	}
+
+	@Test
+	public void testPropertyPrevious() {
+		ModelDefSharedState sharedState = new ModelDefSharedState();
+		ElementNodeDef element = new ElementNodeDef(null, sharedState);
+		element.setMaxOccurs(125);
+		GeneralEvaluatorFactory factory = GeneralEvaluatorFactoryImpl.createWithDefaultTypeEvaluators();
+		Evaluator evaluator = factory.createEvaluator(config, "TestPropertyPrevious.Evaluator", null);
+		ValueResult result = evaluator.evaluate(null, element);
+		assertThat(result.getValue()).isEqualTo("125");
+	}
+
+	@Test
+	public void testPropertyFullMethodName() {
+		ModelDefSharedState sharedState = new ModelDefSharedState();
+		ElementNodeDef element = new ElementNodeDef(null, sharedState);
+		element.setMaxOccurs(125);
+		GeneralEvaluatorFactory factory = GeneralEvaluatorFactoryImpl.createWithDefaultTypeEvaluators();
+		Evaluator evaluator = factory.createEvaluator(config, "TestPropertyFullMethodName.Evaluator", null);
+		ValueResult result = evaluator.evaluate(element, null);
+		assertThat(result.getValue()).isEqualTo("125");
+	}
+
+	@Test
+	public void testPropertyWithPropertyNameStartingWithLowerCaseLetter() {
+		ModelDefSharedState sharedState = new ModelDefSharedState();
+		ElementNodeDef element = new ElementNodeDef(null, sharedState);
+		element.setMaxOccurs(125);
+		GeneralEvaluatorFactory factory = GeneralEvaluatorFactoryImpl.createWithDefaultTypeEvaluators();
+		Evaluator evaluator = factory.createEvaluator(config, "TestPropertyLowerCaseFirstLetter.Evaluator", null);
+		ValueResult result = evaluator.evaluate(element, null);
+		assertThat(result.getValue()).isEqualTo("125");
 	}
 }
