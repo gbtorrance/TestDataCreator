@@ -58,7 +58,6 @@ public class ModelCustomizerReader extends AbstractModelCustomizer {
 	
 	private void validateNode(TDCNode node) {
 		validateNodeName(node);
-		validateNodeOccurs(node);
 	}
 	
 	private void validateNodeName(TDCNode node) {
@@ -71,16 +70,6 @@ public class ModelCustomizerReader extends AbstractModelCustomizer {
 		}
 	}
 
-	private void validateNodeOccurs(TDCNode node) {
-		int row = getNodeRow(node);
-		int col = getDataCol(COL_OCCURS);
-		String expectedValue = node.getDispOccurs();
-		String actualValue = getCustomizerSheet().getCellValue(row, col);
-		if (!actualValue.equals(expectedValue)) {
-			exception(row, col, "Invalid Occurs value", actualValue, "expected '" + expectedValue + "'");
-		}
-	}
-	
 	private void readOccursCountOverride(TDCNode node, boolean isAttrib) {
 		int row = getNodeRow(node);
 		int col = getDataCol(COL_OCCURS_OVERRIDE);

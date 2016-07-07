@@ -15,6 +15,13 @@
 			<ModelAddress>/ConfigTest/SchemaConfigTest/ModelConfigTest</ModelAddress>
 			<DocTypeName>DocTypeNotInConfig</DocTypeName>
 		</Page>
-	</Pages>	
+	</Pages>
+
+	<DefaultStyle>
+		<FontName>Calibri</FontName>
+		<FontHeight>11</FontHeight>
+	</DefaultStyle>
+	<TreeStructureColumnCount>12</TreeStructureColumnCount>
+	<TreeStructureColumnWidth>500</TreeStructureColumnWidth>
 	
 </Config>

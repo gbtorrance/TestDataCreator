@@ -49,7 +49,6 @@ public class ModelCustomizerWriter extends AbstractModelCustomizer {
 		trackMaxColumns(node);
 
 		outputNodeName(node, getConfig().getAttribNodeStyle());
-		outputOccurs(node);
 		outputOccursOverride(node, true);
 		outputCustomColumns(node);
 	}
@@ -63,7 +62,6 @@ public class ModelCustomizerWriter extends AbstractModelCustomizer {
 		}
 		
 		outputNodeName(node, getConfig().getCompositorNodeStyle());
-		outputOccurs(node);
 		outputOccursOverride(node, false);
 		outputCustomColumns(node);
 	}
@@ -82,7 +80,6 @@ public class ModelCustomizerWriter extends AbstractModelCustomizer {
 		}
 
 		outputNodeName(node, cellStyle);
-		outputOccurs(node);
 		outputOccursOverride(node, false);
 		outputCustomColumns(node);
 	}
@@ -97,10 +94,6 @@ public class ModelCustomizerWriter extends AbstractModelCustomizer {
 
 	private void outputNodeName(TDCNode node, CellStyle cellStyle) {
 		getCustomizerSheet().setCellValue(node.getDispName(), getNodeRow(node), getNodeCol(node), cellStyle);
-	}
-	
-	private void outputOccurs(TDCNode node) {
-		getCustomizerSheet().setCellValue(node.getDispOccurs(), getNodeRow(node), getDataCol(COL_OCCURS)); 
 	}
 	
 	private void outputOccursOverride(TDCNode node, boolean isAttrib) {
@@ -175,8 +168,6 @@ public class ModelCustomizerWriter extends AbstractModelCustomizer {
 		for (int row = 1; row <= rowCount; row++) {
 			getCustomizerSheet().setCellValue(
 					getConfig().getTreeStructureHeaderLabel(row), row, 1, style);
-			getCustomizerSheet().setCellValue(
-					getConfig().getOccursHeaderLabel(row), row, getDataCol(COL_OCCURS), style);
 			getCustomizerSheet().setCellValue(
 					getConfig().getOccursOverrideHeaderLabel(row), row, getDataCol(COL_OCCURS_OVERRIDE), style);
 			for (int colIndex = 0; colIndex < columns.size(); colIndex++) {

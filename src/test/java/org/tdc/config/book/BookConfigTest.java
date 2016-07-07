@@ -15,6 +15,7 @@ import org.tdc.config.model.ModelConfigFactory;
 import org.tdc.config.model.ModelConfigFactoryImpl;
 import org.tdc.config.schema.SchemaConfigFactory;
 import org.tdc.config.schema.SchemaConfigFactoryImpl;
+import org.tdc.spreadsheet.CellStyle;
 import org.tdc.util.Addr;
 
 /**
@@ -55,24 +56,83 @@ public class BookConfigTest {
 		assertThat(bookConfig.getBooksConfigRoot()).isEqualTo(booksConfigRoot);
 		assertThat(bookConfig.getAddr()).isEqualTo(bookAddr);
 		assertThat(bookConfig.getBookConfigRoot()).isEqualTo(booksConfigRoot.resolve(bookAddr.toString()));
-		assertThat(bookConfig.getDefaultNodeStyle().getFontName()).isEqualTo("Calibri");
-		assertThat(bookConfig.getDefaultNodeStyle().getFontHeight()).isEqualTo(11);
-		assertThat(bookConfig.getParentNodeStyle().getFontName()).isEqualTo("Arial");
-		assertThat(bookConfig.getParentNodeStyle().getFontHeight()).isEqualTo(12);
-		assertThat(bookConfig.getParentNodeStyle().getColor()).isEqualTo(new Color(0, 0, 255));
-		assertThat(bookConfig.getParentNodeStyle().getItalic()).isEqualTo(false);
-		assertThat(bookConfig.getAttribNodeStyle().getFontName()).isEqualTo("Calibri");
-		assertThat(bookConfig.getAttribNodeStyle().getFontHeight()).isEqualTo(13);
-		assertThat(bookConfig.getAttribNodeStyle().getColor()).isEqualTo(new Color(34, 97, 13));
-		assertThat(bookConfig.getCompositorNodeStyle().getFontName()).isEqualTo("Times New Roman");
-		assertThat(bookConfig.getCompositorNodeStyle().getFontHeight()).isEqualTo(14);
-		assertThat(bookConfig.getCompositorNodeStyle().getColor()).isEqualTo(new Color(64, 64, 64));
-		assertThat(bookConfig.getCompositorNodeStyle().getItalic()).isEqualTo(true);
-		assertThat(bookConfig.getChoiceMarkerStyle().getFontName()).isEqualTo("Calibri");
-		assertThat(bookConfig.getChoiceMarkerStyle().getFontHeight()).isEqualTo(15);
-		assertThat(bookConfig.getChoiceMarkerStyle().getColor()).isEqualTo(new Color(255, 0, 0));
+
+		CellStyle style;
+		style = bookConfig.getDefaultStyle();
+		assertThat(style.getFontName()).isEqualTo("Calibri");
+		assertThat(style.getFontHeight()).isEqualTo(11);
+		assertThat(style.getBold()).isEqualTo(false);
+		assertThat(style.getItalic()).isEqualTo(false);
+		assertThat(style.getColor()).isEqualTo(null);
+		assertThat(style.getFillColor()).isEqualTo(null);
+		assertThat(style.getShrinkToFit()).isEqualTo(false);
+
+		style = bookConfig.getDefaultHeaderStyle();
+		assertThat(style.getFontName()).isEqualTo("Calibri");
+		assertThat(style.getFontHeight()).isEqualTo(11);
+		assertThat(style.getBold()).isEqualTo(true);
+		assertThat(style.getItalic()).isEqualTo(false);
+		assertThat(style.getColor()).isEqualTo(null);
+		assertThat(style.getFillColor()).isEqualTo(null);
+		assertThat(style.getShrinkToFit()).isEqualTo(false);
+		
+		style = bookConfig.getDefaultColumnStyle();
+		assertThat(style.getFontName()).isEqualTo("Calibri");
+		assertThat(style.getFontHeight()).isEqualTo(11);
+		assertThat(style.getBold()).isEqualTo(false);
+		assertThat(style.getItalic()).isEqualTo(false);
+		assertThat(style.getColor()).isEqualTo(null);
+		assertThat(style.getFillColor()).isEqualTo(null);
+		assertThat(style.getShrinkToFit()).isEqualTo(true);
+		
+		style = bookConfig.getDefaultNodeStyle();
+		assertThat(style.getFontName()).isEqualTo("Calibri");
+		assertThat(style.getFontHeight()).isEqualTo(10);
+		assertThat(style.getBold()).isEqualTo(false);
+		assertThat(style.getItalic()).isEqualTo(false);
+		assertThat(style.getColor()).isEqualTo(null);
+		assertThat(style.getFillColor()).isEqualTo(null);
+		assertThat(style.getShrinkToFit()).isEqualTo(false);
+
+		style = bookConfig.getParentNodeStyle();
+		assertThat(style.getFontName()).isEqualTo("Arial");
+		assertThat(style.getFontHeight()).isEqualTo(12);
+		assertThat(style.getBold()).isEqualTo(false);
+		assertThat(style.getItalic()).isEqualTo(false);
+		assertThat(style.getColor()).isEqualTo(new Color(0, 0, 255));
+		assertThat(style.getFillColor()).isEqualTo(null);
+		assertThat(style.getShrinkToFit()).isEqualTo(false);
+
+		style = bookConfig.getAttribNodeStyle();
+		assertThat(style.getFontName()).isEqualTo("Calibri");
+		assertThat(style.getFontHeight()).isEqualTo(13);
+		assertThat(style.getBold()).isEqualTo(false);
+		assertThat(style.getItalic()).isEqualTo(false);
+		assertThat(style.getColor()).isEqualTo(null);
+		assertThat(style.getFillColor()).isEqualTo(new Color(34, 97, 13));
+		assertThat(style.getShrinkToFit()).isEqualTo(false);
+
+		style = bookConfig.getCompositorNodeStyle();
+		assertThat(style.getFontName()).isEqualTo("Times New Roman");
+		assertThat(style.getFontHeight()).isEqualTo(10);
+		assertThat(style.getBold()).isEqualTo(false);
+		assertThat(style.getItalic()).isEqualTo(true);
+		assertThat(style.getColor()).isEqualTo(new Color(64, 64, 64));
+		assertThat(style.getFillColor()).isEqualTo(null);
+		assertThat(style.getShrinkToFit()).isEqualTo(false);
+
+		style = bookConfig.getChoiceMarkerStyle();
+		assertThat(style.getFontName()).isEqualTo("Calibri");
+		assertThat(style.getFontHeight()).isEqualTo(10);
+		assertThat(style.getBold()).isEqualTo(false);
+		assertThat(style.getItalic()).isEqualTo(false);
+		assertThat(style.getColor()).isEqualTo(new Color(255, 0, 0));
+		assertThat(style.getFillColor()).isEqualTo(null);
+		assertThat(style.getShrinkToFit()).isEqualTo(false);
+
 		assertThat(bookConfig.getTreeStructureColumnCount()).isEqualTo(12);
 		assertThat(bookConfig.getTreeStructureColumnWidth()).isEqualTo(500);
+
 		Map<String, DocTypeConfig> docTypeConfigs = bookConfig.getDocTypeConfigs();
 		DocTypeConfig dtConfig1 = docTypeConfigs.get("DocType1");
 		assertThat(dtConfig1.getDocTypeName()).isEqualTo("DocType1");
@@ -86,6 +146,7 @@ public class BookConfigTest {
 		assertThat(dtConfig3.getDocTypeName()).isEqualTo("DocType3");
 		assertThat(dtConfig3.getMinPerTestCase()).isEqualTo(1); // defaults
 		assertThat(dtConfig3.getMaxPerTestCase()).isEqualTo(1); // defaults
+
 		Map<String, PageConfig> pageConfigs = bookConfig.getPageConfigs();
 		PageConfig pConfig1 = pageConfigs.get("Page1");
 		assertThat(pConfig1.getPageName()).isEqualTo("Page1");

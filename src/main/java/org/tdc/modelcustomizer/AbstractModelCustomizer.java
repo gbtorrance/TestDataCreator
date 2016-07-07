@@ -21,9 +21,8 @@ public abstract class AbstractModelCustomizer {
 	private static final Logger log = LoggerFactory.getLogger(AbstractModelCustomizer.class);
 	
 	protected static final String CUSTOMIZER_SHEET_NAME = "Customizer";
-	protected static final int COL_OCCURS = 0;
-	protected static final int COL_OCCURS_OVERRIDE = 1;
-	protected static final int COL_CUSTOM_BASE = 2;
+	protected static final int COL_OCCURS_OVERRIDE = 0;
+	protected static final int COL_CUSTOM_BASE = 1;
 	
 	private final ElementNodeDef rootElement;
 	private final ModelCustomizerConfig config; 

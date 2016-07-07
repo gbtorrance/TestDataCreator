@@ -10,4 +10,5 @@ public interface PageColumnConfig {
 	int getWidth();
 	CellStyle getStyle(); 
 	String getReadFromVariable();
+	String getReadFromProperty();
 }

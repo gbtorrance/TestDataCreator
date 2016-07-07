@@ -31,5 +31,4 @@ public interface BookConfig {
 	int getTreeStructureColumnWidth();
 	int getHeaderRowCount();
 	String getTreeStructureHeaderLabel(int headerRowNum);
-	String getOccursHeaderLabel(int headerRowNum);
 }

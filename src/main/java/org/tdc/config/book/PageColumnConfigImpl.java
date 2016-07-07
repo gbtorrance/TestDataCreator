@@ -14,12 +14,14 @@ public class PageColumnConfigImpl implements PageColumnConfig {
 	private final int width;
 	private final CellStyle style;
 	private final String readFromVariable;
+	private final String readFromProperty;
 	
 	private PageColumnConfigImpl(PageColumnConfigBuilder builder) {
 		this.headerLabels = builder.headerLabels;
 		this.width = builder.width;
 		this.style = builder.style;
 		this.readFromVariable = builder.readFromVariable;
+		this.readFromProperty = builder.readFromProperty;
 	}
 
 	@Override
@@ -42,6 +44,11 @@ public class PageColumnConfigImpl implements PageColumnConfig {
 		return readFromVariable;
 	}
 
+	@Override
+	public String getReadFromProperty() {
+		return readFromProperty;
+	}
+
 	public static class PageColumnConfigBuilder {
 		private static final String CONFIG_PREFIX = ".Columns.Column";
 
@@ -54,6 +61,7 @@ public class PageColumnConfigImpl implements PageColumnConfig {
 		private int width;
 		private CellStyle style;
 		private String readFromVariable;
+		private String readFromProperty;
 		
 		public PageColumnConfigBuilder(XMLConfigWrapper config, 
 				String pageKey, int headerRowCount, CellStyle defaultColumnStyle) {
@@ -80,7 +88,15 @@ public class PageColumnConfigImpl implements PageColumnConfig {
 			width = config.getInt(indexPrefix + "Width", 0, true);
 			style = config.getCellStyle(indexPrefix + "Style", defaultColumnStyle, false);
 			readFromVariable = config.getString(
-					indexPrefix + "ReadFromVariable", null, true);
+					indexPrefix + "ReadFromVariable", null, false);
+			readFromProperty = config.getString(
+					indexPrefix + "ReadFromProperty", null, false);
+			if ((readFromVariable == null && readFromProperty == null) ||
+				(readFromVariable != null && readFromProperty != null)	) {
+				throw new IllegalStateException(
+						"One and only one of ReadFromVariable or ReadFromProperty must be specified for: " + 
+						indexPrefix);
+			}
 			return new PageColumnConfigImpl(this);
 		}
 	}

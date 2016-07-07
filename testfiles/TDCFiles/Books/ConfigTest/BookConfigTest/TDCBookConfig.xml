@@ -39,10 +39,19 @@
 			<DocTypeName>DocType1</DocTypeName>  <!-- use one that was used before --> 
 		</Page>	
 	</Pages>
-	
-	<DefaultNodeStyle>
+
+	<DefaultStyle>
 		<FontName>Calibri</FontName>
 		<FontHeight>11</FontHeight>
+	</DefaultStyle>
+	<DefaultHeaderStyle>
+		<Bold>true</Bold>
+	</DefaultHeaderStyle>
+	<DefaultColumnStyle>
+		<ShrinkToFit>true</ShrinkToFit>
+	</DefaultColumnStyle>
+	<DefaultNodeStyle>
+		<FontHeight>10</FontHeight>
 	</DefaultNodeStyle>
 	<ParentNodeStyle>
 		<FontName>Arial</FontName>
@@ -51,19 +60,16 @@
 		<Italic>false</Italic>
 	</ParentNodeStyle>
 	<AttribNodeStyle>
-		<FontName>Calibri</FontName>
 		<FontHeight>13</FontHeight>
-		<ColorRGB>34 97 13</ColorRGB> <!-- green -->
+		<FillColorRGB>34 97 13</FillColorRGB> <!-- green -->
 	</AttribNodeStyle>
 	<CompositorNodeStyle>
 		<FontName>Times New Roman</FontName>
-		<FontHeight>14</FontHeight>
 		<ColorRGB>64 64 64</ColorRGB> <!-- dark gray -->
 		<Italic>true</Italic>
 	</CompositorNodeStyle>
 	<ChoiceMarkerStyle>
 		<FontName>Calibri</FontName>
-		<FontHeight>15</FontHeight>
 		<ColorRGB>255 0 0</ColorRGB> <!-- red -->
 	</ChoiceMarkerStyle>
 	<TreeStructureColumnCount>12</TreeStructureColumnCount>

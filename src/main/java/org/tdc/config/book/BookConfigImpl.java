@@ -44,7 +44,6 @@ public class BookConfigImpl implements BookConfig {
 	private final int treeStructureColumnWidth;
 	private final int headerRowCount;
 	private final String[] treeStructureHeaderLabels;
-	private final String[] occursHeaderLabels;
 	
 	private BookConfigImpl(BookConfigBuilder builder) {
 		this.booksConfigRoot = builder.booksConfigRoot;
@@ -65,7 +64,6 @@ public class BookConfigImpl implements BookConfig {
 		this.treeStructureColumnWidth = builder.treeStructureColumnWidth;
 		this.headerRowCount = builder.headerRowCount;
 		this.treeStructureHeaderLabels = builder.treeStructureHeaderLabels;
-		this.occursHeaderLabels = builder.occursHeaderLabels;
 	}
 	
 	@Override
@@ -173,11 +171,6 @@ public class BookConfigImpl implements BookConfig {
 		return treeStructureHeaderLabels[headerRowNum-1];
 	}
 
-	@Override
-	public String getOccursHeaderLabel(int headerRowNum) {
-		return occursHeaderLabels[headerRowNum-1];
-	}
-
 	public static class BookConfigBuilder {
 		private final XMLConfigWrapper config;
 		private final ModelConfigFactory modelConfigFactory;
@@ -200,7 +193,6 @@ public class BookConfigImpl implements BookConfig {
 		private int treeStructureColumnWidth;
 		private int headerRowCount;
 		private String[] treeStructureHeaderLabels;
-		private String[] occursHeaderLabels;
 		
 		public BookConfigBuilder(Path booksConfigRoot, Addr addr, ModelConfigFactory modelConfigFactory) {
 			log.info("Creating BookConfig: {}", addr);
@@ -231,8 +223,6 @@ public class BookConfigImpl implements BookConfig {
 			headerRowCount = config.getInt("HeaderRowCount", 1, false);
 			treeStructureHeaderLabels = config.getHeaderLabels(
 					"TreeStructureHeaderLabels", headerRowCount);
-			occursHeaderLabels = config.getHeaderLabels(
-					"OccursHeaderLabels", headerRowCount);
 			pageConfigs = new PageConfigImpl.PageConfigBuilder(config, docTypeConfigs, 
 					modelConfigFactory, headerRowCount, defaultColumnStyle).buildAll();
 			return new BookConfigImpl(this);

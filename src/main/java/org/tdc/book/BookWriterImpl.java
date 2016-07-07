@@ -18,14 +18,14 @@ import org.tdc.modelinst.NonAttribNodeInst;
 import org.tdc.spreadsheet.CellStyle;
 import org.tdc.spreadsheet.Spreadsheet;
 import org.tdc.spreadsheet.SpreadsheetFile;
+import org.tdc.util.Util;
 
 /**
  * A {@link BookWriter} implementation.
  */
 public class BookWriterImpl implements BookWriter {
 	
-	private static final int COL_OCCURS = 0;
-	private static final int COL_CUSTOM_BASE = 1;
+	private static final int COL_CUSTOM_BASE = 0;
 	
 	private final Book book;
 	private final SpreadsheetFile spreadsheetFile;
@@ -84,7 +84,6 @@ public class BookWriterImpl implements BookWriter {
 		trackMaxColumns(node);
 
 		outputNodeName(node, config.getAttribNodeStyle());
-		outputOccurs(node);
 		outputOccurrenceMarkers(node); 
 		outputCustomColumns(node);
 	}
@@ -97,7 +96,6 @@ public class BookWriterImpl implements BookWriter {
 		}
 		
 		outputNodeName(node, config.getCompositorNodeStyle());
-		outputOccurs(node);
 		outputOccurrenceMarkers(node);
 		outputCustomColumns(node);
 	}
@@ -115,7 +113,6 @@ public class BookWriterImpl implements BookWriter {
 		}
 
 		outputNodeName(node, cellStyle);
-		outputOccurs(node);
 		outputOccurrenceMarkers(node);
 		outputCustomColumns(node);
 	}
@@ -142,10 +139,6 @@ public class BookWriterImpl implements BookWriter {
 
 	private void outputNodeName(TDCNode node, CellStyle cellStyle) {
 		currentSheet.setCellValue(node.getDispName(), getNodeRow(node), getNodeCol(node), cellStyle);
-	}
-	
-	private void outputOccurs(TDCNode node) {
-		currentSheet.setCellValue(node.getDispOccurs(), getNodeRow(node), getDataCol(COL_OCCURS));
 	}
 	
 	private void outputOccurrenceMarkers(NonAttribNode nonAttribNode) {
@@ -180,8 +173,15 @@ public class BookWriterImpl implements BookWriter {
 		for (int i = 0; i < columns.size(); i++) {
 			PageColumnConfig column = columns.get(i);
 			CellStyle style = column.getStyle();
+			String value = "";
 			String variableName = column.getReadFromVariable();
-			String value = node.getVariable(variableName);
+			String propertyName = column.getReadFromProperty();
+			if (variableName != null) {
+				value = node.getVariable(variableName);
+			}
+			if (propertyName != null) {
+				value = Util.getStringValueFromProperty(node, propertyName, "");
+			}
 			currentSheet.setCellValue(value, getNodeRow(node), getDataCol(COL_CUSTOM_BASE) + i, style);
 		}
 	}
@@ -210,8 +210,6 @@ public class BookWriterImpl implements BookWriter {
 		for (int row = 1; row <= rowCount; row++) {
 			currentSheet.setCellValue(
 					config.getTreeStructureHeaderLabel(row), row, 1, style);
-			currentSheet.setCellValue(
-					config.getOccursHeaderLabel(row), row, getDataCol(COL_OCCURS), style);
 			for (int colIndex = 0; colIndex < columns.size(); colIndex++) {
 				PageColumnConfig column = columns.get(colIndex);
 				currentSheet.setCellValue(

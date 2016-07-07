@@ -42,6 +42,11 @@
 					<Style><Italic>true</Italic></Style>
 					<ReadFromVariable>DATA_TYPE_FROM_SCHEMA</ReadFromVariable>
 				</Column>
+				<Column>
+					<HeaderLabels><Label>Occurs</Label></HeaderLabels>
+					<Width>2000</Width>
+					<ReadFromProperty>DispOccurs</ReadFromProperty>
+				</Column>
 			</Columns>
 		</Page>	
 		<Page>
@@ -88,9 +93,6 @@
 	<TreeStructureHeaderLabels>
 		<Label>Document Structure</Label>
 	</TreeStructureHeaderLabels>
-	<OccursHeaderLabels>
-		<Label>Occurs</Label>
-	</OccursHeaderLabels>
 	<TreeStructureColumnCount>25</TreeStructureColumnCount>
 	<TreeStructureColumnWidth>500</TreeStructureColumnWidth>
 	
