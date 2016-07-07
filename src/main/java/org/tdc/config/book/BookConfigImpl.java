@@ -25,13 +25,15 @@ public class BookConfigImpl implements BookConfig {
 	private static final String CONFIG_SHEET_NAME = "_Config";
 	private static final int CONFIG_SHEET_BOOK_ADDR_ROW = 1;
 	private static final int CONFIG_SHEET_BOOK_ADDR_COL = 1;
-	private static final int NODE_ROW_START = 2;
 
 	private final Path booksConfigRoot;
 	private final Addr addr;
 	private final Path bookConfigRoot;
 	private final Map<String, DocTypeConfig> docTypeConfigs;
 	private final Map<String, PageConfig> pageConfigs;
+	private final CellStyle defaultStyle;
+	private final CellStyle defaultHeaderStyle;
+	private final CellStyle defaultColumnStyle;
 	private final CellStyle defaultNodeStyle;
 	private final CellStyle parentNodeStyle;
 	private final CellStyle attribNodeStyle;
@@ -40,6 +42,9 @@ public class BookConfigImpl implements BookConfig {
 	private final CellStyle occurMarkerStyle;
 	private final int treeStructureColumnCount;
 	private final int treeStructureColumnWidth;
+	private final int headerRowCount;
+	private final String[] treeStructureHeaderLabels;
+	private final String[] occursHeaderLabels;
 	
 	private BookConfigImpl(BookConfigBuilder builder) {
 		this.booksConfigRoot = builder.booksConfigRoot;
@@ -47,6 +52,9 @@ public class BookConfigImpl implements BookConfig {
 		this.bookConfigRoot = builder.bookConfigRoot;
 		this.docTypeConfigs = Collections.unmodifiableMap(builder.docTypeConfigs); // unmodifiable
 		this.pageConfigs = Collections.unmodifiableMap(builder.pageConfigs); // unmodifiable
+		this.defaultStyle = builder.defaultStyle;
+		this.defaultHeaderStyle = builder.defaultHeaderStyle;
+		this.defaultColumnStyle = builder.defaultColumnStyle;
 		this.defaultNodeStyle = builder.defaultNodeStyle;
 		this.parentNodeStyle = builder.parentNodeStyle;
 		this.attribNodeStyle = builder.attribNodeStyle;
@@ -55,6 +63,9 @@ public class BookConfigImpl implements BookConfig {
 		this.occurMarkerStyle = builder.occurMarkerStyle;
 		this.treeStructureColumnCount = builder.treeStructureColumnCount;
 		this.treeStructureColumnWidth = builder.treeStructureColumnWidth;
+		this.headerRowCount = builder.headerRowCount;
+		this.treeStructureHeaderLabels = builder.treeStructureHeaderLabels;
+		this.occursHeaderLabels = builder.occursHeaderLabels;
 	}
 	
 	@Override
@@ -98,6 +109,21 @@ public class BookConfigImpl implements BookConfig {
 	}
 	
 	@Override
+	public CellStyle getDefaultStyle() {
+		return defaultStyle;
+	}
+	
+	@Override
+	public CellStyle getDefaultHeaderStyle() {
+		return defaultHeaderStyle;
+	}
+	
+	@Override
+	public CellStyle getDefaultColumnStyle() {
+		return defaultColumnStyle;
+	}
+	
+	@Override
 	public CellStyle getDefaultNodeStyle() {
 		return defaultNodeStyle;
 	}
@@ -138,15 +164,20 @@ public class BookConfigImpl implements BookConfig {
 	}
 
 	@Override
-	public int getNodeRowStart() {
-		return NODE_ROW_START;
+	public int getHeaderRowCount() {
+		return headerRowCount;
+	}
+	
+	@Override
+	public String getTreeStructureHeaderLabel(int headerRowNum) {
+		return treeStructureHeaderLabels[headerRowNum-1];
 	}
 
 	@Override
-	public int getDataColStart() {
-		return treeStructureColumnCount + 1;
+	public String getOccursHeaderLabel(int headerRowNum) {
+		return occursHeaderLabels[headerRowNum-1];
 	}
-	
+
 	public static class BookConfigBuilder {
 		private final XMLConfigWrapper config;
 		private final ModelConfigFactory modelConfigFactory;
@@ -156,6 +187,9 @@ public class BookConfigImpl implements BookConfig {
 		
 		private Map<String, DocTypeConfig> docTypeConfigs;
 		private Map<String, PageConfig> pageConfigs;
+		private CellStyle defaultStyle;
+		private CellStyle defaultHeaderStyle;
+		private CellStyle defaultColumnStyle;
 		private CellStyle defaultNodeStyle;
 		private CellStyle parentNodeStyle;
 		private CellStyle attribNodeStyle;
@@ -164,6 +198,9 @@ public class BookConfigImpl implements BookConfig {
 		private CellStyle occurMarkerStyle;
 		private int treeStructureColumnCount;
 		private int treeStructureColumnWidth;
+		private int headerRowCount;
+		private String[] treeStructureHeaderLabels;
+		private String[] occursHeaderLabels;
 		
 		public BookConfigBuilder(Path booksConfigRoot, Addr addr, ModelConfigFactory modelConfigFactory) {
 			log.info("Creating BookConfig: {}", addr);
@@ -180,8 +217,10 @@ public class BookConfigImpl implements BookConfig {
 
 		public BookConfig build() {
 			docTypeConfigs = new DocTypeConfigImpl.DocTypeConfigBuilder(config).buildAll();
-			pageConfigs = new PageConfigImpl.PageConfigBuilder(config, docTypeConfigs, modelConfigFactory).buildAll();
-			defaultNodeStyle = config.getCellStyle("DefaultNodeStyle", null, true);
+			defaultStyle = config.getCellStyle("DefaultStyle", null, true);
+			defaultHeaderStyle = config.getCellStyle("DefaultHeaderStyle", defaultStyle, false);
+			defaultColumnStyle = config.getCellStyle("DefaultColumnStyle", defaultStyle, false);
+			defaultNodeStyle = config.getCellStyle("DefaultNodeStyle", defaultStyle, false);
 			parentNodeStyle = config.getCellStyle("ParentNodeStyle", defaultNodeStyle, false);
 			attribNodeStyle = config.getCellStyle("AttribNodeStyle", defaultNodeStyle, false);
 			compositorNodeStyle = config.getCellStyle("CompositorNodeStyle", defaultNodeStyle, false);
@@ -189,6 +228,13 @@ public class BookConfigImpl implements BookConfig {
 			occurMarkerStyle = config.getCellStyle("OccurMarkerStyle", defaultNodeStyle, false);
 			treeStructureColumnCount = config.getInt("TreeStructureColumnCount", 0, true);
 			treeStructureColumnWidth = config.getInt("TreeStructureColumnWidth", 0, true);
+			headerRowCount = config.getInt("HeaderRowCount", 1, false);
+			treeStructureHeaderLabels = config.getHeaderLabels(
+					"TreeStructureHeaderLabels", headerRowCount);
+			occursHeaderLabels = config.getHeaderLabels(
+					"OccursHeaderLabels", headerRowCount);
+			pageConfigs = new PageConfigImpl.PageConfigBuilder(config, docTypeConfigs, 
+					modelConfigFactory, headerRowCount, defaultColumnStyle).buildAll();
 			return new BookConfigImpl(this);
 		}
 	}

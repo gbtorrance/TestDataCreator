@@ -20,6 +20,11 @@ public class PageImpl implements Page {
 		this.config = builder.config;
 		this.modelInstFactory = builder.modelInstFactory;
 	}
+
+	@Override
+	public PageConfig getConfig() {
+		return config;
+	}
 	
 	@Override
 	public String getName() {

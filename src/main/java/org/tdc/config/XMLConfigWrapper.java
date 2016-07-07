@@ -94,6 +94,22 @@ public class XMLConfigWrapper {
 		return config.getMaxIndex(key) + 1;
 	}
 	
+	public String[] getHeaderLabels(String key, int rowCount) {
+		final String labelKey = key + ".Label";
+		String[] labels = new String[rowCount];
+		int labelCount = getCount(labelKey);
+		if (labelCount > rowCount) {
+			throw new IllegalStateException("Number of " + labelKey + " entries (" + labelCount + 
+					") exceeds maximum of (" + rowCount + ")");
+		}
+		for (int i = 0; i < rowCount; i++) {
+			labels[i] = rowCount - labelCount > i ? 
+					"" :  
+					getString(labelKey + "(" + (i - rowCount + labelCount) + ")", null, true);
+		}
+		return labels;
+	}
+
 	public CellStyle getCellStyle(String key, CellStyle defaultValue, boolean required) {
 		CellStyle result = null;
 		if (hasNode(key)) {

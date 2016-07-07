@@ -88,7 +88,7 @@ public class BookWriterTest {
 				modelDef.getRootElement(), config.getModelCustomizerConfig(), spreadsheetFile, null);
 		writer.writeCustomizer();
 		
-		Path path = Paths.get("testfiles/TDCFiles/Schemas/Tax/efile1040x_2012v3.0/Model_1040A/Customizer2.xlsx");
+		Path path = Paths.get("testfiles/Temp/Customizer2.xlsx");
 		spreadsheetFile.save(path);
 	}
 
@@ -109,7 +109,7 @@ public class BookWriterTest {
 				modelDef.getRootElement(), config.getModelCustomizerConfig(), spreadsheetFile, prevModelDef.getMPathIndex());
 		writer.writeCustomizer();
 		
-		Path path = Paths.get("testfiles/TDCFiles/Schemas/Tax/efile1040x_2012v3.0/Model_1040A/Customizer3.xlsx");
+		Path path = Paths.get("testfiles/Temp/Customizer3.xlsx");
 		spreadsheetFile.save(path);
 	}
 

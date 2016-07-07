@@ -99,11 +99,6 @@ public class ModelCustomizerConfigImpl implements ModelCustomizerConfig {
 	}
 	
 	@Override
-	public int getHeaderRowCount() {
-		return headerRowCount;
-	}
-	
-	@Override
 	public int getTreeStructureColumnCount() {
 		return treeStructureColumnCount;
 	}
@@ -111,6 +106,11 @@ public class ModelCustomizerConfigImpl implements ModelCustomizerConfig {
 	@Override
 	public int getTreeStructureColumnWidth() {
 		return treeStructureColumnWidth;
+	}
+	
+	@Override
+	public int getHeaderRowCount() {
+		return headerRowCount;
 	}
 	
 	@Override
@@ -143,22 +143,6 @@ public class ModelCustomizerConfigImpl implements ModelCustomizerConfig {
 		return columns;
 	}
 	
-	public static String[] getHeaderLabels(XMLConfigWrapper config, String labelsKey, int rowCount) {
-		final String labelKey = labelsKey + ".Label";
-		String[] labels = new String[rowCount];
-		int labelCount = config.getCount(labelKey);
-		if (labelCount > rowCount) {
-			throw new IllegalStateException("Number of " + labelKey + " entries (" + labelCount + 
-					") cannot be more than HeaderRowCount (" + rowCount + ")");
-		}
-		for (int i = 0; i < rowCount; i++) {
-			labels[i] = rowCount - labelCount > i ? 
-					"" :  
-					config.getString(labelKey + "(" + (i - rowCount + labelCount) + ")", null, true);
-		}
-		return labels;
-	}
-
 	public static class ModelCustomizerConfigBuilder {
 		private static final String CONFIG_PREFIX = "Customizer";
 
@@ -210,12 +194,12 @@ public class ModelCustomizerConfigImpl implements ModelCustomizerConfig {
 				treeStructureColumnCount = config.getInt(CONFIG_PREFIX + ".TreeStructureColumnCount", 0, true);
 				treeStructureColumnWidth = config.getInt(CONFIG_PREFIX + ".TreeStructureColumnWidth", 0, true);
 				headerRowCount = config.getInt(CONFIG_PREFIX + ".HeaderRowCount", 1, false);
-				treeStructureHeaderLabels = getHeaderLabels(
-						config, CONFIG_PREFIX + ".TreeStructureHeaderLabels", headerRowCount);
-				occursHeaderLabels = getHeaderLabels(
-						config, CONFIG_PREFIX + ".OccursHeaderLabels", headerRowCount);
-				occursOverrideHeaderLabels = getHeaderLabels(
-						config, CONFIG_PREFIX + ".OccursOverrideHeaderLabels", headerRowCount);
+				treeStructureHeaderLabels = config.getHeaderLabels(
+						CONFIG_PREFIX + ".TreeStructureHeaderLabels", headerRowCount);
+				occursHeaderLabels = config.getHeaderLabels(
+						CONFIG_PREFIX + ".OccursHeaderLabels", headerRowCount);
+				occursOverrideHeaderLabels = config.getHeaderLabels(
+						CONFIG_PREFIX + ".OccursOverrideHeaderLabels", headerRowCount);
 				allowMinMaxInvalidOccursCountOverride = config.getBoolean(
 						CONFIG_PREFIX + ".AllowMinMaxInvalidOccursCountOverride", false, false);
 				columns = new ModelCustomizerColumnConfigImpl.ModelCustomizerColumnConfigBuilder(

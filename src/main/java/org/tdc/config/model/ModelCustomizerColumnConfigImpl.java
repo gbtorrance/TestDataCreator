@@ -94,8 +94,8 @@ public class ModelCustomizerColumnConfigImpl implements ModelCustomizerColumnCon
 	
 		private ModelCustomizerColumnConfig build(int index) {
 			String indexPrefix = CONFIG_PREFIX + "(" + index + ").";
-			headerLabels = ModelCustomizerConfigImpl.getHeaderLabels(
-					config, indexPrefix + "HeaderLabels", headerRowCount);
+			headerLabels = config.getHeaderLabels(
+					indexPrefix + "HeaderLabels", headerRowCount);
 			width = config.getInt(indexPrefix + "Width", 0, true);
 			style = config.getCellStyle(indexPrefix + "Style", defaultColumnStyle, false);
 			initAsNewEvaluator = evaluatorFactory.createEvaluator(

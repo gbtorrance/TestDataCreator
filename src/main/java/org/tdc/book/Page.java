@@ -1,5 +1,6 @@
 package org.tdc.book;
 
+import org.tdc.config.book.PageConfig;
 import org.tdc.modelinst.ModelInst;
 
 /**
@@ -9,6 +10,7 @@ import org.tdc.modelinst.ModelInst;
  * a particular {@link ModelInst} which defines the structure of the Page. 
  */
 public interface Page {
+	PageConfig getConfig();
 	String getName();
 	ModelInst getModelInst();
 }

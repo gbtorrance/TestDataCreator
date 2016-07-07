@@ -1,8 +1,11 @@
 package org.tdc.book;
 
 import java.util.Collection;
+import java.util.List;
 
 import org.tdc.config.book.BookConfig;
+import org.tdc.config.book.PageColumnConfig;
+import org.tdc.config.book.PageConfig;
 import org.tdc.model.AttribNode;
 import org.tdc.model.CompositorNode;
 import org.tdc.model.ElementNode;
@@ -21,17 +24,26 @@ import org.tdc.spreadsheet.SpreadsheetFile;
  */
 public class BookWriterImpl implements BookWriter {
 	
+	private static final int COL_OCCURS = 0;
+	private static final int COL_CUSTOM_BASE = 1;
+	
 	private final Book book;
 	private final SpreadsheetFile spreadsheetFile;
 	private final BookConfig config;
+	private final int nodeRowStart;
+	private final int dataColStart;
 	
 	private int maxColumns;
+	private Page currentPage;
+	private PageConfig currentPageConfig;
 	private Spreadsheet currentSheet;
 	
 	public BookWriterImpl(Book book, SpreadsheetFile spreadsheetFile) {
 		this.book = book;
 		this.spreadsheetFile = spreadsheetFile;
 		this.config = book.getConfig();
+		this.nodeRowStart = config.getHeaderRowCount() + 1;
+		this.dataColStart = config.getTreeStructureColumnCount() + 1;
 	}
 
 	@Override
@@ -49,12 +61,15 @@ public class BookWriterImpl implements BookWriter {
 	
 	private void writePage(Page page) {
 		maxColumns = 0;
-		currentSheet = spreadsheetFile.createSpreadsheet(page.getName());
-		ModelInst modelInst = page.getModelInst();
+		currentPage = page;
+		currentPageConfig = currentPage.getConfig();
+		currentSheet = spreadsheetFile.createSpreadsheet(currentPage.getName());
+		ModelInst modelInst = currentPage.getModelInst();
 		ElementNodeInst rootElement = modelInst.getRootElement();
 		ModelWriterVisitor writerVisitor = new ModelWriterVisitor();
 		rootElement.accept(writerVisitor);
 		formatColumns();
+		writeHeaderLabels();
 	}
 	
 	private void writeConfigSheet() {
@@ -70,9 +85,8 @@ public class BookWriterImpl implements BookWriter {
 
 		outputNodeName(node, config.getAttribNodeStyle());
 		outputOccurs(node);
-		// start w/parent node when checking for repeating nodes,
-		// as attributes themselves will never repeat
 		outputOccurrenceMarkers(node); 
+		outputCustomColumns(node);
 	}
 	
 	private void processCompositorNode(CompositorNode node) {
@@ -85,6 +99,7 @@ public class BookWriterImpl implements BookWriter {
 		outputNodeName(node, config.getCompositorNodeStyle());
 		outputOccurs(node);
 		outputOccurrenceMarkers(node);
+		outputCustomColumns(node);
 	}
 	
 	private void processElementNode(ElementNode node) {
@@ -102,6 +117,7 @@ public class BookWriterImpl implements BookWriter {
 		outputNodeName(node, cellStyle);
 		outputOccurs(node);
 		outputOccurrenceMarkers(node);
+		outputCustomColumns(node);
 	}
 	
 	private void trackMaxColumns(TDCNode node) {
@@ -109,7 +125,7 @@ public class BookWriterImpl implements BookWriter {
 	}
 	
 	private int getNodeRow(TDCNode node) {
-		return config.getNodeRowStart() + node.getRowOffset();
+		return nodeRowStart + node.getRowOffset();
 	}
 	
 	private int getNodeCol(TDCNode node) {
@@ -117,7 +133,7 @@ public class BookWriterImpl implements BookWriter {
 	}
 	
 	private int getDataCol(int dataColOffset) {
-		return config.getDataColStart() + dataColOffset;
+		return dataColStart + dataColOffset;
 	}
 	
 	private void outputChoiceMarker(NonAttribNode node, CellStyle cellStyle) {
@@ -129,7 +145,7 @@ public class BookWriterImpl implements BookWriter {
 	}
 	
 	private void outputOccurs(TDCNode node) {
-		currentSheet.setCellValue(node.getDispOccurs(), getNodeRow(node), getDataCol(1)); // TODO remove hard-coding; only temporary
+		currentSheet.setCellValue(node.getDispOccurs(), getNodeRow(node), getDataCol(COL_OCCURS));
 	}
 	
 	private void outputOccurrenceMarkers(NonAttribNode nonAttribNode) {
@@ -159,6 +175,17 @@ public class BookWriterImpl implements BookWriter {
 		while (possibleRepeatingNode != null);
 	}
 
+	private void outputCustomColumns(TDCNode node) {
+		List<PageColumnConfig> columns = currentPageConfig.getColumns();
+		for (int i = 0; i < columns.size(); i++) {
+			PageColumnConfig column = columns.get(i);
+			CellStyle style = column.getStyle();
+			String variableName = column.getReadFromVariable();
+			String value = node.getVariable(variableName);
+			currentSheet.setCellValue(value, getNodeRow(node), getDataCol(COL_CUSTOM_BASE) + i, style);
+		}
+	}
+
 	private void formatColumns() {
 		int allowedColumns = config.getTreeStructureColumnCount(); 
 		if (allowedColumns < maxColumns) {
@@ -168,8 +195,31 @@ public class BookWriterImpl implements BookWriter {
 		for (int i = 1; i <= allowedColumns; i++) {
 			currentSheet.setColumnWidth(i, config.getTreeStructureColumnWidth());
 		}
+		List<PageColumnConfig> columns = currentPageConfig.getColumns(); 
+		for (int i = 0; i < columns.size(); i++) {
+			PageColumnConfig column = columns.get(i);
+			currentSheet.setColumnWidth(getDataCol(COL_CUSTOM_BASE) + i, column.getWidth());
+		}
+		currentSheet.freeze(getDataCol(COL_CUSTOM_BASE) + columns.size(), config.getHeaderRowCount()+1);
 	}
 	
+	private void writeHeaderLabels() {
+		int rowCount = config.getHeaderRowCount();
+		CellStyle style = config.getDefaultHeaderStyle();
+		List<PageColumnConfig> columns = currentPageConfig.getColumns(); 
+		for (int row = 1; row <= rowCount; row++) {
+			currentSheet.setCellValue(
+					config.getTreeStructureHeaderLabel(row), row, 1, style);
+			currentSheet.setCellValue(
+					config.getOccursHeaderLabel(row), row, getDataCol(COL_OCCURS), style);
+			for (int colIndex = 0; colIndex < columns.size(); colIndex++) {
+				PageColumnConfig column = columns.get(colIndex);
+				currentSheet.setCellValue(
+						column.getHeaderLabel(row), row, getDataCol(COL_CUSTOM_BASE) + colIndex, style);
+			}
+		}
+	}
+
 	class ModelWriterVisitor implements ModelVisitor {
 		@Override
 		public void visit(AttribNode attribNode) {

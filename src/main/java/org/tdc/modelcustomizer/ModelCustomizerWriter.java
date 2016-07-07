@@ -185,6 +185,5 @@ public class ModelCustomizerWriter extends AbstractModelCustomizer {
 						column.getHeaderLabel(row), row, getDataCol(COL_CUSTOM_BASE) + colIndex, style);
 			}
 		}
-		
 	}
 }

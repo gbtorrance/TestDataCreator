@@ -19,6 +19,30 @@
 			<PageName>1040A</PageName>
 			<ModelAddress>/Tax/efile1040x_2012v3.0/Model_1040A</ModelAddress>
 			<DocTypeName>TaxReturn</DocTypeName>
+			<Columns>
+				<Column>
+					<HeaderLabels><Label>Description</Label></HeaderLabels>
+					<Width>5000</Width>
+					<Style><FillColorRGB>208 204 204</FillColorRGB></Style>
+					<ReadFromVariable>DESCRIPTION_FROM_SCHEMA</ReadFromVariable>
+				</Column>
+				<Column>
+					<HeaderLabels><Label>Line</Label><Label>Num</Label></HeaderLabels>
+					<Width>2000</Width>
+					<ReadFromVariable>LINE_NUMBER_FROM_SCHEMA</ReadFromVariable>
+				</Column>
+				<Column>
+					<HeaderLabels><Label>Form</Label><Label>Num</Label></HeaderLabels>
+					<Width>2000</Width>
+					<ReadFromVariable>FORM_NUMBER_FROM_SCHEMA</ReadFromVariable>
+				</Column>
+				<Column>
+					<HeaderLabels><Label>Data</Label><Label>Type</Label></HeaderLabels>
+					<Width>3000</Width>
+					<Style><Italic>true</Italic></Style>
+					<ReadFromVariable>DATA_TYPE_FROM_SCHEMA</ReadFromVariable>
+				</Column>
+			</Columns>
 		</Page>	
 		<Page>
 			<PageName>1040EZ</PageName>
@@ -32,36 +56,41 @@
 		</Page>
 	</Pages>
 	
-	<DefaultNodeStyle>
+	<DefaultStyle>
 		<FontName>Calibri</FontName>
 		<FontHeight>11</FontHeight>
-	</DefaultNodeStyle>
+	</DefaultStyle>
+	<DefaultHeaderStyle>
+		<Bold>true</Bold>
+	</DefaultHeaderStyle>
+	<DefaultColumnStyle>
+		<ShrinkToFit>true</ShrinkToFit>
+	</DefaultColumnStyle>
+	<DefaultNodeStyle/>
 	<ParentNodeStyle>
-		<FontName>Calibri</FontName>
-		<FontHeight>11</FontHeight>
 		<ColorRGB>0 0 255</ColorRGB> <!-- blue -->
 	</ParentNodeStyle>
 	<AttribNodeStyle>
-		<FontName>Calibri</FontName>
-		<FontHeight>11</FontHeight>
 		<ColorRGB>34 97 13</ColorRGB> <!-- green -->
 	</AttribNodeStyle>
 	<CompositorNodeStyle>
-		<FontName>Calibri</FontName>
-		<FontHeight>11</FontHeight>
 		<ColorRGB>64 64 64</ColorRGB> <!-- dark gray -->
 		<Italic>true</Italic>
 	</CompositorNodeStyle>
 	<ChoiceMarkerStyle>
-		<FontName>Calibri</FontName>
-		<FontHeight>11</FontHeight>
-		<ColorRGB>255 0 0</ColorRGB>  <!-- red -->
+		<ColorRGB>255 0 0</ColorRGB> <!-- red -->
 	</ChoiceMarkerStyle>
 	<OccurMarkerStyle>
-		<FontName>Calibri</FontName>
 		<FontHeight>10</FontHeight>
 		<ColorRGB>107 36 12</ColorRGB> <!-- brown -->
 	</OccurMarkerStyle>
+	<HeaderRowCount>2</HeaderRowCount>
+	<TreeStructureHeaderLabels>
+		<Label>Document Structure</Label>
+	</TreeStructureHeaderLabels>
+	<OccursHeaderLabels>
+		<Label>Occurs</Label>
+	</OccursHeaderLabels>
 	<TreeStructureColumnCount>25</TreeStructureColumnCount>
 	<TreeStructureColumnWidth>500</TreeStructureColumnWidth>
 	

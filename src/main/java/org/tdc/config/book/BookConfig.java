@@ -18,6 +18,9 @@ public interface BookConfig {
 	String getConfigSheetName();
 	int getConfigSheetBookAddrRow();
 	int getConfigSheetBookAddrCol();
+	CellStyle getDefaultStyle();
+	CellStyle getDefaultHeaderStyle();
+	CellStyle getDefaultColumnStyle();
 	CellStyle getDefaultNodeStyle();
 	CellStyle getParentNodeStyle();
 	CellStyle getAttribNodeStyle();
@@ -26,6 +29,7 @@ public interface BookConfig {
 	CellStyle getOccurMarkerStyle();
 	int getTreeStructureColumnCount();
 	int getTreeStructureColumnWidth();
-	int getNodeRowStart();
-	int getDataColStart();
+	int getHeaderRowCount();
+	String getTreeStructureHeaderLabel(int headerRowNum);
+	String getOccursHeaderLabel(int headerRowNum);
 }
