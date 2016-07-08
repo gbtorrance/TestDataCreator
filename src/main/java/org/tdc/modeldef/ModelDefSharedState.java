@@ -16,17 +16,24 @@ public class ModelDefSharedState extends ModelSharedState {
 	
 	public String getVariable(String name, NodeDef node) {
 		Map<NodeDef, String> variables = allVariables.get(name);
-		return variables == null ? null : variables.get(node);
+		String value = variables == null ? null : variables.get(node);
+		return value == null ? "" : value;
 	}
 
 	public synchronized void setVariable(String name, NodeDef node, String value) {
-		throwExceptionIfImmutable("addVariable");
+		throwExceptionIfImmutable("setVariable");
 		
 		Map<NodeDef, String> variables = allVariables.get(name);
 		if (variables == null) {
 			variables = new HashMap<>(100);
 			allVariables.put(name, variables);
 		}
-		variables.put(node, value);
+		// only store variable if non-null/non-empty-string
+		if (value == null || value.equals("")) {
+			variables.remove(node);
+		}
+		else {
+			variables.put(node, value);
+		}
 	}
 }
