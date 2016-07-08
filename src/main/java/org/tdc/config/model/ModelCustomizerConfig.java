@@ -22,8 +22,7 @@ public interface ModelCustomizerConfig {
 	int getTreeStructureColumnWidth();
 	int getHeaderRowCount();
 	String getTreeStructureHeaderLabel(int headerRowNum);
-	String getOccursHeaderLabel(int headerRowNum);
-	String getOccursOverrideHeaderLabel(int headerRowNum);
+	String getReadOccursCountOverrideFromVariable();
 	boolean getAllowMinMaxInvalidOccursCountOverride();
 	int getDefaultOccursCount();
 	List<ModelCustomizerColumnConfig> getColumns();

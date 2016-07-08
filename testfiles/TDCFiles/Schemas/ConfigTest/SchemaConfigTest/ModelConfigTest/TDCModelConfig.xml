@@ -41,6 +41,7 @@
 		</ChoiceMarkerStyle>
 		<TreeStructureColumnCount>12</TreeStructureColumnCount>
 		<TreeStructureColumnWidth>500</TreeStructureColumnWidth>
+		<ReadOccursCountOverrideFromVariable>OCCURS_COUNT_OVERRIDE</ReadOccursCountOverrideFromVariable>
 		<AllowMinMaxInvalidOccursCountOverride>true</AllowMinMaxInvalidOccursCountOverride>
 	</Customizer>
 	

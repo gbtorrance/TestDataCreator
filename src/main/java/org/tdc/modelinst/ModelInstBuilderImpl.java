@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.tdc.model.AttribNode;
 import org.tdc.model.CompositorType;
 import org.tdc.model.MPathBuilder;
 import org.tdc.model.MPathIndex;
@@ -172,11 +173,16 @@ public class ModelInstBuilderImpl implements ModelInstBuilder {
 		int override = nodeDef.getOccursCountOverride();
 		int occursCount = override;
 		if (override == -1) {
-			int maxOccurs = 1;
-			int minOccurs = 0;
+			int maxOccurs;
+			int minOccurs;
 			boolean isUnbounded = false;
-			// above defaults apply to attributes; modify for non-attributes
-			if (nodeDef instanceof NonAttribNode) {
+			if (nodeDef instanceof AttribNode) {
+				AttribNode attrib = (AttribNode)nodeDef;
+				maxOccurs = 1;
+				minOccurs = attrib.isRequired() ? 1 : 0;
+			}
+			else {
+				// if it's not an AttribNode, it's a NonAttribNode
 				NonAttribNode nonAttrib = (NonAttribNode)nodeDef;
 				maxOccurs = nonAttrib.getMaxOccurs();
 				minOccurs = nonAttrib.getMinOccurs();

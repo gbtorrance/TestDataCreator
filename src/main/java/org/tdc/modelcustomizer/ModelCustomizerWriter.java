@@ -49,7 +49,6 @@ public class ModelCustomizerWriter extends AbstractModelCustomizer {
 		trackMaxColumns(node);
 
 		outputNodeName(node, getConfig().getAttribNodeStyle());
-		outputOccursOverride(node, true);
 		outputCustomColumns(node);
 	}
 
@@ -62,7 +61,6 @@ public class ModelCustomizerWriter extends AbstractModelCustomizer {
 		}
 		
 		outputNodeName(node, getConfig().getCompositorNodeStyle());
-		outputOccursOverride(node, false);
 		outputCustomColumns(node);
 	}
 	
@@ -80,7 +78,6 @@ public class ModelCustomizerWriter extends AbstractModelCustomizer {
 		}
 
 		outputNodeName(node, cellStyle);
-		outputOccursOverride(node, false);
 		outputCustomColumns(node);
 	}
 	
@@ -94,29 +91,6 @@ public class ModelCustomizerWriter extends AbstractModelCustomizer {
 
 	private void outputNodeName(TDCNode node, CellStyle cellStyle) {
 		getCustomizerSheet().setCellValue(node.getDispName(), getNodeRow(node), getNodeCol(node), cellStyle);
-	}
-	
-	private void outputOccursOverride(TDCNode node, boolean isAttrib) {
-		int initialOverride;
-		int defaultOccurs = getConfig().getDefaultOccursCount();
-		if (isAttrib) {
-			AttribNode attrib = (AttribNode)node;
-			initialOverride = attrib.isRequired() || defaultOccurs > 0 ? 1 : 0;
-		}
-		else {
-			NonAttribNode nonAttrib = (NonAttribNode)node;
-			initialOverride = defaultOccurs;
-			if (!nonAttrib.isUnbounded() && initialOverride > nonAttrib.getMaxOccurs()) {
-				initialOverride = nonAttrib.getMaxOccurs();
-			}
-			if (initialOverride < nonAttrib.getMinOccurs()) {
-				initialOverride = nonAttrib.getMinOccurs();
-			}
-		}
-		// only output an override number if > 1 (to avoid cluttering the spreadsheet); 
-		// zero and one will be handled by the default (unless manually overriden in the spreadsheet)
-		String initialOverrideStr = initialOverride > 1 ? Integer.toString(initialOverride) : "";
-		getCustomizerSheet().setCellValue(initialOverrideStr, getNodeRow(node), getDataCol(COL_OCCURS_OVERRIDE));
 	}
 	
 	private void outputCustomColumns(TDCNode node) {
@@ -168,8 +142,6 @@ public class ModelCustomizerWriter extends AbstractModelCustomizer {
 		for (int row = 1; row <= rowCount; row++) {
 			getCustomizerSheet().setCellValue(
 					getConfig().getTreeStructureHeaderLabel(row), row, 1, style);
-			getCustomizerSheet().setCellValue(
-					getConfig().getOccursOverrideHeaderLabel(row), row, getDataCol(COL_OCCURS_OVERRIDE), style);
 			for (int colIndex = 0; colIndex < columns.size(); colIndex++) {
 				ModelCustomizerColumnConfig column = columns.get(colIndex);
 				getCustomizerSheet().setCellValue(

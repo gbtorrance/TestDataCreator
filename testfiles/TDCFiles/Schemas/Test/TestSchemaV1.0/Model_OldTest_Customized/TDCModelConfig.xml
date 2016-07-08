@@ -42,7 +42,28 @@
 		<HeaderRowCount>2</HeaderRowCount>
 		<TreeStructureColumnCount>12</TreeStructureColumnCount>
 		<TreeStructureColumnWidth>500</TreeStructureColumnWidth>
+		<ReadOccursCountOverrideFromVariable>OCCURS_COUNT_OVERRIDE</ReadOccursCountOverrideFromVariable>
 		<AllowMinMaxInvalidOccursCountOverride>false</AllowMinMaxInvalidOccursCountOverride>
+		
+		<Columns>
+			<Column>
+				<HeaderLabels>
+					<Label>Occurs</Label>
+					<Label>Override</Label>
+				</HeaderLabels>
+				<Width>2000</Width>
+				<InitializeAsNew>
+					<Evaluator type="literal"></Evaluator>
+				</InitializeAsNew>
+				<InitializeFromPrevious>
+					<Evaluator type="variable" source="previous">OCCURS_COUNT_OVERRIDE</Evaluator>
+				</InitializeFromPrevious>
+				<Read>
+					<StoreValueWithVariableName>OCCURS_COUNT_OVERRIDE</StoreValueWithVariableName>
+				</Read>
+			</Column>
+		</Columns>
+		
 	</Customizer>
 	
 </Config>

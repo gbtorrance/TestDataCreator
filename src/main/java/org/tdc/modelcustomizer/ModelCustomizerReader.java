@@ -38,22 +38,22 @@ public class ModelCustomizerReader extends AbstractModelCustomizer {
 	@Override
 	protected void processAttribNode(AttribNode node) {
 		validateNode(node);
-		readOccursCountOverride(node, true);
 		readCustomColumns(node);
+		readOccursCountOverride(node, true);
 	}
 
 	@Override
 	protected void processCompositorNode(CompositorNode node) {
 		validateNode(node);
-		readOccursCountOverride(node, false);
 		readCustomColumns(node);
+		readOccursCountOverride(node, false);
 	}
 	
 	@Override
 	protected void processElementNode(ElementNode node) {
 		validateNode(node);
-		readOccursCountOverride(node, false);
 		readCustomColumns(node);
+		readOccursCountOverride(node, false);
 	}
 	
 	private void validateNode(TDCNode node) {
@@ -70,53 +70,6 @@ public class ModelCustomizerReader extends AbstractModelCustomizer {
 		}
 	}
 
-	private void readOccursCountOverride(TDCNode node, boolean isAttrib) {
-		int row = getNodeRow(node);
-		int col = getDataCol(COL_OCCURS_OVERRIDE);
-		String overrideStr = getCustomizerSheet().getCellValue(row, col).trim();
-		int override = -1;
-		if (overrideStr.length() > 0) {
-			boolean allowInvalid = getConfig().getAllowMinMaxInvalidOccursCountOverride();
-			AttribNode attrib = isAttrib ? (AttribNode)node : null;
-			NonAttribNode nonAttrib = !isAttrib ? (NonAttribNode)node : null;
-			try {
-				override = Integer.parseUnsignedInt(overrideStr);
-			}
-			catch (NumberFormatException ex) {
-				exception(row, col, "Invalid Occurs Override value", overrideStr, 
-						"expected non-negative number");
-			}
-			if (isAttrib && override > 1) {
-				exception(row, col, "Invalid Occurs Override value", overrideStr, 
-						"attribute can have at most one occurrence");
-			}
-			if (node == getRootElement() && override != 1) {
-				exception(row, col, "Invalid Occurs Override value", overrideStr, 
-						"root element must have exactly one occurrence");
-			}
-			if (!allowInvalid) {
-				if (isAttrib) {
-					if (attrib.isRequired() && override != 1) {
-						exception(row, col, "Invalid Occurs Override value", overrideStr, 
-								"required attributes must have exactly one occurrence");
-					}
-				}
-				else {
-					if (!nonAttrib.isUnbounded() && override > nonAttrib.getMaxOccurs()) {
-						exception(row, col, "Invalid Occurs Override value", overrideStr, 
-								"cannot be greater than max " + nonAttrib.getMaxOccurs());
-					}
-					if (override < nonAttrib.getMinOccurs()) {
-						exception(row, col, "Invalid Occurs Override value", overrideStr, 
-								"cannot be less than min " + nonAttrib.getMinOccurs());
-					}
-				}
-			}
-		}
-		NodeDef nodeDef = (NodeDef)node;
-		nodeDef.setOccursCountOverride(override);
-	}
-	
 	private void readCustomColumns(TDCNode node) {
 		NodeDef nodeDef = (NodeDef)node; // cast so we can set variables;
 		List<ModelCustomizerColumnConfig> columns = getConfig().getColumns(); 
@@ -130,8 +83,59 @@ public class ModelCustomizerReader extends AbstractModelCustomizer {
 		}
 	}
 	
+	private void readOccursCountOverride(TDCNode node, boolean isAttrib) {
+		int row = getNodeRow(node);
+		String overrideVariable = getConfig().getReadOccursCountOverrideFromVariable();
+		String overrideStr = node.getVariable(overrideVariable).trim();
+		int override = -1;
+		if (overrideStr.length() > 0) {
+			boolean allowInvalid = getConfig().getAllowMinMaxInvalidOccursCountOverride();
+			AttribNode attrib = isAttrib ? (AttribNode)node : null;
+			NonAttribNode nonAttrib = !isAttrib ? (NonAttribNode)node : null;
+			try {
+				override = Integer.parseUnsignedInt(overrideStr);
+			}
+			catch (NumberFormatException ex) {
+				exception(row, "Invalid Occurs Override value", overrideStr, 
+						"expected non-negative number");
+			}
+			if (isAttrib && override > 1) {
+				exception(row, "Invalid Occurs Override value", overrideStr, 
+						"attribute can have at most one occurrence");
+			}
+			if (node == getRootElement() && override != 1) {
+				exception(row, "Invalid Occurs Override value", overrideStr, 
+						"root element must have exactly one occurrence");
+			}
+			if (!allowInvalid) {
+				if (isAttrib) {
+					if (attrib.isRequired() && override != 1) {
+						exception(row, "Invalid Occurs Override value", overrideStr, 
+								"required attributes must have exactly one occurrence");
+					}
+				}
+				else {
+					if (!nonAttrib.isUnbounded() && override > nonAttrib.getMaxOccurs()) {
+						exception(row, "Invalid Occurs Override value", overrideStr, 
+								"cannot be greater than max " + nonAttrib.getMaxOccurs());
+					}
+					if (override < nonAttrib.getMinOccurs()) {
+						exception(row, "Invalid Occurs Override value", overrideStr, 
+								"cannot be less than min " + nonAttrib.getMinOccurs());
+					}
+				}
+			}
+		}
+		NodeDef nodeDef = (NodeDef)node;
+		nodeDef.setOccursCountOverride(override);
+	}
+	
+	private void exception(int row, String invalidMsg, String actualValue, String expectedMsg) {
+		exception(row, -1, invalidMsg, actualValue, expectedMsg);
+	}
+
 	private void exception(int row, int col, String invalidMsg, String actualValue, String expectedMsg) {
 		throw new RuntimeException(invalidMsg + " '" + actualValue + 
-				"' at row " + row + " col " + col + "; " + expectedMsg);
+				"' at row " + row + (col == -1 ? "" : " col " + col) + "; " + expectedMsg);
 	}
 }

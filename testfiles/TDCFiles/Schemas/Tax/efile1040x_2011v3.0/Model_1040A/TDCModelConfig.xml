@@ -5,7 +5,7 @@
 	<SchemaRootElementNamespace>http://www.irs.gov/efile</SchemaRootElementNamespace>
 	<SchemaFailOnParserWarning>true</SchemaFailOnParserWarning>
 	<SchemaFailOnParserNonFatalError>true</SchemaFailOnParserNonFatalError>
-	<DefaultOccursCount>1</DefaultOccursCount>
+	<DefaultOccursCount>3</DefaultOccursCount>
 	
 	<SchemaExtractors>
 		<SchemaExtractor type="dataType">
@@ -41,6 +41,7 @@
 		</DefaultStyle>
 		<DefaultHeaderStyle>
 			<Bold>true</Bold>
+			<ShrinkToFit>true</ShrinkToFit>
 		</DefaultHeaderStyle>
 		<DefaultColumnStyle>
 			<ShrinkToFit>true</ShrinkToFit>
@@ -63,18 +64,81 @@
 		<TreeStructureHeaderLabels>
 			<Label>Model Structure</Label>
 		</TreeStructureHeaderLabels>
-		<OccursHeaderLabels>
-			<Label>Occurs</Label>
-		</OccursHeaderLabels>
-		<OccursOverrideHeaderLabels>
-			<Label>Occurs</Label>
-			<Label>Override</Label>
-		</OccursOverrideHeaderLabels>
 		<TreeStructureColumnCount>25</TreeStructureColumnCount>
 		<TreeStructureColumnWidth>500</TreeStructureColumnWidth>
-		<AllowMinMaxInvalidOccursCountOverride>true</AllowMinMaxInvalidOccursCountOverride>
+		<ReadOccursCountOverrideFromVariable>OCCURS_COUNT_OVERRIDE</ReadOccursCountOverrideFromVariable>
+		<AllowMinMaxInvalidOccursCountOverride>false</AllowMinMaxInvalidOccursCountOverride>
 		<Columns>
 		
+			<Column>
+				<HeaderLabels>
+					<Label>Occurs</Label>
+				</HeaderLabels>
+				<Width>2000</Width>
+				<Style>
+					<FillColorRGB>208 204 204</FillColorRGB> <!-- gray -->
+				</Style>
+				<InitializeAsNew>
+					<Evaluator type="property" source="current">DispOccurs</Evaluator>
+				</InitializeAsNew>
+				<InitializeFromPrevious>
+					<Evaluator type="if" operator="equals">
+						<If>
+							<Evaluator type="property" source="current">DispOccurs</Evaluator>
+							<Evaluator type="property" source="previous">DispOccurs</Evaluator>
+						</If>
+						<Then>
+							<Evaluator type="property" source="current">DispOccurs</Evaluator>
+						</Then>
+						<Else>
+							<Evaluator type="value-plus-style">
+								<Evaluator type="compound">
+									<Evaluator type="property" source="current">DispOccurs</Evaluator>
+									<Evaluator type="space" size="1"/>
+									<Evaluator type="literal">[prev:</Evaluator>
+									<Evaluator type="space" size="1"/>
+									<Evaluator type="property" source="previous">DispOccurs</Evaluator>
+									<Evaluator type="literal">]</Evaluator>
+								</Evaluator>
+								<Style>
+									<ColorRGB>255 0 0</ColorRGB> <!-- red -->
+								</Style>
+							</Evaluator>
+						</Else>
+					</Evaluator>
+				</InitializeFromPrevious>
+			</Column>
+			<Column>
+				<HeaderLabels>
+					<Label>Occurs</Label>
+					<Label>Override</Label>
+				</HeaderLabels>
+				<Width>2000</Width>
+				<InitializeAsNew>
+					<Evaluator type="literal"></Evaluator>
+				</InitializeAsNew>
+				<InitializeFromPrevious>
+					<Evaluator type="variable" source="previous">OCCURS_COUNT_OVERRIDE</Evaluator>
+				</InitializeFromPrevious>
+				<Read>
+					<StoreValueWithVariableName>OCCURS_COUNT_OVERRIDE</StoreValueWithVariableName>
+				</Read>
+			</Column>
+			
+			<Column>
+				<HeaderLabels>
+					<Label>Prev</Label>
+					<Label>Seq</Label>
+				</HeaderLabels>
+				<Width>2000</Width>
+				<InitializeAsNew>
+					<Evaluator type="literal"></Evaluator>
+				</InitializeAsNew>
+				<InitializeFromPrevious>
+					<Evaluator type="property" source="previous">RowOffset</Evaluator>
+				</InitializeFromPrevious>
+			</Column>
+
 			<Column>
 				<HeaderLabels>
 					<Label>Description</Label>
@@ -161,8 +225,6 @@
 									<Evaluator type="literal">]</Evaluator>
 								</Evaluator>
 								<Style>
-									<FontName>Calibri</FontName>
-									<FontHeight>11</FontHeight>
 									<ColorRGB>255 0 0</ColorRGB> <!-- red -->
 								</Style>
 							</Evaluator>
@@ -218,8 +280,6 @@
 									<Evaluator type="literal">]</Evaluator>
 								</Evaluator>
 								<Style>
-									<FontName>Calibri</FontName>
-									<FontHeight>11</FontHeight>
 									<ColorRGB>255 0 0</ColorRGB> <!-- red -->
 								</Style>
 							</Evaluator>
@@ -275,8 +335,6 @@
 									<Evaluator type="literal">]</Evaluator>
 								</Evaluator>
 								<Style>
-									<FontName>Calibri</FontName>
-									<FontHeight>11</FontHeight>
 									<ColorRGB>255 0 0</ColorRGB> <!-- red -->
 								</Style>
 							</Evaluator>
@@ -316,8 +374,6 @@
 									<Evaluator type="literal">]</Evaluator>
 								</Evaluator>
 								<Style>
-									<FontName>Calibri</FontName>
-									<FontHeight>11</FontHeight>
 									<ColorRGB>255 0 0</ColorRGB> <!-- red -->
 								</Style>
 							</Evaluator>
@@ -341,7 +397,7 @@
 					<StoreValueWithVariableName>CUSTOM_DATA_TYPE</StoreValueWithVariableName>
 				</Read>
 			</Column>
-			
+
 		</Columns>
 	</Customizer>
 	

@@ -26,8 +26,7 @@ public class ModelCustomizerConfigImpl implements ModelCustomizerConfig {
 	private final int treeStructureColumnWidth;
 	private final int headerRowCount;
 	private final String[] treeStructureHeaderLabels;
-	private final String[] occursHeaderLabels;
-	private final String[] occursOverrideHeaderLabels;
+	private final String readOccursCountOverrideFromVariable;
 	private final boolean allowMinMaxInvalidOccursCountOverride;
 	private final int defaultOccursCount;
 	private final List<ModelCustomizerColumnConfig> columns;
@@ -46,8 +45,7 @@ public class ModelCustomizerConfigImpl implements ModelCustomizerConfig {
 		this.treeStructureColumnWidth = builder.treeStructureColumnWidth;
 		this.headerRowCount = builder.headerRowCount;
 		this.treeStructureHeaderLabels = builder.treeStructureHeaderLabels;
-		this.occursHeaderLabels = builder.occursHeaderLabels;
-		this.occursOverrideHeaderLabels = builder.occursOverrideHeaderLabels;
+		this.readOccursCountOverrideFromVariable = builder.readOccursCountOverrideFromVariable;
 		this.allowMinMaxInvalidOccursCountOverride = builder.allowMinMaxInvalidOccursCountOverride;
 		this.defaultOccursCount = builder.defaultOccursCount;
 		this.columns = Collections.unmodifiableList(builder.columns); // unmodifiable
@@ -119,13 +117,8 @@ public class ModelCustomizerConfigImpl implements ModelCustomizerConfig {
 	}
 
 	@Override
-	public String getOccursHeaderLabel(int headerRowNum) {
-		return occursHeaderLabels[headerRowNum-1];
-	}
-
-	@Override
-	public String getOccursOverrideHeaderLabel(int headerRowNum) {
-		return occursOverrideHeaderLabels[headerRowNum-1];
+	public String getReadOccursCountOverrideFromVariable() {
+		return readOccursCountOverrideFromVariable;
 	}
 
 	@Override
@@ -164,8 +157,7 @@ public class ModelCustomizerConfigImpl implements ModelCustomizerConfig {
 		private int treeStructureColumnWidth;
 		private int headerRowCount;
 		private String[] treeStructureHeaderLabels;
-		private String[] occursHeaderLabels;
-		private String[] occursOverrideHeaderLabels;
+		private String readOccursCountOverrideFromVariable;
 		private boolean allowMinMaxInvalidOccursCountOverride;
 		private List<ModelCustomizerColumnConfig> columns; 
 		
@@ -196,10 +188,8 @@ public class ModelCustomizerConfigImpl implements ModelCustomizerConfig {
 				headerRowCount = config.getInt(CONFIG_PREFIX + ".HeaderRowCount", 1, false);
 				treeStructureHeaderLabels = config.getHeaderLabels(
 						CONFIG_PREFIX + ".TreeStructureHeaderLabels", headerRowCount);
-				occursHeaderLabels = config.getHeaderLabels(
-						CONFIG_PREFIX + ".OccursHeaderLabels", headerRowCount);
-				occursOverrideHeaderLabels = config.getHeaderLabels(
-						CONFIG_PREFIX + ".OccursOverrideHeaderLabels", headerRowCount);
+				readOccursCountOverrideFromVariable = config.getString(
+						CONFIG_PREFIX + ".ReadOccursCountOverrideFromVariable", null, true);
 				allowMinMaxInvalidOccursCountOverride = config.getBoolean(
 						CONFIG_PREFIX + ".AllowMinMaxInvalidOccursCountOverride", false, false);
 				columns = new ModelCustomizerColumnConfigImpl.ModelCustomizerColumnConfigBuilder(
