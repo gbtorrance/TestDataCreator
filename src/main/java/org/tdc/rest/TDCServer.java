@@ -66,7 +66,7 @@ public class TDCServer {
 		// TODO parameterize these appropriately
 		Path schemasConfigRoot = Paths.get("testfiles/TDCFiles/Schemas");
 		Path booksConfigRoot = Paths.get("testfiles/TDCFiles/Books");
-		Path workingRoot = Paths.get("testfiles/Temp/Server/working");
+		Path workingRoot = Paths.get("testfiles/TDCServer/Working");
 		int port = 8080;
 		TDCServer server = new TDCServer(port, schemasConfigRoot, booksConfigRoot, workingRoot);
 		try {
