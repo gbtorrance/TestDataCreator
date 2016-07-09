@@ -131,6 +131,9 @@
 					<Label>Seq</Label>
 				</HeaderLabels>
 				<Width>2000</Width>
+				<Style>
+					<FillColorRGB>208 204 204</FillColorRGB> <!-- gray -->
+				</Style>
 				<InitializeAsNew>
 					<Evaluator type="literal"></Evaluator>
 				</InitializeAsNew>

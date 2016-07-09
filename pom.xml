@@ -80,7 +80,13 @@
 			<artifactId>resteasy-jackson2-provider</artifactId>
 			<version>3.0.17.Final</version>
 		</dependency>
-
+		
+		<dependency>
+			<groupId>org.jboss.resteasy</groupId>
+			<artifactId>resteasy-multipart-provider</artifactId>
+			<version>3.0.17.Final</version>
+		</dependency>
+		
 		<dependency>
 			<groupId>org.eclipse.jetty</groupId>
 			<artifactId>jetty-server</artifactId>

@@ -2,7 +2,6 @@ package org.tdc.rest;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.List;
 
 import javax.servlet.Servlet;
 
@@ -12,15 +11,6 @@ import org.eclipse.jetty.servlet.ServletHolder;
 import org.jboss.resteasy.plugins.server.servlet.HttpServletDispatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.tdc.config.book.BookConfig;
-import org.tdc.config.book.BookConfigFactory;
-import org.tdc.config.book.BookConfigFactoryImpl;
-import org.tdc.config.model.ModelConfig;
-import org.tdc.config.model.ModelConfigFactory;
-import org.tdc.config.model.ModelConfigFactoryImpl;
-import org.tdc.config.schema.SchemaConfig;
-import org.tdc.config.schema.SchemaConfigFactory;
-import org.tdc.config.schema.SchemaConfigFactoryImpl;
 
 /**
  * This is the "main" class for the system when running in server mode.
@@ -33,14 +23,16 @@ public class TDCServer {
 
 	private final Path schemasConfigRoot;
 	private final Path booksConfigRoot;
+	private final Path workingRoot;
 	private final Server server;
 	private final Servlet servlet;
 	private final ServletHolder servletHolder; 
 	private final ServletContextHandler servletContextHandler;
 	
-	public TDCServer(int port, Path schemasConfigRoot, Path booksConfigRoot) {
+	public TDCServer(int port, Path schemasConfigRoot, Path booksConfigRoot, Path workingRoot) {
 		this.schemasConfigRoot = schemasConfigRoot;
 		this.booksConfigRoot = booksConfigRoot;
+		this.workingRoot = workingRoot;
 		server = new Server(port);
 		servlet = new HttpServletDispatcher();
 		servletHolder = new ServletHolder(servlet);
@@ -65,23 +57,18 @@ public class TDCServer {
 	}
 	
 	private final void initResourceParams() {
-		SchemaConfigFactory schemaConfigFactory = new SchemaConfigFactoryImpl(schemasConfigRoot);
-		ModelConfigFactory modelConfigFactory = new ModelConfigFactoryImpl(schemaConfigFactory);
-		BookConfigFactory bookConfigFactory = new BookConfigFactoryImpl(booksConfigRoot, modelConfigFactory);
-		List<SchemaConfig> schemaConfigs = schemaConfigFactory.getAllSchemaConfigs();
-		List<ModelConfig> modelConfigs = modelConfigFactory.getAllModelConfigs();
-		List<BookConfig> bookConfigs = bookConfigFactory.getAllBookConfigs();
-		servletContextHandler.setAttribute(TDCApplication.ATTRIB_SCHEMA_CONFIGS, schemaConfigs);
-		servletContextHandler.setAttribute(TDCApplication.ATTRIB_MODEL_CONFIGS, modelConfigs);
-		servletContextHandler.setAttribute(TDCApplication.ATTRIB_BOOK_CONFIGS, bookConfigs);
+		servletContextHandler.setAttribute(TDCApplication.ATTRIB_SCHEMAS_CONFIG_ROOT, schemasConfigRoot);
+		servletContextHandler.setAttribute(TDCApplication.ATTRIB_BOOKS_CONFIG_ROOT, booksConfigRoot);
+		servletContextHandler.setAttribute(TDCApplication.ATTRIB_WORKING_ROOT, workingRoot);
 	}
 	
 	public static void main(String args[]) {
 		// TODO parameterize these appropriately
 		Path schemasConfigRoot = Paths.get("testfiles/TDCFiles/Schemas");
 		Path booksConfigRoot = Paths.get("testfiles/TDCFiles/Books");
+		Path workingRoot = Paths.get("testfiles/Temp/Server/working");
 		int port = 8080;
-		TDCServer server = new TDCServer(port, schemasConfigRoot, booksConfigRoot);
+		TDCServer server = new TDCServer(port, schemasConfigRoot, booksConfigRoot, workingRoot);
 		try {
 			server.startAndWait();
 		}

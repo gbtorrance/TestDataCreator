@@ -2,6 +2,7 @@ package org.tdc.rest;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -9,12 +10,18 @@ import java.util.List;
 
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.Entity;
+import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.GenericType;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataOutput;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.tdc.rest.dto.BookConfigDTO;
 import org.tdc.rest.dto.ModelConfigDTO;
 import org.tdc.rest.dto.SchemaConfigDTO;
@@ -29,7 +36,9 @@ import org.tdc.rest.dto.SchemaConfigDTO;
  * For now keep everything in one test class (but maybe consider a different approach for future).
  */
 public class RestTest {
-	
+
+	private static final Logger log = LoggerFactory.getLogger(RestTest.class);
+
 	private static TDCServer server;
 	private static Client client;
 	private static String urlPrefix;
@@ -38,8 +47,9 @@ public class RestTest {
 	public static void setup() throws Exception {
 		Path schemasConfigRoot = Paths.get("testfiles/TDCFiles/Schemas");
 		Path booksConfigRoot = Paths.get("testfiles/TDCFiles/Books");
+		Path workingRoot = Paths.get("testfiles/Temp/Server/working");
 		int port = 8080;
-		server = new TDCServer(port, schemasConfigRoot, booksConfigRoot);
+		server = new TDCServer(port, schemasConfigRoot, booksConfigRoot, workingRoot);
 		server.start();
 		client = ClientBuilder.newClient();
 		urlPrefix = "http://localhost:" + port;
@@ -100,5 +110,20 @@ public class RestTest {
 			}
 		}
 		assertThat(foundCount).isEqualTo(2);
+	}
+	
+	@Test
+	public void testBookUpload() throws IOException {
+		String target = urlPrefix + "/tdc/books";
+		MultipartFormDataOutput mdo = new MultipartFormDataOutput();
+		Response response;
+		try (FileInputStream fis = new FileInputStream("testfiles/SampleFiles/TestBook.xlsx")) {
+			mdo.addFormData("file", fis, MediaType.APPLICATION_OCTET_STREAM_TYPE);
+			GenericEntity<MultipartFormDataOutput> entity = 
+					new GenericEntity<MultipartFormDataOutput>(mdo) {};
+			response = client.target(target).request().post(Entity.entity(entity, MediaType.MULTIPART_FORM_DATA));
+		}
+		assertThat(response.getStatus()).isEqualTo(Response.Status.CREATED.getStatusCode());
+		assertThat(response.getLocation().toString()).isEqualTo(urlPrefix + "/tdc/books/123"); // TODO remove hardcoding; just temporary
 	}
 }
