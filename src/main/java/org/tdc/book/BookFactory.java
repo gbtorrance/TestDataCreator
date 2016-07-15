@@ -1,10 +1,10 @@
 package org.tdc.book;
 
-import org.tdc.config.book.BookConfig;
+import java.nio.file.Path;
 
 /**
  * Factory for creating {@link Book} instances.
  */
 public interface BookFactory {
-	Book getBook(BookConfig config);
+	Book getBook(Path bookFile);
 }

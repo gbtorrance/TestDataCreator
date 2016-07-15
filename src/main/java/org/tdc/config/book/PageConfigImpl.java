@@ -22,12 +22,14 @@ public class PageConfigImpl implements PageConfig {
 	private final ModelConfig modelConfig;
 	private final DocTypeConfig docTypeConfig;
 	private final List<PageColumnConfig> columns;
+	private final List<DocIDRowConfig> docIDRows;
 	
-	private PageConfigImpl(PageConfigBuilder builder) {
+	private PageConfigImpl(Builder builder) {
 		this.pageName = builder.pageName;
 		this.modelConfig = builder.modelConfig;
 		this.docTypeConfig = builder.docTypeConfig;
 		this.columns = Collections.unmodifiableList(builder.columns); // unmodifiable
+		this.docIDRows = Collections.unmodifiableList(builder.docIDRows); // unmodifiable
 	}
 
 	@Override
@@ -50,7 +52,12 @@ public class PageConfigImpl implements PageConfig {
 		return columns;
 	}
 	
-	public static class PageConfigBuilder {
+	@Override
+	public List<DocIDRowConfig> getDocIDRows() {
+		return docIDRows;
+	}
+	
+	public static class Builder {
 		private static final String CONFIG_PREFIX = "Pages.Page";
 
 		private final XMLConfigWrapper config;
@@ -62,9 +69,10 @@ public class PageConfigImpl implements PageConfig {
 		private String pageName;
 		private ModelConfig modelConfig;
 		private DocTypeConfig docTypeConfig;
-		private List<PageColumnConfig> columns; 
+		private List<PageColumnConfig> columns;
+		private List<DocIDRowConfig> docIDRows;
 		
-		public PageConfigBuilder(XMLConfigWrapper config, 
+		public Builder(XMLConfigWrapper config, 
 				Map<String, DocTypeConfig> docTypeConfigs, ModelConfigFactory modelConfigFactory,
 				int headerRowCount, CellStyle defaultColumnStyle) {
 			this.config = config;
@@ -107,8 +115,9 @@ public class PageConfigImpl implements PageConfig {
 				throw new IllegalStateException("Unable to locate DocType '" + docTypeName + 
 						"' for Page '" + pageName + "'");
 			}
-			columns = new PageColumnConfigImpl.PageColumnConfigBuilder(
+			columns = new PageColumnConfigImpl.Builder(
 					config, indexPrefix, headerRowCount, defaultColumnStyle).buildAll();
+			docIDRows = new DocIDRowConfigImpl.Builder(config, indexPrefix).buildAll();
 			return new PageConfigImpl(this);
 		}
 	}

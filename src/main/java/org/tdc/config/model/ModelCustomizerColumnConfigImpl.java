@@ -20,7 +20,7 @@ public class ModelCustomizerColumnConfigImpl implements ModelCustomizerColumnCon
 	private final Evaluator initFromPrevEvaluator;
 	private final String storeValueWithVariableName;
 	
-	private ModelCustomizerColumnConfigImpl(ModelCustomizerColumnConfigBuilder builder) {
+	private ModelCustomizerColumnConfigImpl(Builder builder) {
 		this.headerLabels = builder.headerLabels;
 		this.width = builder.width;
 		this.style = builder.style;
@@ -59,7 +59,7 @@ public class ModelCustomizerColumnConfigImpl implements ModelCustomizerColumnCon
 		return storeValueWithVariableName;
 	}
 
-	public static class ModelCustomizerColumnConfigBuilder {
+	public static class Builder {
 		private static final String CONFIG_PREFIX = "Customizer.Columns.Column";
 
 		private final XMLConfigWrapper config;
@@ -74,7 +74,7 @@ public class ModelCustomizerColumnConfigImpl implements ModelCustomizerColumnCon
 		private Evaluator initFromPrevEvaluator;
 		private String storeValueWithVariableName;
 		
-		public ModelCustomizerColumnConfigBuilder(XMLConfigWrapper config, 
+		public Builder(XMLConfigWrapper config, 
 				GeneralEvaluatorFactory evaluatorFactory, int headerRowCount, CellStyle defaultColumnStyle) {
 			this.config = config;
 			this.evaluatorFactory = evaluatorFactory;

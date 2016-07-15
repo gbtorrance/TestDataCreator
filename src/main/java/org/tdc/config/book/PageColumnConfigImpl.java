@@ -16,7 +16,7 @@ public class PageColumnConfigImpl implements PageColumnConfig {
 	private final String readFromVariable;
 	private final String readFromProperty;
 	
-	private PageColumnConfigImpl(PageColumnConfigBuilder builder) {
+	private PageColumnConfigImpl(Builder builder) {
 		this.headerLabels = builder.headerLabels;
 		this.width = builder.width;
 		this.style = builder.style;
@@ -49,7 +49,7 @@ public class PageColumnConfigImpl implements PageColumnConfig {
 		return readFromProperty;
 	}
 
-	public static class PageColumnConfigBuilder {
+	public static class Builder {
 		private static final String CONFIG_PREFIX = ".Columns.Column";
 
 		private final XMLConfigWrapper config;
@@ -63,7 +63,7 @@ public class PageColumnConfigImpl implements PageColumnConfig {
 		private String readFromVariable;
 		private String readFromProperty;
 		
-		public PageColumnConfigBuilder(XMLConfigWrapper config, 
+		public Builder(XMLConfigWrapper config, 
 				String pageKey, int headerRowCount, CellStyle defaultColumnStyle) {
 			this.config = config;
 			this.pageKey = pageKey;

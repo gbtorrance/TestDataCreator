@@ -22,9 +22,6 @@ public class BookConfigImpl implements BookConfig {
 	public static final String CONFIG_FILE = "TDCBookConfig.xml";
 	
 	private static final Logger log = LoggerFactory.getLogger(BookConfigImpl.class);
-	private static final String CONFIG_SHEET_NAME = "_Config";
-	private static final int CONFIG_SHEET_BOOK_ADDR_ROW = 1;
-	private static final int CONFIG_SHEET_BOOK_ADDR_COL = 1;
 
 	private final Path booksConfigRoot;
 	private final Addr addr;
@@ -45,7 +42,7 @@ public class BookConfigImpl implements BookConfig {
 	private final int headerRowCount;
 	private final String[] treeStructureHeaderLabels;
 	
-	private BookConfigImpl(BookConfigBuilder builder) {
+	private BookConfigImpl(Builder builder) {
 		this.booksConfigRoot = builder.booksConfigRoot;
 		this.addr = builder.addr;
 		this.bookConfigRoot = builder.bookConfigRoot;
@@ -89,21 +86,6 @@ public class BookConfigImpl implements BookConfig {
 	@Override
 	public Map<String, PageConfig> getPageConfigs() {
 		return pageConfigs;
-	}
-	
-	@Override
-	public String getConfigSheetName() {
-		return CONFIG_SHEET_NAME;
-	}
-	
-	@Override
-	public int getConfigSheetBookAddrRow() {
-		return CONFIG_SHEET_BOOK_ADDR_ROW;
-	}
-
-	@Override
-	public int getConfigSheetBookAddrCol() {
-		return CONFIG_SHEET_BOOK_ADDR_COL;
 	}
 	
 	@Override
@@ -171,7 +153,7 @@ public class BookConfigImpl implements BookConfig {
 		return treeStructureHeaderLabels[headerRowNum-1];
 	}
 
-	public static class BookConfigBuilder {
+	public static class Builder {
 		private final XMLConfigWrapper config;
 		private final ModelConfigFactory modelConfigFactory;
 		private final Path booksConfigRoot;
@@ -194,7 +176,7 @@ public class BookConfigImpl implements BookConfig {
 		private int headerRowCount;
 		private String[] treeStructureHeaderLabels;
 		
-		public BookConfigBuilder(Path booksConfigRoot, Addr addr, ModelConfigFactory modelConfigFactory) {
+		public Builder(Path booksConfigRoot, Addr addr, ModelConfigFactory modelConfigFactory) {
 			log.info("Creating BookConfig: {}", addr);
 			this.booksConfigRoot = booksConfigRoot;
 			this.addr = addr;
@@ -208,7 +190,7 @@ public class BookConfigImpl implements BookConfig {
 		}
 
 		public BookConfig build() {
-			docTypeConfigs = new DocTypeConfigImpl.DocTypeConfigBuilder(config).buildAll();
+			docTypeConfigs = new DocTypeConfigImpl.Builder(config).buildAll();
 			defaultStyle = config.getCellStyle("DefaultStyle", null, true);
 			defaultHeaderStyle = config.getCellStyle("DefaultHeaderStyle", defaultStyle, false);
 			defaultColumnStyle = config.getCellStyle("DefaultColumnStyle", defaultStyle, false);
@@ -223,7 +205,7 @@ public class BookConfigImpl implements BookConfig {
 			headerRowCount = config.getInt("HeaderRowCount", 1, false);
 			treeStructureHeaderLabels = config.getHeaderLabels(
 					"TreeStructureHeaderLabels", headerRowCount);
-			pageConfigs = new PageConfigImpl.PageConfigBuilder(config, docTypeConfigs, 
+			pageConfigs = new PageConfigImpl.Builder(config, docTypeConfigs, 
 					modelConfigFactory, headerRowCount, defaultColumnStyle).buildAll();
 			return new BookConfigImpl(this);
 		}

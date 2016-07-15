@@ -2,11 +2,13 @@ package org.tdc.book;
 
 import java.util.Collection;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.tdc.config.book.PageConfig;
 import org.tdc.modelinst.ModelInst;
 import org.tdc.modelinst.ModelInstFactory;
+import org.tdc.spreadsheet.SpreadsheetFile;
 
 /**
  * A {@link Page} implementation.
@@ -14,10 +16,12 @@ import org.tdc.modelinst.ModelInstFactory;
 public class PageImpl implements Page {
 	
 	private final PageConfig config;
+	private final List<TestDoc> testDocs;
 	private final ModelInstFactory modelInstFactory;
 	
-	private PageImpl(PageBuilder builder) {
+	private PageImpl(Builder builder) {
 		this.config = builder.config;
+		this.testDocs = builder.testDocs;
 		this.modelInstFactory = builder.modelInstFactory;
 	}
 
@@ -40,15 +44,22 @@ public class PageImpl implements Page {
 		return modelInstFactory.getModelInst(config.getModelConfig());
 	}
 	
-	public static class PageBuilder {
+	public static class Builder {
 		private final Map<String, PageConfig> configs;
 		private final ModelInstFactory modelInstFactory;
+		private final SpreadsheetFile spreadsheetFile;
 		
 		private PageConfig config;
+		private List<TestDoc> testDocs;
 		
-		public PageBuilder(Map<String, PageConfig> configs, ModelInstFactory modelInstFactory) {
+		public Builder(
+				Map<String, PageConfig> configs, 
+				ModelInstFactory modelInstFactory, 
+				SpreadsheetFile spreadsheetFile) {
+			
 			this.configs = configs;
 			this.modelInstFactory = modelInstFactory;
+			this.spreadsheetFile = spreadsheetFile;
 		}
 		
 		public Map<String, Page> buildAll() {
@@ -62,6 +73,7 @@ public class PageImpl implements Page {
 
 		private Page build(PageConfig config) {
 			this.config = config;
+			testDocs = new TestDocImpl.Builder(config, spreadsheetFile).buildAll();
 			return new PageImpl(this);
 		}
 	}

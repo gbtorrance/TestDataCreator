@@ -15,14 +15,14 @@ public class ExcelSpreadsheetFileFactory implements SpreadsheetFileFactory {
 	@Override
 	public SpreadsheetFile getSpreadsheetFile() {
 		XSSFWorkbook workbook = new XSSFWorkbook();
-		return new ExcelSpreadsheetFile.SpreadsheetFileBuilder(workbook).build();
+		return new ExcelSpreadsheetFile.Builder(workbook).build();
 	}
 
 	@Override
 	public SpreadsheetFile getSpreadsheetFileFromPath(Path path) {
 		try (FileInputStream fis = new FileInputStream(path.toFile())) {
 			XSSFWorkbook xssfWorkbook = new XSSFWorkbook(fis);
-			return new ExcelSpreadsheetFile.SpreadsheetFileBuilder(xssfWorkbook).build();
+			return new ExcelSpreadsheetFile.Builder(xssfWorkbook).build();
 		}
 		catch (Exception ex) {
 			throw new RuntimeException("Unable to read Excel file: " + path.toString(), ex);

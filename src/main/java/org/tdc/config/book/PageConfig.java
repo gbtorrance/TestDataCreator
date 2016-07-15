@@ -12,4 +12,5 @@ public interface PageConfig {
 	ModelConfig getModelConfig();
 	DocTypeConfig getDocTypeConfig();
 	List<PageColumnConfig> getColumns();
+	List<DocIDRowConfig> getDocIDRows();
 }

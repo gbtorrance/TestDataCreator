@@ -16,7 +16,7 @@ public class DocTypeConfigImpl implements DocTypeConfig {
 	private final int minPerTestCase;
 	private final int maxPerTestCase;
 	
-	private DocTypeConfigImpl(DocTypeConfigBuilder builder) {
+	private DocTypeConfigImpl(Builder builder) {
 		this.docTypeName = builder.docTypeName;
 		this.minPerTestCase = builder.minPerTestCase;
 		this.maxPerTestCase = builder.maxPerTestCase;
@@ -37,7 +37,7 @@ public class DocTypeConfigImpl implements DocTypeConfig {
 		return maxPerTestCase;
 	}
 	
-	public static class DocTypeConfigBuilder {
+	public static class Builder {
 		private static final String CONFIG_PREFIX = "DocTypes.DocType";
 
 		private final XMLConfigWrapper config;
@@ -46,7 +46,7 @@ public class DocTypeConfigImpl implements DocTypeConfig {
 		private int minPerTestCase;
 		private int maxPerTestCase;
 		
-		public DocTypeConfigBuilder(XMLConfigWrapper config) {
+		public Builder(XMLConfigWrapper config) {
 			this.config = config;
 		}
 		

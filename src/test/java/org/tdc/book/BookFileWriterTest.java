@@ -27,9 +27,9 @@ import org.tdc.spreadsheet.excel.ExcelSpreadsheetFileFactory;
 import org.tdc.util.Addr;
 
 /**
- * Unit tests for {@link BookWriter} an its related classes.
+ * Unit tests for {@link BookFileWriter} an its related classes.
  */
-public class BookWriterTest {
+public class BookFileWriterTest {
 	
 	// TODO improve test 
 	// not true unit testing at this point, since there is no verification of results;
@@ -42,7 +42,6 @@ public class BookWriterTest {
 	private static SchemaFactory schemaFactory;
 	private static ModelDefFactory modelDefFactory;
 	private static ModelInstFactory modelInstFactory;
-	private static BookFactory bookFactory;
 
 	@BeforeClass
 	public static void setup() {
@@ -58,18 +57,16 @@ public class BookWriterTest {
 		schemaFactory = new SchemaFactoryImpl();
 		modelDefFactory = new ModelDefFactoryImpl(schemaFactory, spreadsheetFileFactory);
 		modelInstFactory = new ModelInstFactoryImpl(modelDefFactory);
-		bookFactory = new BookFactoryImpl(modelInstFactory);
 	}
 	
 	@Test
 	public void testWriteBook() {
 		Addr bookAddr = new Addr("/Tax/IndividualIncome2012v1");
 		BookConfig bookConfig = bookConfigFactory.getBookConfig(bookAddr);
-		Book book = bookFactory.getBook(bookConfig);
 		SpreadsheetFile bookFile = spreadsheetFileFactory.getSpreadsheetFile();
 		
-		BookWriter bookWriter =  new BookWriterImpl(book, bookFile);
-		bookWriter.write();
+		BookFileWriter bookFileWriter =  new BookFileWriter(bookConfig, bookFile, modelInstFactory);
+		bookFileWriter.write();
 		
 		Path bookFilePath = Paths.get("testfiles/Temp/TestBook.xlsx");
 		bookFile.save(bookFilePath);

@@ -17,7 +17,7 @@ public class ExcelSpreadsheetFile implements SpreadsheetFile {
 	private final XSSFWorkbook workbook;
 	private final Map<String, Spreadsheet> spreadsheets;
 	
-	private ExcelSpreadsheetFile(SpreadsheetFileBuilder builder) {
+	private ExcelSpreadsheetFile(Builder builder) {
 		this.workbook = builder.workbook;
 		this.spreadsheets = builder.spreadsheets;
 	}
@@ -29,7 +29,7 @@ public class ExcelSpreadsheetFile implements SpreadsheetFile {
 
 	@Override
 	public Spreadsheet createSpreadsheet(String name) {
-		Spreadsheet spreadsheet = new ExcelSpreadsheet.SpreadsheetBuilder(workbook).build(name);
+		Spreadsheet spreadsheet = new ExcelSpreadsheet.Builder(workbook).build(name);
 		spreadsheets.put(spreadsheet.getName(), spreadsheet);
 		return spreadsheet;
 	}
@@ -62,17 +62,17 @@ public class ExcelSpreadsheetFile implements SpreadsheetFile {
 		workbook.setSheetHidden(index, hide);
 	}
 
-	public static class SpreadsheetFileBuilder {
+	public static class Builder {
 		private final XSSFWorkbook workbook;
 		
 		private Map<String, Spreadsheet> spreadsheets;
 		
-		public SpreadsheetFileBuilder(XSSFWorkbook workbook) {
+		public Builder(XSSFWorkbook workbook) {
 			this.workbook = workbook;
 		}
 		
 		public SpreadsheetFile build() {
-			spreadsheets = new ExcelSpreadsheet.SpreadsheetBuilder(workbook).buildAll();
+			spreadsheets = new ExcelSpreadsheet.Builder(workbook).buildAll();
 			return new ExcelSpreadsheetFile(this);
 		}
 	}

@@ -37,7 +37,7 @@ public class ModelConfigImpl implements ModelConfig {
 	private final List<SchemaExtractor> schemaExtractors;
 	private final ModelCustomizerConfig modelCustomizerConfig;
 	
-	private ModelConfigImpl(ModelConfigBuilder builder) {
+	private ModelConfigImpl(Builder builder) {
 		this.schemaConfig = builder.schemaConfig;
 		this.addr = builder.addr;
 		this.modelConfigRoot = builder.modelConfigRoot;
@@ -116,7 +116,7 @@ public class ModelConfigImpl implements ModelConfig {
 		return modelCustomizerConfig != null;
 	}
 	
-	public static class ModelConfigBuilder {
+	public static class Builder {
 		private final XMLConfigWrapper config;
 		private final SchemaConfig schemaConfig;
 		private final Addr addr;
@@ -133,7 +133,7 @@ public class ModelConfigImpl implements ModelConfig {
 		private List<SchemaExtractor> schemaExtractors;
 		private ModelCustomizerConfig modelCustomizerConfig;
 		
-		public ModelConfigBuilder(SchemaConfig schemaConfig, String name, 
+		public Builder(SchemaConfig schemaConfig, String name, 
 				SchemaExtractorFactory schemaExtractorFactory, GeneralEvaluatorFactory evaluatorFactory) {
 			this.schemaConfig = schemaConfig;
 			this.addr = schemaConfig.getAddr().resolve(name);
@@ -156,7 +156,7 @@ public class ModelConfigImpl implements ModelConfig {
 			schemaFailOnParserNonFatalError = config.getBoolean("SchemaFailOnParserNonFatalError", true, false);
 			defaultOccursCount = config.getInt("DefaultOccursCount", 5, false);
 			schemaExtractors = schemaExtractorFactory.createSchemaExtractors(config, "SchemaExtractors");
-			modelCustomizerConfig = new ModelCustomizerConfigImpl.ModelCustomizerConfigBuilder(
+			modelCustomizerConfig = new ModelCustomizerConfigImpl.Builder(
 					config, modelConfigRoot, defaultOccursCount, evaluatorFactory).build();
 			return new ModelConfigImpl(this);
 		}

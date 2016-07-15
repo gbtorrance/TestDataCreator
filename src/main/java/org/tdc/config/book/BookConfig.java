@@ -15,9 +15,6 @@ public interface BookConfig {
 	Path getBookConfigRoot();
 	Map<String, DocTypeConfig> getDocTypeConfigs();
 	Map<String, PageConfig> getPageConfigs();
-	String getConfigSheetName();
-	int getConfigSheetBookAddrRow();
-	int getConfigSheetBookAddrCol();
 	CellStyle getDefaultStyle();
 	CellStyle getDefaultHeaderStyle();
 	CellStyle getDefaultColumnStyle();

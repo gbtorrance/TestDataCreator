@@ -31,7 +31,7 @@ public class ExcelSpreadsheet implements Spreadsheet {
 	private final XSSFSheet xssfSheet;
 	private final POICellStyleLookup poiCellStyleLookup = new POICellStyleLookup();
 	
-	private ExcelSpreadsheet(SpreadsheetBuilder builder) {
+	private ExcelSpreadsheet(Builder builder) {
 		this.xssfSheet = builder.xssfSheet;
 	}
 	
@@ -200,12 +200,12 @@ public class ExcelSpreadsheet implements Spreadsheet {
 		}
 	}
 	
-	public static class SpreadsheetBuilder {
+	public static class Builder {
 		private final XSSFWorkbook workbook;
 		
 		private XSSFSheet xssfSheet;
 		
-		public SpreadsheetBuilder(XSSFWorkbook workbook) {
+		public Builder(XSSFWorkbook workbook) {
 			this.workbook = workbook;
 		}
 		

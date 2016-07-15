@@ -34,7 +34,7 @@ public class BookConfigFactoryImpl implements BookConfigFactory {
 	public synchronized BookConfig getBookConfig(Addr addr) {
 		BookConfig bookConfig = cache.get(addr);
 		if (bookConfig == null) {
-			bookConfig = new BookConfigImpl.BookConfigBuilder(booksConfigRoot, addr, modelConfigFactory).build();
+			bookConfig = new BookConfigImpl.Builder(booksConfigRoot, addr, modelConfigFactory).build();
 			cache.put(addr, bookConfig);
 		}
 		else {

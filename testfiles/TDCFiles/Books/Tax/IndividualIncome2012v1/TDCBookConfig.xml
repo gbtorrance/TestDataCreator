@@ -19,6 +19,23 @@
 			<PageName>1040A</PageName>
 			<ModelAddress>/Tax/efile1040x_2012v3.0/Model_1040A</ModelAddress>
 			<DocTypeName>TaxReturn</DocTypeName>
+			<DocIDRows>
+				<Row type="case-num">
+					<Label>Test Case Number</Label>
+				</Row>
+				<Row type="set-name">
+					<Label>Test Set Name (optional)</Label>
+				</Row>
+				<Row type="doc-variable" variableName="SUBMISSION_ID">
+					<Label>Submission ID</Label>
+				</Row>
+				<Row type="note">
+					<Label>Note 1</Label>
+				</Row>
+				<Row type="note">
+					<Label>Note 2</Label>
+				</Row>
+			</DocIDRows>
 			<Columns>
 				<Column>
 					<HeaderLabels><Label>Description</Label></HeaderLabels>
@@ -53,11 +70,27 @@
 			<PageName>1040EZ</PageName>
 			<ModelAddress>/Tax/efile1040x_2012v3.0/Model_1040EZ</ModelAddress>
 			<DocTypeName>TaxReturn</DocTypeName>
+			<DocIDRows>
+				<Row type="case-num">
+					<Label>Test Case Number</Label>
+				</Row>
+				<Row type="set-name">
+					<Label>Test Set Name (optional)</Label>
+				</Row>
+			</DocIDRows>
 		</Page>
 		<Page>
 			<PageName>Manifest</PageName>
 			<ModelAddress>/Tax/efile1040x_2012v3.0/Model_Manifest</ModelAddress>
 			<DocTypeName>Manifest</DocTypeName>
+			<DocIDRows>
+				<Row type="case-num">
+					<Label>Test Case Number</Label>
+				</Row>
+				<Row type="set-name">
+					<Label>Test Set Name (optional)</Label>
+				</Row>
+			</DocIDRows>
 		</Page>
 	</Pages>
 	

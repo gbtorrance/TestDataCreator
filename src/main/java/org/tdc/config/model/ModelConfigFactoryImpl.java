@@ -41,7 +41,7 @@ public class ModelConfigFactoryImpl implements ModelConfigFactory {
 			SchemaConfig schemaConfig = schemaConfigFactory.getSchemaConfig(addr.getParentAddr());
 			SchemaExtractorFactory schemaExtractorFactory = new SchemaExtractorFactoryImpl();
 			GeneralEvaluatorFactory evaluatorFactory = GeneralEvaluatorFactoryImpl.createWithDefaultTypeEvaluators();
-			modelConfig = new ModelConfigImpl.ModelConfigBuilder(
+			modelConfig = new ModelConfigImpl.Builder(
 					schemaConfig, addr.getName(), schemaExtractorFactory, evaluatorFactory).build();
 			cache.put(addr, modelConfig);
 		}

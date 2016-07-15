@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.List;
 
 import org.tdc.config.book.BookConfig;
+import org.tdc.config.book.DocIDRowConfig;
 import org.tdc.config.book.PageColumnConfig;
 import org.tdc.config.book.PageConfig;
 import org.tdc.model.AttribNode;
@@ -14,6 +15,7 @@ import org.tdc.model.NonAttribNode;
 import org.tdc.model.TDCNode;
 import org.tdc.modelinst.ElementNodeInst;
 import org.tdc.modelinst.ModelInst;
+import org.tdc.modelinst.ModelInstFactory;
 import org.tdc.modelinst.NonAttribNodeInst;
 import org.tdc.spreadsheet.CellStyle;
 import org.tdc.spreadsheet.Spreadsheet;
@@ -21,65 +23,110 @@ import org.tdc.spreadsheet.SpreadsheetFile;
 import org.tdc.util.Util;
 
 /**
- * A {@link BookWriter} implementation.
+ * Implements functionality for writing a new {@link Book} spreadsheet file confirming to a {@link BookConfig}. 
  */
-public class BookWriterImpl implements BookWriter {
+public class BookFileWriter {
 	
 	private static final int COL_CUSTOM_BASE = 0;
 	
-	private final Book book;
-	private final SpreadsheetFile spreadsheetFile;
 	private final BookConfig config;
-	private final int nodeRowStart;
+	private final SpreadsheetFile spreadsheetFile;
+	private final ModelInstFactory modelInstFactory;
+	private final int docIDRowStart;
 	private final int dataColStart;
 	
 	private int maxColumns;
-	private Page currentPage;
 	private PageConfig currentPageConfig;
 	private Spreadsheet currentSheet;
+	private int headerRowStart;
+	private int nodeRowStart;
 	
-	public BookWriterImpl(Book book, SpreadsheetFile spreadsheetFile) {
-		this.book = book;
+	public BookFileWriter(BookConfig config, SpreadsheetFile spreadsheetFile, ModelInstFactory modelInstFactory) {
+		this.config = config;
 		this.spreadsheetFile = spreadsheetFile;
-		this.config = book.getConfig();
-		this.nodeRowStart = config.getHeaderRowCount() + 1;
+		this.modelInstFactory = modelInstFactory;
+		this.docIDRowStart = 1;
 		this.dataColStart = config.getTreeStructureColumnCount() + 1;
 	}
 
-	@Override
 	public void write() {
 		writePages();
 		writeConfigSheet();
 	}
 	
 	private void writePages() {
-		Collection<Page> pages = book.getPages().values();
-		for (Page page : pages) {
-			writePage(page);
+		Collection<PageConfig> pageConfigs = config.getPageConfigs().values();
+		for (PageConfig pageConfig : pageConfigs) {
+			writePage(pageConfig);
 		}
 	}
 	
-	private void writePage(Page page) {
+	private void writePage(PageConfig pageConfig) {
 		maxColumns = 0;
-		currentPage = page;
-		currentPageConfig = currentPage.getConfig();
-		currentSheet = spreadsheetFile.createSpreadsheet(currentPage.getName());
-		ModelInst modelInst = currentPage.getModelInst();
+		currentPageConfig = pageConfig;
+		currentSheet = spreadsheetFile.createSpreadsheet(currentPageConfig.getPageName());
+		headerRowStart = docIDRowStart + currentPageConfig.getDocIDRows().size();
+		nodeRowStart = headerRowStart + config.getHeaderRowCount();
+		ModelInst modelInst = modelInstFactory.getModelInst(currentPageConfig.getModelConfig());
 		ElementNodeInst rootElement = modelInst.getRootElement();
 		ModelWriterVisitor writerVisitor = new ModelWriterVisitor();
 		rootElement.accept(writerVisitor);
 		formatColumns();
+		writeDocIDRowLabels();
 		writeHeaderLabels();
 	}
 	
 	private void writeConfigSheet() {
-		Spreadsheet configSheet = spreadsheetFile.createSpreadsheet(config.getConfigSheetName());
+		Spreadsheet configSheet = spreadsheetFile.createSpreadsheet(
+				BookUtil.CONFIG_SHEET_NAME);
 		configSheet.setCellValue(
 				config.getAddr().toString(), 
-				config.getConfigSheetBookAddrRow(), config.getConfigSheetBookAddrCol());
-		spreadsheetFile.setSpreadsheetHidden(config.getConfigSheetName(), true);
+				BookUtil.CONFIG_SHEET_BOOK_ADDR_ROW, BookUtil.CONFIG_SHEET_BOOK_ADDR_COL);
+		spreadsheetFile.setSpreadsheetHidden(BookUtil.CONFIG_SHEET_NAME, true);
 	}
 	
+	private void formatColumns() {
+		int allowedColumns = config.getTreeStructureColumnCount(); 
+		if (allowedColumns < maxColumns) {
+			throw new RuntimeException("TreeStructureColumnCount (" + allowedColumns + 
+					") must be at least " + maxColumns + " to support this particular model");
+		}
+		for (int i = 1; i <= allowedColumns; i++) {
+			currentSheet.setColumnWidth(i, config.getTreeStructureColumnWidth());
+		}
+		List<PageColumnConfig> columns = currentPageConfig.getColumns(); 
+		for (int i = 0; i < columns.size(); i++) {
+			PageColumnConfig column = columns.get(i);
+			currentSheet.setColumnWidth(getDataCol(COL_CUSTOM_BASE) + i, column.getWidth());
+		}
+		currentSheet.freeze(getDataCol(COL_CUSTOM_BASE) + columns.size(), nodeRowStart);
+	}
+	
+	private void writeDocIDRowLabels() {
+		List<DocIDRowConfig> docIDRows = currentPageConfig.getDocIDRows();
+		CellStyle style = config.getDefaultHeaderStyle();
+		int rowCount = docIDRows.size();
+		for (int row = 0; row < rowCount; row++) {
+			DocIDRowConfig docIDRow = docIDRows.get(row);
+			currentSheet.setCellValue(docIDRow.getLabel(), docIDRowStart + row, 1, style);
+		}
+	}
+	
+	private void writeHeaderLabels() {
+		int rowCount = config.getHeaderRowCount();
+		CellStyle style = config.getDefaultHeaderStyle();
+		List<PageColumnConfig> columns = currentPageConfig.getColumns(); 
+		for (int row = 0; row < rowCount; row++) {
+			currentSheet.setCellValue(
+					config.getTreeStructureHeaderLabel(row+1), headerRowStart + row, 1, style);
+			for (int colIndex = 0; colIndex < columns.size(); colIndex++) {
+				PageColumnConfig column = columns.get(colIndex);
+				currentSheet.setCellValue(
+						column.getHeaderLabel(row+1), headerRowStart + row, getDataCol(COL_CUSTOM_BASE) + colIndex, style);
+			}
+		}
+	}
+
 	private void processAttribNode(AttribNode node) {
 		trackMaxColumns(node);
 
@@ -183,38 +230,6 @@ public class BookWriterImpl implements BookWriter {
 				value = Util.getStringValueFromProperty(node, propertyName, "");
 			}
 			currentSheet.setCellValue(value, getNodeRow(node), getDataCol(COL_CUSTOM_BASE) + i, style);
-		}
-	}
-
-	private void formatColumns() {
-		int allowedColumns = config.getTreeStructureColumnCount(); 
-		if (allowedColumns < maxColumns) {
-			throw new RuntimeException("TreeStructureColumnCount (" + allowedColumns + 
-					") must be at least " + maxColumns + " to support this particular model");
-		}
-		for (int i = 1; i <= allowedColumns; i++) {
-			currentSheet.setColumnWidth(i, config.getTreeStructureColumnWidth());
-		}
-		List<PageColumnConfig> columns = currentPageConfig.getColumns(); 
-		for (int i = 0; i < columns.size(); i++) {
-			PageColumnConfig column = columns.get(i);
-			currentSheet.setColumnWidth(getDataCol(COL_CUSTOM_BASE) + i, column.getWidth());
-		}
-		currentSheet.freeze(getDataCol(COL_CUSTOM_BASE) + columns.size(), config.getHeaderRowCount()+1);
-	}
-	
-	private void writeHeaderLabels() {
-		int rowCount = config.getHeaderRowCount();
-		CellStyle style = config.getDefaultHeaderStyle();
-		List<PageColumnConfig> columns = currentPageConfig.getColumns(); 
-		for (int row = 1; row <= rowCount; row++) {
-			currentSheet.setCellValue(
-					config.getTreeStructureHeaderLabel(row), row, 1, style);
-			for (int colIndex = 0; colIndex < columns.size(); colIndex++) {
-				PageColumnConfig column = columns.get(colIndex);
-				currentSheet.setCellValue(
-						column.getHeaderLabel(row), row, getDataCol(COL_CUSTOM_BASE) + colIndex, style);
-			}
 		}
 	}
 

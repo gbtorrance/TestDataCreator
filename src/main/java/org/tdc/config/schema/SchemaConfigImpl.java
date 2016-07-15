@@ -24,7 +24,7 @@ public class SchemaConfigImpl implements SchemaConfig {
 	private final Path schemaConfigRoot;
 	private final Path schemaFilesRoot;
 	
-	private SchemaConfigImpl(SchemaConfigBuilder builder) {
+	private SchemaConfigImpl(Builder builder) {
 		this.schemasConfigRoot = builder.schemasConfigRoot;
 		this.addr = builder.addr;
 		this.schemaConfigRoot = builder.schemaConfigRoot;
@@ -51,7 +51,7 @@ public class SchemaConfigImpl implements SchemaConfig {
 		return schemaFilesRoot;
 	}
 
-	public static class SchemaConfigBuilder {
+	public static class Builder {
 		private final XMLConfigWrapper config;
 		private final Path schemasConfigRoot;
 		private final Addr addr;
@@ -59,7 +59,7 @@ public class SchemaConfigImpl implements SchemaConfig {
 		
 		private Path schemaFilesRoot;
 		
-		public SchemaConfigBuilder(Path schemasConfigRoot, Addr addr) {
+		public Builder(Path schemasConfigRoot, Addr addr) {
 			log.info("Creating SchemaConfig: {}", addr);
 			this.schemasConfigRoot = schemasConfigRoot;
 			this.addr = addr;

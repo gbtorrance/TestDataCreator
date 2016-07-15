@@ -31,7 +31,7 @@ public class ModelCustomizerConfigImpl implements ModelCustomizerConfig {
 	private final int defaultOccursCount;
 	private final List<ModelCustomizerColumnConfig> columns;
 	
-	private ModelCustomizerConfigImpl(ModelCustomizerConfigBuilder builder) {
+	private ModelCustomizerConfigImpl(Builder builder) {
 		this.filePath = builder.filePath;
 		this.defaultStyle = builder.defaultStyle;
 		this.defaultHeaderStyle = builder.defaultHeaderStyle;
@@ -136,7 +136,7 @@ public class ModelCustomizerConfigImpl implements ModelCustomizerConfig {
 		return columns;
 	}
 	
-	public static class ModelCustomizerConfigBuilder {
+	public static class Builder {
 		private static final String CONFIG_PREFIX = "Customizer";
 
 		private final XMLConfigWrapper config;
@@ -161,7 +161,7 @@ public class ModelCustomizerConfigImpl implements ModelCustomizerConfig {
 		private boolean allowMinMaxInvalidOccursCountOverride;
 		private List<ModelCustomizerColumnConfig> columns; 
 		
-		public ModelCustomizerConfigBuilder(
+		public Builder(
 				XMLConfigWrapper config, Path modelConfigRoot, int defaultOccursCount, 
 				GeneralEvaluatorFactory evaluatorFactory) {
 			this.config = config;
@@ -192,7 +192,7 @@ public class ModelCustomizerConfigImpl implements ModelCustomizerConfig {
 						CONFIG_PREFIX + ".ReadOccursCountOverrideFromVariable", null, true);
 				allowMinMaxInvalidOccursCountOverride = config.getBoolean(
 						CONFIG_PREFIX + ".AllowMinMaxInvalidOccursCountOverride", false, false);
-				columns = new ModelCustomizerColumnConfigImpl.ModelCustomizerColumnConfigBuilder(
+				columns = new ModelCustomizerColumnConfigImpl.Builder(
 						config, evaluatorFactory, headerRowCount, defaultColumnStyle).buildAll();
 				custConfig = new ModelCustomizerConfigImpl(this);
 			}

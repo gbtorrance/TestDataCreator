@@ -22,21 +22,53 @@
 			<PageName>Page1</PageName>
 			<ModelAddress>/ConfigTest/SchemaConfigTest/ModelConfigTest</ModelAddress>
 			<DocTypeName>DocType1</DocTypeName>
+			<DocIDRows>
+				<Row type="case-num">
+					<Label>Test Case Number</Label>
+				</Row>
+				<Row type="set-name">
+					<Label>Test Set Name (optional)</Label>
+				</Row>
+			</DocIDRows>
 		</Page>	
 		<Page>
 			<PageName>Page2</PageName>
 			<ModelAddress>/ConfigTest/SchemaConfigTest/ModelConfigTest</ModelAddress>
 			<DocTypeName>DocType2</DocTypeName>
+			<DocIDRows>
+				<Row type="case-num">
+					<Label>Test Case Number</Label>
+				</Row>
+				<Row type="set-name">
+					<Label>Test Set Name (optional)</Label>
+				</Row>
+			</DocIDRows>
 		</Page>
 		<Page>
 			<PageName>Page3</PageName>
 			<ModelAddress>/ConfigTest/SchemaConfigTest/ModelConfigTest</ModelAddress>
 			<DocTypeName>DocType3</DocTypeName>
+			<DocIDRows>
+				<Row type="case-num">
+					<Label>Test Case Number</Label>
+				</Row>
+				<Row type="set-name">
+					<Label>Test Set Name (optional)</Label>
+				</Row>
+			</DocIDRows>
 		</Page>	
 		<Page>
 			<PageName>Page4</PageName>
 			<ModelAddress>/ConfigTest/SchemaConfigTest/ModelConfigTest</ModelAddress>
 			<DocTypeName>DocType1</DocTypeName>  <!-- use one that was used before --> 
+			<DocIDRows>
+				<Row type="case-num">
+					<Label>Test Case Number</Label>
+				</Row>
+				<Row type="set-name">
+					<Label>Test Set Name (optional)</Label>
+				</Row>
+			</DocIDRows>
 		</Page>	
 	</Pages>
 
