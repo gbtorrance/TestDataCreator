@@ -12,11 +12,15 @@ public class DocIDRowConfigImpl implements DocIDRowConfig {
 	private final DocIDType docIDType;
 	private final String docVariableName;
 	private final String label;
+	private final int index;
+	private final int rowNum;
 	
 	public DocIDRowConfigImpl(Builder builder) {
 		this.docIDType = builder.docIDType;
 		this.docVariableName = builder.docVariableName;
 		this.label = builder.label;
+		this.index = builder.index;
+		this.rowNum = builder.docIDRowStart + index;
 	}
 	
 	@Override
@@ -34,19 +38,32 @@ public class DocIDRowConfigImpl implements DocIDRowConfig {
 		return label;
 	}
 	
+	@Override
+	public int getIndex() {
+		return index;
+	}
+	
+	@Override
+	public int getRowNum() {
+		return rowNum;
+	}
+	
 	public static class Builder {
 		private static final String CONFIG_PREFIX = ".DocIDRows.Row";
 
 		private final XMLConfigWrapper config;
 		private final String pageKey;
+		private final int docIDRowStart;
 		
 		private DocIDType docIDType;
 		private String docVariableName;
 		private String label;
+		private int index;
 		
-		public Builder(XMLConfigWrapper config, String pageKey) {
+		public Builder(XMLConfigWrapper config, String pageKey, int docIDRowStart) {
 			this.config = config;
 			this.pageKey = pageKey;
+			this.docIDRowStart = docIDRowStart;
 		}
 		
 		public List<DocIDRowConfig> buildAll() {
@@ -54,8 +71,8 @@ public class DocIDRowConfigImpl implements DocIDRowConfig {
 			int count = config.getCount(pageKey + CONFIG_PREFIX);
 			int caseNumTypeCount = 0;
 			int setNameTypeCount = 0;
-			for (int i = 0; i < count; i++) {
-				DocIDRowConfig row = build(i);
+			for (index = 0; index < count; index++) {
+				DocIDRowConfig row = build();
 				rows.add(row);
 				if (row.getType() == DocIDType.CASE_NUM) {
 					caseNumTypeCount++;
@@ -75,7 +92,7 @@ public class DocIDRowConfigImpl implements DocIDRowConfig {
 			return rows;
 		}
 	
-		private DocIDRowConfig build(int index) {
+		private DocIDRowConfig build() {
 			String indexPrefix = pageKey + CONFIG_PREFIX + "(" + index + ")";
 			String type = config.getString(indexPrefix + "[@type]", null, true);
 			try {

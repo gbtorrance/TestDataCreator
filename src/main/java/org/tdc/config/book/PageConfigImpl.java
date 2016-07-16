@@ -21,15 +21,29 @@ public class PageConfigImpl implements PageConfig {
 	private final String pageName;
 	private final ModelConfig modelConfig;
 	private final DocTypeConfig docTypeConfig;
-	private final List<PageColumnConfig> columns;
+	private final List<PageNodeDetailColumnConfig> nodeDetailColumns;
 	private final List<DocIDRowConfig> docIDRows;
+	private final int docIDRowStart;
+	private final int docIDRowLabelCol;
+	private final int headerRowStart;
+	private final int nodeRowStart;
+	private final int nodeColStart;
+	private final int nodeDetailColStart;
+	private final int testDocColStart;
 	
 	private PageConfigImpl(Builder builder) {
 		this.pageName = builder.pageName;
 		this.modelConfig = builder.modelConfig;
 		this.docTypeConfig = builder.docTypeConfig;
-		this.columns = Collections.unmodifiableList(builder.columns); // unmodifiable
+		this.nodeDetailColumns = Collections.unmodifiableList(builder.nodeDetailColumns); // unmodifiable
 		this.docIDRows = Collections.unmodifiableList(builder.docIDRows); // unmodifiable
+		this.docIDRowStart = builder.docIDRowStart;
+		this.docIDRowLabelCol = builder.docIDRowLabelCol;
+		this.headerRowStart = builder.headerRowStart;
+		this.nodeRowStart = builder.nodeRowStart;
+		this.nodeColStart = builder.nodeColStart;
+		this.nodeDetailColStart = builder.nodeDetailColStart;
+		this.testDocColStart = builder.testDocColStart;
 	}
 
 	@Override
@@ -48,13 +62,48 @@ public class PageConfigImpl implements PageConfig {
 	}
 	
 	@Override
-	public List<PageColumnConfig> getColumns() {
-		return columns;
+	public List<PageNodeDetailColumnConfig> getNodeDetailColumns() {
+		return nodeDetailColumns;
 	}
 	
 	@Override
 	public List<DocIDRowConfig> getDocIDRows() {
 		return docIDRows;
+	}
+
+	@Override
+	public int getDocIDRowStart() {
+		return docIDRowStart;
+	}
+	
+	@Override
+	public int getDocIDRowLabelCol() {
+		return docIDRowLabelCol;
+	}
+
+	@Override
+	public int getHeaderRowStart() {
+		return headerRowStart;
+	}
+
+	@Override
+	public int getNodeRowStart() {
+		return nodeRowStart;
+	}
+
+	@Override
+	public int getNodeColStart() {
+		return nodeColStart;
+	}
+
+	@Override
+	public int getNodeDetailColStart() {
+		return nodeDetailColStart;
+	}
+
+	@Override
+	public int getTestDocColStart() {
+		return testDocColStart;
 	}
 	
 	public static class Builder {
@@ -64,22 +113,33 @@ public class PageConfigImpl implements PageConfig {
 		private final Map<String, DocTypeConfig> docTypeConfigs;
 		private final ModelConfigFactory modelConfigFactory;
 		private final int headerRowCount;
-		private final CellStyle defaultColumnStyle;
+		private final CellStyle defaultNodeDetailColumnStyle;
+		private final int docIDRowStart;
+		private final int docIDRowLabelCol;
+		private final int nodeColStart;
+		private final int nodeDetailColStart;
 
 		private String pageName;
 		private ModelConfig modelConfig;
 		private DocTypeConfig docTypeConfig;
-		private List<PageColumnConfig> columns;
+		private List<PageNodeDetailColumnConfig> nodeDetailColumns;
 		private List<DocIDRowConfig> docIDRows;
+		private int headerRowStart;
+		private int nodeRowStart;
+		private int testDocColStart;
 		
 		public Builder(XMLConfigWrapper config, 
 				Map<String, DocTypeConfig> docTypeConfigs, ModelConfigFactory modelConfigFactory,
-				int headerRowCount, CellStyle defaultColumnStyle) {
+				int nodeColumnCount, int headerRowCount, CellStyle defaultNodeDetailColumnStyle) {
 			this.config = config;
 			this.docTypeConfigs = docTypeConfigs;
 			this.modelConfigFactory = modelConfigFactory;
 			this.headerRowCount = headerRowCount;
-			this.defaultColumnStyle = defaultColumnStyle;
+			this.defaultNodeDetailColumnStyle = defaultNodeDetailColumnStyle;
+			this.docIDRowStart = 1;
+			this.docIDRowLabelCol = 1;
+			this.nodeColStart = 1;
+			this.nodeDetailColStart = nodeColStart + nodeColumnCount;
 		}
 		
 		public Map<String, PageConfig> buildAll() {
@@ -115,9 +175,17 @@ public class PageConfigImpl implements PageConfig {
 				throw new IllegalStateException("Unable to locate DocType '" + docTypeName + 
 						"' for Page '" + pageName + "'");
 			}
-			columns = new PageColumnConfigImpl.Builder(
-					config, indexPrefix, headerRowCount, defaultColumnStyle).buildAll();
-			docIDRows = new DocIDRowConfigImpl.Builder(config, indexPrefix).buildAll();
+
+			nodeDetailColumns = new PageNodeDetailColumnConfigImpl.Builder(
+					config, indexPrefix, headerRowCount, 
+					defaultNodeDetailColumnStyle, nodeDetailColStart).buildAll();
+
+			docIDRows = new DocIDRowConfigImpl.Builder(config, indexPrefix, docIDRowStart).buildAll();
+
+			headerRowStart = docIDRowStart + docIDRows.size();
+			nodeRowStart = headerRowStart + headerRowCount;
+			testDocColStart = nodeDetailColStart + nodeDetailColumns.size();
+			
 			return new PageConfigImpl(this);
 		}
 	}

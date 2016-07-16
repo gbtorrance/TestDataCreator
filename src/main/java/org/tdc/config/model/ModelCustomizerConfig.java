@@ -12,18 +12,22 @@ public interface ModelCustomizerConfig {
 	Path getFilePath();
 	CellStyle getDefaultStyle();
 	CellStyle getDefaultHeaderStyle();
-	CellStyle getDefaultColumnStyle();
+	CellStyle getDefaultNodeDetailColumnStyle();
 	CellStyle getDefaultNodeStyle();
 	CellStyle getParentNodeStyle();
 	CellStyle getAttribNodeStyle();
 	CellStyle getCompositorNodeStyle();
 	CellStyle getChoiceMarkerStyle();
-	int getTreeStructureColumnCount();
-	int getTreeStructureColumnWidth();
+	int getNodeColumnCount();
+	int getNodeColumnWidth();
 	int getHeaderRowCount();
-	String getTreeStructureHeaderLabel(int headerRowNum);
+	String getNodeHeaderLabel(int headerRowNum);
 	String getReadOccursCountOverrideFromVariable();
 	boolean getAllowMinMaxInvalidOccursCountOverride();
 	int getDefaultOccursCount();
-	List<ModelCustomizerColumnConfig> getColumns();
+	List<ModelCustomizerColumnConfig> getNodeDetailColumns();
+	int getHeaderRowStart();
+	int getNodeRowStart();
+	int getNodeColStart();
+	int getNodeDetailColStart();
 }

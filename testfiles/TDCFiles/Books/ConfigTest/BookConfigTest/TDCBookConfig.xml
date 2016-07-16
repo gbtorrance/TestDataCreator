@@ -79,9 +79,9 @@
 	<DefaultHeaderStyle>
 		<Bold>true</Bold>
 	</DefaultHeaderStyle>
-	<DefaultColumnStyle>
+	<DefaultNodeDetailColumnStyle>
 		<ShrinkToFit>true</ShrinkToFit>
-	</DefaultColumnStyle>
+	</DefaultNodeDetailColumnStyle>
 	<DefaultNodeStyle>
 		<FontHeight>10</FontHeight>
 	</DefaultNodeStyle>
@@ -104,7 +104,7 @@
 		<FontName>Calibri</FontName>
 		<ColorRGB>255 0 0</ColorRGB> <!-- red -->
 	</ChoiceMarkerStyle>
-	<TreeStructureColumnCount>12</TreeStructureColumnCount>
-	<TreeStructureColumnWidth>500</TreeStructureColumnWidth>
+	<NodeColumnCount>12</NodeColumnCount>
+	<NodeColumnWidth>500</NodeColumnWidth>
 	
 </Config>

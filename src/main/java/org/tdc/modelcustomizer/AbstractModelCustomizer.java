@@ -21,13 +21,10 @@ public abstract class AbstractModelCustomizer {
 	private static final Logger log = LoggerFactory.getLogger(AbstractModelCustomizer.class);
 	
 	protected static final String CUSTOMIZER_SHEET_NAME = "Customizer";
-	protected static final int COL_CUSTOM_BASE = 0;
 	
 	private final ElementNodeDef rootElement;
 	private final ModelCustomizerConfig config; 
 	private final SpreadsheetFile spreadsheetFile;
-	private final int nodeRowStart;
-	private final int dataColStart;
 	
 	private Spreadsheet customizerSheet;
 	
@@ -43,8 +40,6 @@ public abstract class AbstractModelCustomizer {
 		this.rootElement = rootElement;
 		this.config = config;
 		this.spreadsheetFile = spreadsheetFile;
-		this.nodeRowStart = config.getHeaderRowCount() + 1;
-		this.dataColStart = config.getTreeStructureColumnCount() + 1;
 	}
 	
 	protected final ElementNodeDef getRootElement() {
@@ -66,24 +61,12 @@ public abstract class AbstractModelCustomizer {
 		return config;
 	}
 	
-	protected final int getNodeRowStart() {
-		return nodeRowStart;
-	}
-	
-	protected final int getDataColStart() {
-		return dataColStart;
-	}
-	
 	protected final int getNodeRow(TDCNode node) {
-		return nodeRowStart + node.getRowOffset();
+		return config.getNodeRowStart() + node.getRowOffset();
 	}
 	
 	protected final int getNodeCol(TDCNode node) {
-		return 1 + node.getColOffset();
-	}
-	
-	protected final int getDataCol(int dataColOffset) {
-		return dataColStart + dataColOffset;
+		return config.getNodeColStart() + node.getColOffset();
 	}
 	
 	protected void processTree() {

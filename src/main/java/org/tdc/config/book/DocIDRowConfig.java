@@ -7,4 +7,6 @@ public interface DocIDRowConfig {
 	DocIDType getType();
 	String getDocVariableName();
 	String getLabel();
+	int getIndex();
+	int getRowNum();
 }

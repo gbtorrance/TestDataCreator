@@ -11,6 +11,13 @@ public interface PageConfig {
 	String getPageName();
 	ModelConfig getModelConfig();
 	DocTypeConfig getDocTypeConfig();
-	List<PageColumnConfig> getColumns();
+	List<PageNodeDetailColumnConfig> getNodeDetailColumns();
 	List<DocIDRowConfig> getDocIDRows();
+	int getDocIDRowStart();
+	int getDocIDRowLabelCol();
+	int getHeaderRowStart();
+	int getNodeRowStart();
+	int getNodeColStart();
+	int getNodeDetailColStart();
+	int getTestDocColStart();
 }

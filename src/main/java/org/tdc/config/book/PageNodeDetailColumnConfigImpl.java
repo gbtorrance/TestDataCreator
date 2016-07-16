@@ -7,21 +7,25 @@ import org.tdc.config.XMLConfigWrapper;
 import org.tdc.spreadsheet.CellStyle;
 
 /**
- * A {@link PageColumnConfigImpl} implementation.
+ * A {@link PageNodeDetailColumnConfigImpl} implementation.
  */
-public class PageColumnConfigImpl implements PageColumnConfig {
+public class PageNodeDetailColumnConfigImpl implements PageNodeDetailColumnConfig {
 	private final String[] headerLabels;
 	private final int width;
 	private final CellStyle style;
 	private final String readFromVariable;
 	private final String readFromProperty;
+	private final int index;
+	private final int colNum;
 	
-	private PageColumnConfigImpl(Builder builder) {
+	private PageNodeDetailColumnConfigImpl(Builder builder) {
 		this.headerLabels = builder.headerLabels;
 		this.width = builder.width;
 		this.style = builder.style;
 		this.readFromVariable = builder.readFromVariable;
 		this.readFromProperty = builder.readFromProperty;
+		this.index = builder.index;
+		this.colNum = builder.nodeDetailColStart + index;
 	}
 
 	@Override
@@ -48,45 +52,58 @@ public class PageColumnConfigImpl implements PageColumnConfig {
 	public String getReadFromProperty() {
 		return readFromProperty;
 	}
-
+	
+	@Override
+	public int getIndex() {
+		return index;
+	}
+	
+	@Override
+	public int getColNum() {
+		return colNum;
+	}
+	
 	public static class Builder {
-		private static final String CONFIG_PREFIX = ".Columns.Column";
+		private static final String CONFIG_PREFIX = ".NodeDetailColumns.Column";
 
 		private final XMLConfigWrapper config;
 		private final String pageKey;
 		private final int headerRowCount;
-		private final CellStyle defaultColumnStyle;
+		private final CellStyle defaultNodeDetailColumnStyle;
+		private final int nodeDetailColStart;
 		
 		private String[] headerLabels;
 		private int width;
 		private CellStyle style;
 		private String readFromVariable;
 		private String readFromProperty;
+		private int index;
 		
-		public Builder(XMLConfigWrapper config, 
-				String pageKey, int headerRowCount, CellStyle defaultColumnStyle) {
+		public Builder(XMLConfigWrapper config, String pageKey, 
+				int headerRowCount, CellStyle defaultNodeDetailColumnStyle, int nodeDetailColStart) {
 			this.config = config;
 			this.pageKey = pageKey;
 			this.headerRowCount = headerRowCount;
-			this.defaultColumnStyle = defaultColumnStyle;
+			this.defaultNodeDetailColumnStyle = defaultNodeDetailColumnStyle;
+			this.nodeDetailColStart = nodeDetailColStart;
 		}
 		
-		public List<PageColumnConfig> buildAll() {
-			List<PageColumnConfig> columns = new ArrayList<>();
+		public List<PageNodeDetailColumnConfig> buildAll() {
+			List<PageNodeDetailColumnConfig> columns = new ArrayList<>();
 			int count = config.getCount(pageKey + CONFIG_PREFIX);
-			for (int i = 0; i < count; i++) {
-				PageColumnConfig column = build(i);
+			for (index = 0; index < count; index++) {
+				PageNodeDetailColumnConfig column = build();
 				columns.add(column);
 			}
 			return columns;
 		}
 	
-		private PageColumnConfig build(int index) {
+		private PageNodeDetailColumnConfig build() {
 			String indexPrefix = pageKey + CONFIG_PREFIX + "(" + index + ").";
 			headerLabels = config.getHeaderLabels(
 					indexPrefix + "HeaderLabels", headerRowCount);
 			width = config.getInt(indexPrefix + "Width", 0, true);
-			style = config.getCellStyle(indexPrefix + "Style", defaultColumnStyle, false);
+			style = config.getCellStyle(indexPrefix + "Style", defaultNodeDetailColumnStyle, false);
 			readFromVariable = config.getString(
 					indexPrefix + "ReadFromVariable", null, false);
 			readFromProperty = config.getString(
@@ -97,7 +114,7 @@ public class PageColumnConfigImpl implements PageColumnConfig {
 						"One and only one of ReadFromVariable or ReadFromProperty must be specified for: " + 
 						indexPrefix);
 			}
-			return new PageColumnConfigImpl(this);
+			return new PageNodeDetailColumnConfigImpl(this);
 		}
 	}
 }

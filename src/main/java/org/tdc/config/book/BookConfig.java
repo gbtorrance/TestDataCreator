@@ -17,15 +17,15 @@ public interface BookConfig {
 	Map<String, PageConfig> getPageConfigs();
 	CellStyle getDefaultStyle();
 	CellStyle getDefaultHeaderStyle();
-	CellStyle getDefaultColumnStyle();
+	CellStyle getDefaultNodeDetailColumnStyle();
 	CellStyle getDefaultNodeStyle();
 	CellStyle getParentNodeStyle();
 	CellStyle getAttribNodeStyle();
 	CellStyle getCompositorNodeStyle();
 	CellStyle getChoiceMarkerStyle();
 	CellStyle getOccurMarkerStyle();
-	int getTreeStructureColumnCount();
-	int getTreeStructureColumnWidth();
+	int getNodeColumnCount();
+	int getNodeColumnWidth();
 	int getHeaderRowCount();
-	String getTreeStructureHeaderLabel(int headerRowNum);
+	String getNodeHeaderLabel(int headerRowNum);
 }

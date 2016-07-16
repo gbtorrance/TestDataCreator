@@ -75,8 +75,8 @@ public class ModelConfigTest {
 		assertThat(cust.getChoiceMarkerStyle().getFontName()).isEqualTo("Calibri");
 		assertThat(cust.getChoiceMarkerStyle().getFontHeight()).isEqualTo(15);
 		assertThat(cust.getChoiceMarkerStyle().getColor()).isEqualTo(new Color(255, 0, 0));
-		assertThat(cust.getTreeStructureColumnCount()).isEqualTo(12);
-		assertThat(cust.getTreeStructureColumnWidth()).isEqualTo(500);
+		assertThat(cust.getNodeColumnCount()).isEqualTo(12);
+		assertThat(cust.getNodeColumnWidth()).isEqualTo(500);
 		assertThat(cust.getAllowMinMaxInvalidOccursCountOverride()).isEqualTo(true);
 	}
 	

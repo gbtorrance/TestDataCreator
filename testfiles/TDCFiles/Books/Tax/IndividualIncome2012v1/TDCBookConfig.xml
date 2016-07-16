@@ -36,7 +36,7 @@
 					<Label>Note 2</Label>
 				</Row>
 			</DocIDRows>
-			<Columns>
+			<NodeDetailColumns>
 				<Column>
 					<HeaderLabels><Label>Description</Label></HeaderLabels>
 					<Width>5000</Width>
@@ -64,7 +64,7 @@
 					<Width>2000</Width>
 					<ReadFromProperty>DispOccurs</ReadFromProperty>
 				</Column>
-			</Columns>
+			</NodeDetailColumns>
 		</Page>	
 		<Page>
 			<PageName>1040EZ</PageName>
@@ -101,9 +101,9 @@
 	<DefaultHeaderStyle>
 		<Bold>true</Bold>
 	</DefaultHeaderStyle>
-	<DefaultColumnStyle>
+	<DefaultNodeDetailColumnStyle>
 		<ShrinkToFit>true</ShrinkToFit>
-	</DefaultColumnStyle>
+	</DefaultNodeDetailColumnStyle>
 	<DefaultNodeStyle/>
 	<ParentNodeStyle>
 		<ColorRGB>0 0 255</ColorRGB> <!-- blue -->
@@ -122,11 +122,11 @@
 		<FontHeight>10</FontHeight>
 		<ColorRGB>107 36 12</ColorRGB> <!-- brown -->
 	</OccurMarkerStyle>
+	<NodeColumnCount>25</NodeColumnCount>
+	<NodeColumnWidth>500</NodeColumnWidth>
 	<HeaderRowCount>2</HeaderRowCount>
-	<TreeStructureHeaderLabels>
+	<NodeHeaderLabels>
 		<Label>Document Structure</Label>
-	</TreeStructureHeaderLabels>
-	<TreeStructureColumnCount>25</TreeStructureColumnCount>
-	<TreeStructureColumnWidth>500</TreeStructureColumnWidth>
+	</NodeHeaderLabels>
 	
 </Config>

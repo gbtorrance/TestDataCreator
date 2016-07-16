@@ -39,8 +39,8 @@
 			<FontHeight>15</FontHeight>
 			<ColorRGB>255 0 0</ColorRGB> <!-- red -->
 		</ChoiceMarkerStyle>
-		<TreeStructureColumnCount>12</TreeStructureColumnCount>
-		<TreeStructureColumnWidth>500</TreeStructureColumnWidth>
+		<NodeColumnCount>12</NodeColumnCount>
+		<NodeColumnWidth>500</NodeColumnWidth>
 		<ReadOccursCountOverrideFromVariable>OCCURS_COUNT_OVERRIDE</ReadOccursCountOverrideFromVariable>
 		<AllowMinMaxInvalidOccursCountOverride>true</AllowMinMaxInvalidOccursCountOverride>
 	</Customizer>

@@ -15,6 +15,7 @@ import org.tdc.model.MPathIndex;
 import org.tdc.model.NonAttribNode;
 import org.tdc.model.TDCNode;
 import org.tdc.modeldef.ElementNodeDef;
+import org.tdc.modeldef.NodeDef;
 import org.tdc.spreadsheet.CellStyle;
 import org.tdc.spreadsheet.SpreadsheetFile;
 
@@ -25,12 +26,12 @@ public class ModelCustomizerWriter extends AbstractModelCustomizer {
 
 	private static final Logger log = LoggerFactory.getLogger(ModelCustomizerWriter.class);
 	
-	private final MPathIndex prevModelMPathIndex;
+	private final MPathIndex<NodeDef> prevModelMPathIndex;
 
 	private int maxColumns;
 	
 	public ModelCustomizerWriter(ElementNodeDef rootElement, ModelCustomizerConfig config, 
-			SpreadsheetFile spreadsheetFile, MPathIndex prevModelMPathIndex) {
+			SpreadsheetFile spreadsheetFile, MPathIndex<NodeDef> prevModelMPathIndex) {
 		super(rootElement, config, spreadsheetFile);
 		this.prevModelMPathIndex = prevModelMPathIndex;
 	}
@@ -94,7 +95,7 @@ public class ModelCustomizerWriter extends AbstractModelCustomizer {
 	}
 	
 	private void outputCustomColumns(TDCNode node) {
-		List<ModelCustomizerColumnConfig> columns = getConfig().getColumns(); 
+		List<ModelCustomizerColumnConfig> columns = getConfig().getNodeDetailColumns(); 
 		for (int i = 0; i < columns.size(); i++) {
 			ModelCustomizerColumnConfig column = columns.get(i);
 			CellStyle style = column.getStyle();
@@ -109,7 +110,7 @@ public class ModelCustomizerWriter extends AbstractModelCustomizer {
 			if (result instanceof ValuePlusStyleResult) {
 				style = ((ValuePlusStyleResult)result).getCellStyle();
 			}
-			getCustomizerSheet().setCellValue(result.getValue(), getNodeRow(node), getDataCol(COL_CUSTOM_BASE) + i, style);
+			getCustomizerSheet().setCellValue(result.getValue(), getNodeRow(node), column.getColNum(), style);
 		}
 	}
 
@@ -119,33 +120,33 @@ public class ModelCustomizerWriter extends AbstractModelCustomizer {
 	}
 
 	private void formatColumns() {
-		int allowedColumns = getConfig().getTreeStructureColumnCount(); 
+		int allowedColumns = getConfig().getNodeColumnCount(); 
 		if (allowedColumns < maxColumns) {
 			throw new RuntimeException("TreeStructureColumnCount (" + allowedColumns + 
 					") must be at least " + maxColumns + " to support this particular model");
 		}
 		for (int i = 1; i <= allowedColumns; i++) {
-			getCustomizerSheet().setColumnWidth(i, getConfig().getTreeStructureColumnWidth());
+			getCustomizerSheet().setColumnWidth(i, getConfig().getNodeColumnWidth());
 		}
-		List<ModelCustomizerColumnConfig> columns = getConfig().getColumns(); 
+		List<ModelCustomizerColumnConfig> columns = getConfig().getNodeDetailColumns(); 
 		for (int i = 0; i < columns.size(); i++) {
 			ModelCustomizerColumnConfig column = columns.get(i);
-			getCustomizerSheet().setColumnWidth(getDataCol(COL_CUSTOM_BASE) + i, column.getWidth());
+			getCustomizerSheet().setColumnWidth(column.getColNum(), column.getWidth());
 		}
-		getCustomizerSheet().freeze(getConfig().getTreeStructureColumnCount()+1, getConfig().getHeaderRowCount()+1);
+		getCustomizerSheet().freeze(getConfig().getNodeDetailColStart(), getConfig().getNodeRowStart());
 	}
 
 	private void writeHeaderLabels() {
 		int rowCount = getConfig().getHeaderRowCount();
 		CellStyle style = getConfig().getDefaultHeaderStyle();
-		List<ModelCustomizerColumnConfig> columns = getConfig().getColumns(); 
+		List<ModelCustomizerColumnConfig> columns = getConfig().getNodeDetailColumns(); 
 		for (int row = 1; row <= rowCount; row++) {
 			getCustomizerSheet().setCellValue(
-					getConfig().getTreeStructureHeaderLabel(row), row, 1, style);
+					getConfig().getNodeHeaderLabel(row), row, 1, style);
 			for (int colIndex = 0; colIndex < columns.size(); colIndex++) {
 				ModelCustomizerColumnConfig column = columns.get(colIndex);
 				getCustomizerSheet().setCellValue(
-						column.getHeaderLabel(row), row, getDataCol(COL_CUSTOM_BASE) + colIndex, style);
+						column.getHeaderLabel(row), row, column.getColNum(), style);
 			}
 		}
 	}

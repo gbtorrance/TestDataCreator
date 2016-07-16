@@ -72,12 +72,12 @@ public class ModelCustomizerReader extends AbstractModelCustomizer {
 
 	private void readCustomColumns(TDCNode node) {
 		NodeDef nodeDef = (NodeDef)node; // cast so we can set variables;
-		List<ModelCustomizerColumnConfig> columns = getConfig().getColumns(); 
+		List<ModelCustomizerColumnConfig> columns = getConfig().getNodeDetailColumns(); 
 		for (int i = 0; i < columns.size(); i++) {
 			ModelCustomizerColumnConfig column = columns.get(i);
 			String variable = column.getStoreValueWithVariableName();
 			if (variable != null && !variable.equals("")) {
-				String value = getCustomizerSheet().getCellValue(getNodeRow(node), getDataCol(COL_CUSTOM_BASE) + i).trim();
+				String value = getCustomizerSheet().getCellValue(getNodeRow(node), column.getColNum()).trim();
 				nodeDef.setVariable(variable, value);
 			}
 		}

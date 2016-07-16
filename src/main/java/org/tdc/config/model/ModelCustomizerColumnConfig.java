@@ -13,4 +13,6 @@ public interface ModelCustomizerColumnConfig {
 	Evaluator getInitAsNewEvaluator();
 	Evaluator getInitFromPrevEvaluator();
 	String getStoreValueWithVariableName();
+	int getIndex();
+	int getColNum();
 }

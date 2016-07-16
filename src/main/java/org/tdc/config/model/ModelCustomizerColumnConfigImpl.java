@@ -19,6 +19,8 @@ public class ModelCustomizerColumnConfigImpl implements ModelCustomizerColumnCon
 	private final Evaluator initAsNewEvaluator;
 	private final Evaluator initFromPrevEvaluator;
 	private final String storeValueWithVariableName;
+	private final int index;
+	private final int colNum;
 	
 	private ModelCustomizerColumnConfigImpl(Builder builder) {
 		this.headerLabels = builder.headerLabels;
@@ -27,6 +29,8 @@ public class ModelCustomizerColumnConfigImpl implements ModelCustomizerColumnCon
 		this.initAsNewEvaluator = builder.initAsNewEvaluator;
 		this.initFromPrevEvaluator = builder.initFromPrevEvaluator;
 		this.storeValueWithVariableName = builder.storeValueWithVariableName;
+		this.index = builder.index;
+		this.colNum = builder.nodeDetailColStart + index;
 	}
 
 	@Override
@@ -58,14 +62,25 @@ public class ModelCustomizerColumnConfigImpl implements ModelCustomizerColumnCon
 	public String getStoreValueWithVariableName() {
 		return storeValueWithVariableName;
 	}
+	
+	@Override
+	public int getIndex() {
+		return index;
+	}
 
+	@Override
+	public int getColNum() {
+		return colNum;
+	}
+	
 	public static class Builder {
-		private static final String CONFIG_PREFIX = "Customizer.Columns.Column";
+		private static final String CONFIG_PREFIX = "Customizer.NodeDetailColumns.Column";
 
 		private final XMLConfigWrapper config;
 		private final GeneralEvaluatorFactory evaluatorFactory;
 		private final int headerRowCount;
-		private final CellStyle defaultColumnStyle;
+		private final CellStyle defaultNodeDetailColumnStyle;
+		private final int nodeDetailColStart;
 		
 		private String[] headerLabels;
 		private int width;
@@ -73,31 +88,35 @@ public class ModelCustomizerColumnConfigImpl implements ModelCustomizerColumnCon
 		private Evaluator initAsNewEvaluator;
 		private Evaluator initFromPrevEvaluator;
 		private String storeValueWithVariableName;
+		private int index;
 		
 		public Builder(XMLConfigWrapper config, 
-				GeneralEvaluatorFactory evaluatorFactory, int headerRowCount, CellStyle defaultColumnStyle) {
+				GeneralEvaluatorFactory evaluatorFactory, int headerRowCount, 
+				CellStyle defaultNodeDetailColumnStyle, int nodeDetailColStart) {
+			
 			this.config = config;
 			this.evaluatorFactory = evaluatorFactory;
 			this.headerRowCount = headerRowCount;
-			this.defaultColumnStyle = defaultColumnStyle;
+			this.defaultNodeDetailColumnStyle = defaultNodeDetailColumnStyle;
+			this.nodeDetailColStart = nodeDetailColStart;
 		}
 		
 		public List<ModelCustomizerColumnConfig> buildAll() {
 			List<ModelCustomizerColumnConfig> columns = new ArrayList<>();
 			int count = config.getCount(CONFIG_PREFIX);
-			for (int i = 0; i < count; i++) {
-				ModelCustomizerColumnConfig column = build(i);
+			for (index = 0; index < count; index++) {
+				ModelCustomizerColumnConfig column = build();
 				columns.add(column);
 			}
 			return columns;
 		}
 	
-		private ModelCustomizerColumnConfig build(int index) {
+		private ModelCustomizerColumnConfig build() {
 			String indexPrefix = CONFIG_PREFIX + "(" + index + ").";
 			headerLabels = config.getHeaderLabels(
 					indexPrefix + "HeaderLabels", headerRowCount);
 			width = config.getInt(indexPrefix + "Width", 0, true);
-			style = config.getCellStyle(indexPrefix + "Style", defaultColumnStyle, false);
+			style = config.getCellStyle(indexPrefix + "Style", defaultNodeDetailColumnStyle, false);
 			initAsNewEvaluator = evaluatorFactory.createEvaluator(
 					config, indexPrefix + "InitializeAsNew.Evaluator", style);
 			initFromPrevEvaluator = evaluatorFactory.createEvaluator(

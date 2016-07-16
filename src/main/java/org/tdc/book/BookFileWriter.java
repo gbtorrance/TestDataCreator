@@ -5,7 +5,7 @@ import java.util.List;
 
 import org.tdc.config.book.BookConfig;
 import org.tdc.config.book.DocIDRowConfig;
-import org.tdc.config.book.PageColumnConfig;
+import org.tdc.config.book.PageNodeDetailColumnConfig;
 import org.tdc.config.book.PageConfig;
 import org.tdc.model.AttribNode;
 import org.tdc.model.CompositorNode;
@@ -27,26 +27,18 @@ import org.tdc.util.Util;
  */
 public class BookFileWriter {
 	
-	private static final int COL_CUSTOM_BASE = 0;
-	
 	private final BookConfig config;
 	private final SpreadsheetFile spreadsheetFile;
 	private final ModelInstFactory modelInstFactory;
-	private final int docIDRowStart;
-	private final int dataColStart;
 	
 	private int maxColumns;
 	private PageConfig currentPageConfig;
 	private Spreadsheet currentSheet;
-	private int headerRowStart;
-	private int nodeRowStart;
 	
 	public BookFileWriter(BookConfig config, SpreadsheetFile spreadsheetFile, ModelInstFactory modelInstFactory) {
 		this.config = config;
 		this.spreadsheetFile = spreadsheetFile;
 		this.modelInstFactory = modelInstFactory;
-		this.docIDRowStart = 1;
-		this.dataColStart = config.getTreeStructureColumnCount() + 1;
 	}
 
 	public void write() {
@@ -65,8 +57,6 @@ public class BookFileWriter {
 		maxColumns = 0;
 		currentPageConfig = pageConfig;
 		currentSheet = spreadsheetFile.createSpreadsheet(currentPageConfig.getPageName());
-		headerRowStart = docIDRowStart + currentPageConfig.getDocIDRows().size();
-		nodeRowStart = headerRowStart + config.getHeaderRowCount();
 		ModelInst modelInst = modelInstFactory.getModelInst(currentPageConfig.getModelConfig());
 		ElementNodeInst rootElement = modelInst.getRootElement();
 		ModelWriterVisitor writerVisitor = new ModelWriterVisitor();
@@ -86,20 +76,20 @@ public class BookFileWriter {
 	}
 	
 	private void formatColumns() {
-		int allowedColumns = config.getTreeStructureColumnCount(); 
+		int allowedColumns = config.getNodeColumnCount(); 
 		if (allowedColumns < maxColumns) {
 			throw new RuntimeException("TreeStructureColumnCount (" + allowedColumns + 
 					") must be at least " + maxColumns + " to support this particular model");
 		}
 		for (int i = 1; i <= allowedColumns; i++) {
-			currentSheet.setColumnWidth(i, config.getTreeStructureColumnWidth());
+			currentSheet.setColumnWidth(i, config.getNodeColumnWidth());
 		}
-		List<PageColumnConfig> columns = currentPageConfig.getColumns(); 
+		List<PageNodeDetailColumnConfig> columns = currentPageConfig.getNodeDetailColumns(); 
 		for (int i = 0; i < columns.size(); i++) {
-			PageColumnConfig column = columns.get(i);
-			currentSheet.setColumnWidth(getDataCol(COL_CUSTOM_BASE) + i, column.getWidth());
+			PageNodeDetailColumnConfig column = columns.get(i);
+			currentSheet.setColumnWidth(column.getColNum(), column.getWidth());
 		}
-		currentSheet.freeze(getDataCol(COL_CUSTOM_BASE) + columns.size(), nodeRowStart);
+		currentSheet.freeze(currentPageConfig.getTestDocColStart(), currentPageConfig.getNodeRowStart());
 	}
 	
 	private void writeDocIDRowLabels() {
@@ -108,21 +98,23 @@ public class BookFileWriter {
 		int rowCount = docIDRows.size();
 		for (int row = 0; row < rowCount; row++) {
 			DocIDRowConfig docIDRow = docIDRows.get(row);
-			currentSheet.setCellValue(docIDRow.getLabel(), docIDRowStart + row, 1, style);
+			currentSheet.setCellValue(docIDRow.getLabel(), docIDRow.getRowNum(), 
+					currentPageConfig.getDocIDRowLabelCol(), style);
 		}
 	}
 	
 	private void writeHeaderLabels() {
 		int rowCount = config.getHeaderRowCount();
 		CellStyle style = config.getDefaultHeaderStyle();
-		List<PageColumnConfig> columns = currentPageConfig.getColumns(); 
+		List<PageNodeDetailColumnConfig> columns = currentPageConfig.getNodeDetailColumns(); 
 		for (int row = 0; row < rowCount; row++) {
 			currentSheet.setCellValue(
-					config.getTreeStructureHeaderLabel(row+1), headerRowStart + row, 1, style);
+					config.getNodeHeaderLabel(row+1), currentPageConfig.getHeaderRowStart() + row, 1, style);
 			for (int colIndex = 0; colIndex < columns.size(); colIndex++) {
-				PageColumnConfig column = columns.get(colIndex);
+				PageNodeDetailColumnConfig column = columns.get(colIndex);
 				currentSheet.setCellValue(
-						column.getHeaderLabel(row+1), headerRowStart + row, getDataCol(COL_CUSTOM_BASE) + colIndex, style);
+						column.getHeaderLabel(row+1), 
+						currentPageConfig.getHeaderRowStart() + row, column.getColNum(), style);
 			}
 		}
 	}
@@ -169,15 +161,11 @@ public class BookFileWriter {
 	}
 	
 	private int getNodeRow(TDCNode node) {
-		return nodeRowStart + node.getRowOffset();
+		return currentPageConfig.getNodeRowStart() + node.getRowOffset();
 	}
 	
 	private int getNodeCol(TDCNode node) {
-		return 1 + node.getColOffset();
-	}
-	
-	private int getDataCol(int dataColOffset) {
-		return dataColStart + dataColOffset;
+		return currentPageConfig.getNodeColStart() + node.getColOffset();
 	}
 	
 	private void outputChoiceMarker(NonAttribNode node, CellStyle cellStyle) {
@@ -216,9 +204,9 @@ public class BookFileWriter {
 	}
 
 	private void outputCustomColumns(TDCNode node) {
-		List<PageColumnConfig> columns = currentPageConfig.getColumns();
+		List<PageNodeDetailColumnConfig> columns = currentPageConfig.getNodeDetailColumns();
 		for (int i = 0; i < columns.size(); i++) {
-			PageColumnConfig column = columns.get(i);
+			PageNodeDetailColumnConfig column = columns.get(i);
 			CellStyle style = column.getStyle();
 			String value = "";
 			String variableName = column.getReadFromVariable();
@@ -229,7 +217,7 @@ public class BookFileWriter {
 			if (propertyName != null) {
 				value = Util.getStringValueFromProperty(node, propertyName, "");
 			}
-			currentSheet.setCellValue(value, getNodeRow(node), getDataCol(COL_CUSTOM_BASE) + i, style);
+			currentSheet.setCellValue(value, getNodeRow(node), column.getColNum(), style);
 		}
 	}
 

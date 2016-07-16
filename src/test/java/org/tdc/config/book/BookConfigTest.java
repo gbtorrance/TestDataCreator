@@ -76,7 +76,7 @@ public class BookConfigTest {
 		assertThat(style.getFillColor()).isEqualTo(null);
 		assertThat(style.getShrinkToFit()).isEqualTo(false);
 		
-		style = bookConfig.getDefaultColumnStyle();
+		style = bookConfig.getDefaultNodeDetailColumnStyle();
 		assertThat(style.getFontName()).isEqualTo("Calibri");
 		assertThat(style.getFontHeight()).isEqualTo(11);
 		assertThat(style.getBold()).isEqualTo(false);
@@ -130,8 +130,8 @@ public class BookConfigTest {
 		assertThat(style.getFillColor()).isEqualTo(null);
 		assertThat(style.getShrinkToFit()).isEqualTo(false);
 
-		assertThat(bookConfig.getTreeStructureColumnCount()).isEqualTo(12);
-		assertThat(bookConfig.getTreeStructureColumnWidth()).isEqualTo(500);
+		assertThat(bookConfig.getNodeColumnCount()).isEqualTo(12);
+		assertThat(bookConfig.getNodeColumnWidth()).isEqualTo(500);
 
 		Map<String, DocTypeConfig> docTypeConfigs = bookConfig.getDocTypeConfigs();
 		DocTypeConfig dtConfig1 = docTypeConfigs.get("DocType1");

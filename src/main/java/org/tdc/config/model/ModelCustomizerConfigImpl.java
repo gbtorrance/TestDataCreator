@@ -16,39 +16,47 @@ public class ModelCustomizerConfigImpl implements ModelCustomizerConfig {
 	private final Path filePath;
 	private final CellStyle defaultStyle;
 	private final CellStyle defaultHeaderStyle;
-	private final CellStyle defaultColumnStyle;
+	private final CellStyle defaultNodeDetailColumnStyle;
 	private final CellStyle defaultNodeStyle;
 	private final CellStyle parentNodeStyle;
 	private final CellStyle attribNodeStyle;
 	private final CellStyle compositorNodeStyle;
 	private final CellStyle choiceMarkerStyle;
-	private final int treeStructureColumnCount;
-	private final int treeStructureColumnWidth;
+	private final int nodeColumnCount;
+	private final int nodeColumnWidth;
 	private final int headerRowCount;
-	private final String[] treeStructureHeaderLabels;
+	private final String[] nodeHeaderLabels;
 	private final String readOccursCountOverrideFromVariable;
 	private final boolean allowMinMaxInvalidOccursCountOverride;
 	private final int defaultOccursCount;
-	private final List<ModelCustomizerColumnConfig> columns;
+	private final List<ModelCustomizerColumnConfig> nodeDetailcolumns;
+	private final int headerRowStart;
+	private final int nodeRowStart;
+	private final int nodeColStart;
+	private final int nodeDetailColStart;
 	
 	private ModelCustomizerConfigImpl(Builder builder) {
 		this.filePath = builder.filePath;
 		this.defaultStyle = builder.defaultStyle;
 		this.defaultHeaderStyle = builder.defaultHeaderStyle;
-		this.defaultColumnStyle = builder.defaultColumnStyle;
+		this.defaultNodeDetailColumnStyle = builder.defaultNodeDetailColumnStyle;
 		this.defaultNodeStyle = builder.defaultNodeStyle;
 		this.parentNodeStyle = builder.parentNodeStyle;
 		this.attribNodeStyle = builder.attribNodeStyle;
 		this.compositorNodeStyle = builder.compositorNodeStyle;
 		this.choiceMarkerStyle = builder.choiceMarkerStyle;
-		this.treeStructureColumnCount = builder.treeStructureColumnCount;
-		this.treeStructureColumnWidth = builder.treeStructureColumnWidth;
+		this.nodeColumnCount = builder.nodeColumnCount;
+		this.nodeColumnWidth = builder.nodeColumnWidth;
 		this.headerRowCount = builder.headerRowCount;
-		this.treeStructureHeaderLabels = builder.treeStructureHeaderLabels;
+		this.nodeHeaderLabels = builder.nodeHeaderLabels;
 		this.readOccursCountOverrideFromVariable = builder.readOccursCountOverrideFromVariable;
 		this.allowMinMaxInvalidOccursCountOverride = builder.allowMinMaxInvalidOccursCountOverride;
 		this.defaultOccursCount = builder.defaultOccursCount;
-		this.columns = Collections.unmodifiableList(builder.columns); // unmodifiable
+		this.nodeDetailcolumns = Collections.unmodifiableList(builder.nodeDetailColumns); // unmodifiable
+		this.headerRowStart = builder.headerRowStart;
+		this.nodeRowStart = builder.nodeRowStart;
+		this.nodeColStart = builder.nodeColStart;
+		this.nodeDetailColStart = builder.nodeDetailColStart;
 	}
 	
 	@Override
@@ -67,8 +75,8 @@ public class ModelCustomizerConfigImpl implements ModelCustomizerConfig {
 	}
 	
 	@Override
-	public CellStyle getDefaultColumnStyle() {
-		return defaultColumnStyle;
+	public CellStyle getDefaultNodeDetailColumnStyle() {
+		return defaultNodeDetailColumnStyle;
 	}
 	
 	@Override
@@ -97,13 +105,13 @@ public class ModelCustomizerConfigImpl implements ModelCustomizerConfig {
 	}
 	
 	@Override
-	public int getTreeStructureColumnCount() {
-		return treeStructureColumnCount;
+	public int getNodeColumnCount() {
+		return nodeColumnCount;
 	}
 
 	@Override
-	public int getTreeStructureColumnWidth() {
-		return treeStructureColumnWidth;
+	public int getNodeColumnWidth() {
+		return nodeColumnWidth;
 	}
 	
 	@Override
@@ -112,8 +120,8 @@ public class ModelCustomizerConfigImpl implements ModelCustomizerConfig {
 	}
 	
 	@Override
-	public String getTreeStructureHeaderLabel(int headerRowNum) {
-		return treeStructureHeaderLabels[headerRowNum-1];
+	public String getNodeHeaderLabel(int headerRowNum) {
+		return nodeHeaderLabels[headerRowNum-1];
 	}
 
 	@Override
@@ -132,8 +140,28 @@ public class ModelCustomizerConfigImpl implements ModelCustomizerConfig {
 	}
 
 	@Override
-	public List<ModelCustomizerColumnConfig> getColumns() {
-		return columns;
+	public List<ModelCustomizerColumnConfig> getNodeDetailColumns() {
+		return nodeDetailcolumns;
+	}
+
+	@Override
+	public int getHeaderRowStart() {
+		return headerRowStart;
+	}
+
+	@Override
+	public int getNodeRowStart() {
+		return nodeRowStart;
+	}
+
+	@Override
+	public int getNodeColStart() {
+		return nodeColStart;
+	}
+
+	@Override
+	public int getNodeDetailColStart() {
+		return nodeDetailColStart;
 	}
 	
 	public static class Builder {
@@ -143,23 +171,27 @@ public class ModelCustomizerConfigImpl implements ModelCustomizerConfig {
 		private final Path modelConfigRoot;
 		private final int defaultOccursCount;
 		private final GeneralEvaluatorFactory evaluatorFactory;
+		private final int headerRowStart;
+		private final int nodeColStart;
 
 		private Path filePath;
 		private CellStyle defaultStyle;
 		private CellStyle defaultHeaderStyle;
-		private CellStyle defaultColumnStyle;
+		private CellStyle defaultNodeDetailColumnStyle;
 		private CellStyle defaultNodeStyle;
 		private CellStyle parentNodeStyle;
 		private CellStyle attribNodeStyle;
 		private CellStyle compositorNodeStyle;
 		private CellStyle choiceMarkerStyle;
-		private int treeStructureColumnCount;
-		private int treeStructureColumnWidth;
+		private int nodeColumnCount;
+		private int nodeColumnWidth;
 		private int headerRowCount;
-		private String[] treeStructureHeaderLabels;
+		private String[] nodeHeaderLabels;
 		private String readOccursCountOverrideFromVariable;
 		private boolean allowMinMaxInvalidOccursCountOverride;
-		private List<ModelCustomizerColumnConfig> columns; 
+		private int nodeDetailColStart;
+		private List<ModelCustomizerColumnConfig> nodeDetailColumns; 
+		private int nodeRowStart;
 		
 		public Builder(
 				XMLConfigWrapper config, Path modelConfigRoot, int defaultOccursCount, 
@@ -168,6 +200,8 @@ public class ModelCustomizerConfigImpl implements ModelCustomizerConfig {
 			this.modelConfigRoot = modelConfigRoot;
 			this.defaultOccursCount = defaultOccursCount;
 			this.evaluatorFactory = evaluatorFactory;
+			this.headerRowStart = 1;
+			this.nodeColStart = 1;
 		}
 	
 		public ModelCustomizerConfig build() {
@@ -177,23 +211,27 @@ public class ModelCustomizerConfigImpl implements ModelCustomizerConfig {
 				filePath = modelConfigRoot.resolve(fileName);
 				defaultStyle = config.getCellStyle(CONFIG_PREFIX + ".DefaultStyle", null, true);
 				defaultHeaderStyle = config.getCellStyle(CONFIG_PREFIX + ".DefaultHeaderStyle", defaultStyle, false);
-				defaultColumnStyle = config.getCellStyle(CONFIG_PREFIX + ".DefaultColumnStyle", defaultStyle, false);
+				defaultNodeDetailColumnStyle = config.getCellStyle(
+						CONFIG_PREFIX + ".DefaultNodeDetailColumnStyle", defaultStyle, false);
 				defaultNodeStyle = config.getCellStyle(CONFIG_PREFIX + ".DefaultNodeStyle", defaultStyle, false);
 				parentNodeStyle = config.getCellStyle(CONFIG_PREFIX + ".ParentNodeStyle", defaultNodeStyle, false);
 				attribNodeStyle = config.getCellStyle(CONFIG_PREFIX + ".AttribNodeStyle", defaultNodeStyle, false);
 				compositorNodeStyle = config.getCellStyle(CONFIG_PREFIX + ".CompositorNodeStyle", defaultNodeStyle, false);
 				choiceMarkerStyle = config.getCellStyle(CONFIG_PREFIX + ".ChoiceMarkerStyle", defaultNodeStyle, false);
-				treeStructureColumnCount = config.getInt(CONFIG_PREFIX + ".TreeStructureColumnCount", 0, true);
-				treeStructureColumnWidth = config.getInt(CONFIG_PREFIX + ".TreeStructureColumnWidth", 0, true);
+				nodeColumnCount = config.getInt(CONFIG_PREFIX + ".NodeColumnCount", 0, true);
+				nodeColumnWidth = config.getInt(CONFIG_PREFIX + ".NodeColumnWidth", 0, true);
 				headerRowCount = config.getInt(CONFIG_PREFIX + ".HeaderRowCount", 1, false);
-				treeStructureHeaderLabels = config.getHeaderLabels(
-						CONFIG_PREFIX + ".TreeStructureHeaderLabels", headerRowCount);
+				nodeHeaderLabels = config.getHeaderLabels(
+						CONFIG_PREFIX + ".NodeHeaderLabels", headerRowCount);
 				readOccursCountOverrideFromVariable = config.getString(
 						CONFIG_PREFIX + ".ReadOccursCountOverrideFromVariable", null, true);
 				allowMinMaxInvalidOccursCountOverride = config.getBoolean(
 						CONFIG_PREFIX + ".AllowMinMaxInvalidOccursCountOverride", false, false);
-				columns = new ModelCustomizerColumnConfigImpl.Builder(
-						config, evaluatorFactory, headerRowCount, defaultColumnStyle).buildAll();
+				nodeDetailColStart = nodeColStart + nodeColumnCount;
+				nodeDetailColumns = new ModelCustomizerColumnConfigImpl.Builder(
+						config, evaluatorFactory, headerRowCount, 
+						defaultNodeDetailColumnStyle, nodeDetailColStart).buildAll();
+				nodeRowStart = headerRowStart + headerRowCount;
 				custConfig = new ModelCustomizerConfigImpl(this);
 			}
 			return custConfig;
