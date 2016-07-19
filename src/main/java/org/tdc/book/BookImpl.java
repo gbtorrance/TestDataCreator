@@ -75,7 +75,7 @@ public class BookImpl implements Book {
 			Addr addr = getBookAddrFromConfigSheet(bookFile, spreadsheetFile);
 			config = bookConfigFactory.getBookConfig(addr);
 			pages = new PageImpl.Builder(config.getPageConfigs(), modelInstFactory, spreadsheetFile).buildAll();
-			testSets = new TestSetImpl.Builder(pages).buildAll();
+			testSets = new TestSetImpl.Builder(pages, config.getDocTypeConfigs()).buildAll();
 			return new BookImpl(this);
 		}
 		

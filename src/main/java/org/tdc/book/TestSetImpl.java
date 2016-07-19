@@ -7,6 +7,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
+import org.tdc.config.book.DocTypeConfig;
+
 /**
  * A {@link TestSet} implementation.
  */
@@ -32,12 +34,14 @@ public class TestSetImpl implements TestSet {
 
 	public static class Builder {
 		private final Map<String, Page> pages;
+		private final Map<String, DocTypeConfig> docTypeConfigs;
 		
 		private String setName;
 		private List<TestCase> testCases;
 		
-		public Builder(Map<String, Page> pages) {
+		public Builder(Map<String, Page> pages, Map<String, DocTypeConfig> docTypeConfigs) {
 			this.pages = pages;
+			this.docTypeConfigs = docTypeConfigs;
 		}
 		
 		public List<TestSet> buildAll() {
@@ -56,7 +60,7 @@ public class TestSetImpl implements TestSet {
 
 		private TestSet build(String setName, List<TestDoc> allTestDocsInSet) {
 			this.setName = setName;
-			testCases = new TestCaseImpl.Builder(setName, allTestDocsInSet).buildAll();
+			testCases = new TestCaseImpl.Builder(setName, allTestDocsInSet, docTypeConfigs).buildAll();
 			return new TestSetImpl(this);
 		}
 	}

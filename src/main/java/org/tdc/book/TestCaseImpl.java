@@ -7,6 +7,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
+import org.tdc.config.book.DocTypeConfig;
+
 /**
  * A {@link TestCase} implementation.
  */
@@ -40,13 +42,19 @@ public class TestCaseImpl implements TestCase {
 	public static class Builder {
 		private final String setName;
 		private final List<TestDoc> allTestDocsInSet;
+		private final Map<String, DocTypeConfig> docTypeConfigs;
 		
 		private int caseNum;
 		private List<TestDoc> testDocs;
 		
-		public Builder(String setName, List<TestDoc> allTestDocsInSet) {
+		public Builder(
+				String setName, 
+				List<TestDoc> allTestDocsInSet, 
+				Map<String, DocTypeConfig> docTypeConfigs) {
+			
 			this.setName = setName;
 			this.allTestDocsInSet = allTestDocsInSet;
+			this.docTypeConfigs = docTypeConfigs;
 		}
 		
 		public List<TestCase> buildAll() {
@@ -64,7 +72,29 @@ public class TestCaseImpl implements TestCase {
 		private TestCase build(int caseNum, List<TestDoc> allTestDocsInCase) {
 			this.caseNum = caseNum;
 			this.testDocs = allTestDocsInCase;
+			verifyDocTypeMinMax();
 			return new TestCaseImpl(this);
+		}
+		
+		private void verifyDocTypeMinMax() {
+			// count the number of each DocType among the TestDocs for this TestCase
+			Map<DocTypeConfig, Long> docTypeConfigToDocTypeCountMap = testDocs
+					.stream()
+					.collect(Collectors.groupingBy(
+							td -> td.getPageConfig().getDocTypeConfig(),
+							Collectors.counting()));
+			// compare to min/max in complete list of DocTypes specified in configuration
+			// [don't want to compare to just list in Book; if we do, some might be missed]
+			for (DocTypeConfig dtConfig : docTypeConfigs.values()) {
+				Long count = docTypeConfigToDocTypeCountMap.getOrDefault(dtConfig, Long.valueOf(0));
+				if (dtConfig.getMinPerTestCase() > count || dtConfig.getMaxPerTestCase() < count) {
+					String msg = "Number of Test Docs for Test Set '" + 
+							(setName.equals("") ? "[default]" : setName) + "', Test Case " +
+							caseNum + " must be at least " + dtConfig.getMinPerTestCase() + 
+							" and at most " + dtConfig.getMaxPerTestCase() + "; current count: " + count;
+					throw new RuntimeException(msg);
+				}
+			}
 		}
 	}
 }
