@@ -71,4 +71,19 @@ public interface Spreadsheet {
 	 * @param rowNum Number of row just to the right of freeze (1-based index).
 	 */
 	void freeze(int colNum, int rowNum);
+	
+	/**
+	 * Get row num (1-based) of last row in Spreadsheet.
+	 * 
+	 * @return Number of last row in Spreadsheet (1-based)
+	 */
+	int getLastRowNum();
+	
+	/**
+	 * Get column num (1-based) of last column in specified row in Spreadsheet.
+	 * 
+	 * @param rowNum Run number to inspect (1-based).
+	 * @return Number of last column in row containing a value (1-based) 
+	 */
+	int getLastColNum(int rowNum);
 }

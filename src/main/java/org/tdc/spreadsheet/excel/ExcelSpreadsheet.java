@@ -85,7 +85,25 @@ public class ExcelSpreadsheet implements Spreadsheet {
 		
 		xssfSheet.createFreezePane(colNum-1, rowNum-1, colNum-1, rowNum-1);
 	}
+	
+	@Override
+	public int getLastRowNum() {
+		// Whereas the public methods in this class use 1-based index values, 
+		// Apache POI libraries use 0-based indexes;
+		// this method accepts 1-based indexes and converts to 0-based indexes for POI (as necessary)
+		
+		return xssfSheet.getLastRowNum() + 1;
+	}
 
+	@Override
+	public int getLastColNum(int rowNum) {
+		// Strangely getLastCellNum() returns a 1-based index, 
+		// so no conversion is necessary when returning
+		// a 1-based index to the caller
+		
+		return xssfSheet.getRow(rowNum-1).getLastCellNum();
+	}
+	
 	private String getCellValue(XSSFCell cell) {
 		return getCellValueByType(cell, cell.getCellType());
 	}

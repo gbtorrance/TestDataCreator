@@ -1,6 +1,7 @@
 package org.tdc.book;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -16,13 +17,13 @@ import org.tdc.spreadsheet.SpreadsheetFile;
 public class PageImpl implements Page {
 	
 	private final PageConfig config;
-	private final List<TestDoc> testDocs;
 	private final ModelInstFactory modelInstFactory;
+	private final List<TestDoc> testDocs;
 	
 	private PageImpl(Builder builder) {
 		this.config = builder.config;
-		this.testDocs = builder.testDocs;
 		this.modelInstFactory = builder.modelInstFactory;
+		this.testDocs = Collections.unmodifiableList(builder.testDocs); // unmodifiable
 	}
 
 	@Override
@@ -42,6 +43,11 @@ public class PageImpl implements Page {
 		// keeping the very heavy-weight ModelInsts in memory all the time;
 		// allows for better memory management
 		return modelInstFactory.getModelInst(config.getModelConfig());
+	}
+	
+	@Override 
+	public List<TestDoc> getTestDocs() {
+		return testDocs;
 	}
 	
 	public static class Builder {

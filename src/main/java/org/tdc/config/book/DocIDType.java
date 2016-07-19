@@ -6,8 +6,7 @@ package org.tdc.config.book;
 public enum DocIDType {
 	CASE_NUM("case-num"),
 	SET_NAME("set-name"),
-	DOC_VARIABLE("doc-variable"),
-	NOTE("note");
+	DOC_VARIABLE("doc-variable");
 
 	private final String configType;
 	

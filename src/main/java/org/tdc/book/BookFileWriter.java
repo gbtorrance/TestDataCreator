@@ -84,7 +84,7 @@ public class BookFileWriter {
 		for (int i = 1; i <= allowedColumns; i++) {
 			currentSheet.setColumnWidth(i, config.getNodeColumnWidth());
 		}
-		List<PageNodeDetailColumnConfig> columns = currentPageConfig.getNodeDetailColumns(); 
+		List<PageNodeDetailColumnConfig> columns = currentPageConfig.getNodeDetailColumnConfigs(); 
 		for (int i = 0; i < columns.size(); i++) {
 			PageNodeDetailColumnConfig column = columns.get(i);
 			currentSheet.setColumnWidth(column.getColNum(), column.getWidth());
@@ -93,7 +93,7 @@ public class BookFileWriter {
 	}
 	
 	private void writeDocIDRowLabels() {
-		List<DocIDRowConfig> docIDRows = currentPageConfig.getDocIDRows();
+		List<DocIDRowConfig> docIDRows = currentPageConfig.getDocIDRowConfigs();
 		CellStyle style = config.getDefaultHeaderStyle();
 		int rowCount = docIDRows.size();
 		for (int row = 0; row < rowCount; row++) {
@@ -106,7 +106,7 @@ public class BookFileWriter {
 	private void writeHeaderLabels() {
 		int rowCount = config.getHeaderRowCount();
 		CellStyle style = config.getDefaultHeaderStyle();
-		List<PageNodeDetailColumnConfig> columns = currentPageConfig.getNodeDetailColumns(); 
+		List<PageNodeDetailColumnConfig> columns = currentPageConfig.getNodeDetailColumnConfigs(); 
 		for (int row = 0; row < rowCount; row++) {
 			currentSheet.setCellValue(
 					config.getNodeHeaderLabel(row+1), currentPageConfig.getHeaderRowStart() + row, 1, style);
@@ -204,7 +204,7 @@ public class BookFileWriter {
 	}
 
 	private void outputCustomColumns(TDCNode node) {
-		List<PageNodeDetailColumnConfig> columns = currentPageConfig.getNodeDetailColumns();
+		List<PageNodeDetailColumnConfig> columns = currentPageConfig.getNodeDetailColumnConfigs();
 		for (int i = 0; i < columns.size(); i++) {
 			PageNodeDetailColumnConfig column = columns.get(i);
 			CellStyle style = column.getStyle();

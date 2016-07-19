@@ -2,6 +2,7 @@ package org.tdc.book;
 
 import java.nio.file.Path;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 import org.slf4j.Logger;
@@ -23,10 +24,12 @@ public class BookImpl implements Book {
 	
 	private final BookConfig config;
 	private final Map<String, Page> pages;
+	private final List<TestSet> testSets;
 	
 	private BookImpl(Builder builder) {
 		this.config = builder.config;
 		this.pages = Collections.unmodifiableMap(builder.pages); // unmodifiable
+		this.testSets = Collections.unmodifiableList(builder.testSets); // unmodifiable
 	}
 	
 	@Override
@@ -39,6 +42,11 @@ public class BookImpl implements Book {
 		return pages;
 	}
 	
+	@Override
+	public List<TestSet> getTestSets() {
+		return testSets;
+	}
+	
 	public static class Builder {
 		private final Path bookFile; 
 		private final SpreadsheetFileFactory spreadsheetFileFactory; 
@@ -47,6 +55,7 @@ public class BookImpl implements Book {
 
 		private BookConfig config;
 		private Map<String, Page> pages;
+		public List<TestSet> testSets;
 		
 		public Builder(
 				Path bookFile, 
@@ -66,11 +75,7 @@ public class BookImpl implements Book {
 			Addr addr = getBookAddrFromConfigSheet(bookFile, spreadsheetFile);
 			config = bookConfigFactory.getBookConfig(addr);
 			pages = new PageImpl.Builder(config.getPageConfigs(), modelInstFactory, spreadsheetFile).buildAll();
-
-			// build TestSets (which, in turn, will build TestCases)
-			
-			// TODO where to verify?
-			
+			testSets = new TestSetImpl.Builder(pages).buildAll();
 			return new BookImpl(this);
 		}
 		

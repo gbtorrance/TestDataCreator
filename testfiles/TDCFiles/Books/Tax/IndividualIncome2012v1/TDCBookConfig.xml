@@ -29,10 +29,10 @@
 				<Row type="doc-variable" variableName="SUBMISSION_ID">
 					<Label>Submission ID</Label>
 				</Row>
-				<Row type="note">
+				<Row type="doc-variable" variableName="NOTE_1">
 					<Label>Note 1</Label>
 				</Row>
-				<Row type="note">
+				<Row type="doc-variable" variableName="NOTE_2">
 					<Label>Note 2</Label>
 				</Row>
 			</DocIDRows>

@@ -4,6 +4,7 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.tdc.config.XMLConfigWrapper;
 import org.tdc.config.model.ModelConfig;
@@ -21,8 +22,11 @@ public class PageConfigImpl implements PageConfig {
 	private final String pageName;
 	private final ModelConfig modelConfig;
 	private final DocTypeConfig docTypeConfig;
-	private final List<PageNodeDetailColumnConfig> nodeDetailColumns;
-	private final List<DocIDRowConfig> docIDRows;
+	private final List<PageNodeDetailColumnConfig> nodeDetailColumnConfigs;
+	private final List<DocIDRowConfig> docIDRowConfigs;
+	private final DocIDRowConfig caseNumDocIDRowConfig;
+	private final DocIDRowConfig setNameDocIDRowConfig;
+	private final List<DocIDRowConfig> varDocIDRowConfigs;
 	private final int docIDRowStart;
 	private final int docIDRowLabelCol;
 	private final int headerRowStart;
@@ -35,8 +39,11 @@ public class PageConfigImpl implements PageConfig {
 		this.pageName = builder.pageName;
 		this.modelConfig = builder.modelConfig;
 		this.docTypeConfig = builder.docTypeConfig;
-		this.nodeDetailColumns = Collections.unmodifiableList(builder.nodeDetailColumns); // unmodifiable
-		this.docIDRows = Collections.unmodifiableList(builder.docIDRows); // unmodifiable
+		this.nodeDetailColumnConfigs = Collections.unmodifiableList(builder.nodeDetailColumnConfigs); // unmodifiable
+		this.docIDRowConfigs = Collections.unmodifiableList(builder.docIDRowConfigs); // unmodifiable
+		this.caseNumDocIDRowConfig = builder.caseNumDocIDRowConfig;
+		this.setNameDocIDRowConfig = builder.setNameDocIDRowConfig;
+		this.varDocIDRowConfigs = Collections.unmodifiableList(builder.varDocIDRowConfigs); // unmodifiable
 		this.docIDRowStart = builder.docIDRowStart;
 		this.docIDRowLabelCol = builder.docIDRowLabelCol;
 		this.headerRowStart = builder.headerRowStart;
@@ -62,15 +69,30 @@ public class PageConfigImpl implements PageConfig {
 	}
 	
 	@Override
-	public List<PageNodeDetailColumnConfig> getNodeDetailColumns() {
-		return nodeDetailColumns;
+	public List<PageNodeDetailColumnConfig> getNodeDetailColumnConfigs() {
+		return nodeDetailColumnConfigs;
 	}
 	
 	@Override
-	public List<DocIDRowConfig> getDocIDRows() {
-		return docIDRows;
+	public List<DocIDRowConfig> getDocIDRowConfigs() {
+		return docIDRowConfigs;
 	}
-
+	
+	@Override
+	public DocIDRowConfig getCaseNumDocIDRowConfig() {
+		return caseNumDocIDRowConfig; 
+	}
+	
+	@Override
+	public DocIDRowConfig getSetNameDocIDRowConfig() {
+		return setNameDocIDRowConfig; 
+	}
+	
+	@Override
+	public List<DocIDRowConfig> getVarDocIDRowConfigs() {
+		return varDocIDRowConfigs; 
+	}
+	
 	@Override
 	public int getDocIDRowStart() {
 		return docIDRowStart;
@@ -122,8 +144,11 @@ public class PageConfigImpl implements PageConfig {
 		private String pageName;
 		private ModelConfig modelConfig;
 		private DocTypeConfig docTypeConfig;
-		private List<PageNodeDetailColumnConfig> nodeDetailColumns;
-		private List<DocIDRowConfig> docIDRows;
+		private List<PageNodeDetailColumnConfig> nodeDetailColumnConfigs;
+		private List<DocIDRowConfig> docIDRowConfigs;
+		public DocIDRowConfig caseNumDocIDRowConfig;
+		public DocIDRowConfig setNameDocIDRowConfig;
+		public List varDocIDRowConfigs;
 		private int headerRowStart;
 		private int nodeRowStart;
 		private int testDocColStart;
@@ -176,17 +201,30 @@ public class PageConfigImpl implements PageConfig {
 						"' for Page '" + pageName + "'");
 			}
 
-			nodeDetailColumns = new PageNodeDetailColumnConfigImpl.Builder(
+			nodeDetailColumnConfigs = new PageNodeDetailColumnConfigImpl.Builder(
 					config, indexPrefix, headerRowCount, 
 					defaultNodeDetailColumnStyle, nodeDetailColStart).buildAll();
 
-			docIDRows = new DocIDRowConfigImpl.Builder(config, indexPrefix, docIDRowStart).buildAll();
+			docIDRowConfigs = new DocIDRowConfigImpl.Builder(config, indexPrefix, docIDRowStart).buildAll();
+			processDocIDRowConfigs();
 
-			headerRowStart = docIDRowStart + docIDRows.size();
+			headerRowStart = docIDRowStart + docIDRowConfigs.size();
 			nodeRowStart = headerRowStart + headerRowCount;
-			testDocColStart = nodeDetailColStart + nodeDetailColumns.size();
+			testDocColStart = nodeDetailColStart + nodeDetailColumnConfigs.size();
 			
 			return new PageConfigImpl(this);
+		}
+
+		private void processDocIDRowConfigs() {
+			caseNumDocIDRowConfig = docIDRowConfigs.stream()
+					.filter(docIDRowConfig -> docIDRowConfig.getType() == DocIDType.CASE_NUM)
+					.findFirst().get(); // guaranteed to have CASE_NUM row
+			setNameDocIDRowConfig = docIDRowConfigs.stream()
+					.filter(docIDRowConfig -> docIDRowConfig.getType() == DocIDType.SET_NAME)
+					.findFirst().orElse(null); // SET_NAME may not exist
+			varDocIDRowConfigs = docIDRowConfigs.stream()
+					.filter(docIDRowConfig -> docIDRowConfig.getType() == DocIDType.DOC_VARIABLE)
+					.collect(Collectors.toList()); // collect all of DOC_VARIABLE rows
 		}
 	}
 }
