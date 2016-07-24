@@ -1,10 +1,10 @@
 package org.tdc.book;
 
-import java.nio.file.Path;
+import org.tdc.spreadsheet.SpreadsheetFile;
 
 /**
  * Factory for creating {@link Book} instances.
  */
 public interface BookFactory {
-	Book getBook(Path bookFile);
+	Book getBook(SpreadsheetFile spreadsheetFile);
 }

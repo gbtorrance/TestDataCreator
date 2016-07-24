@@ -8,8 +8,10 @@ import java.util.Map;
 
 import org.tdc.config.book.DocIDRowConfig;
 import org.tdc.config.book.PageConfig;
+import org.tdc.message.TestDocMessages;
 import org.tdc.spreadsheet.Spreadsheet;
 import org.tdc.spreadsheet.SpreadsheetFile;
+import org.w3c.dom.Document;
 
 /**
  * A {@link TestDoc} implementation.
@@ -17,16 +19,22 @@ import org.tdc.spreadsheet.SpreadsheetFile;
 public class TestDocImpl implements TestDoc {
 	private final PageConfig pageConfig;
 	private final int colNum;
+	private final String colLetter;
 	private final int caseNum;
 	private final String setName;
 	private final Map<String, String> docVariables;
+	private final TestDocMessages messages;
+	
+	private Document domDocument;
 	
 	private TestDocImpl(Builder builder) {
 		this.pageConfig = builder.pageConfig;
 		this.colNum = builder.colNum;
+		this.colLetter = builder.colLetter;
 		this.caseNum = builder.caseNum;
 		this.setName = builder.setName;
-		this.docVariables = Collections.unmodifiableMap(builder.docVariables); // unmodifiable 
+		this.docVariables = Collections.unmodifiableMap(builder.docVariables); // unmodifiable
+		this.messages = new TestDocMessages();
 	}
 	
 	@Override
@@ -37,6 +45,11 @@ public class TestDocImpl implements TestDoc {
 	@Override
 	public int getColNum() {
 		return colNum;
+	}
+
+	@Override
+	public String getColLetter() {
+		return colLetter;
 	}
 
 	@Override
@@ -53,12 +66,28 @@ public class TestDocImpl implements TestDoc {
 	public Map<String, String> getDocVariables() {
 		return docVariables;
 	}
+
+	@Override
+	public Document getDOMDocument() {
+		return domDocument;
+	}
+
+	@Override
+	public void setDOMDocument(Document domDocument) {
+		this.domDocument = domDocument;
+	}
 	
+	@Override
+	public TestDocMessages getMessages() {
+		return messages;
+	}
+
 	public static class Builder {
 		private final PageConfig pageConfig;
 		private final SpreadsheetFile spreadsheetFile;
 		
 		private int colNum;
+		private String colLetter;
 		private int caseNum;
 		private String setName;
 		private Map<String, String> docVariables;
@@ -89,6 +118,7 @@ public class TestDocImpl implements TestDoc {
 		
 		private TestDoc build(Spreadsheet sheet, int colNum) {
 			this.colNum = colNum;
+			this.colLetter = sheet.getColLetter(colNum);
 			String caseNumStr = sheet.getCellValue(pageConfig.getCaseNumDocIDRowConfig().getRowNum(), colNum);
 			try {
 				caseNum = Integer.parseUnsignedInt(caseNumStr);

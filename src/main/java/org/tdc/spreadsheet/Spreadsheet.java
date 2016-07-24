@@ -86,4 +86,12 @@ public interface Spreadsheet {
 	 * @return Number of last column in row containing a value (1-based) 
 	 */
 	int getLastColNum(int rowNum);
+	
+	/**
+	 * Gets the letter corresponding to a column number (e.g. col number 4 = "D"). 
+	 *
+	 * @param colNum Column number (1-based index).
+	 * @return Column letter.
+	 */
+	String getColLetter(int colNum);
 }

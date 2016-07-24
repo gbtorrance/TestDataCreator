@@ -17,7 +17,7 @@ public class TestSetImpl implements TestSet {
 	private String setName;
 	private List<TestCase> testCases;
 	
-	public TestSetImpl(Builder builder) {
+	private TestSetImpl(Builder builder) {
 		this.setName = builder.setName;
 		this.testCases = Collections.unmodifiableList(builder.testCases); // unmodifiable
 	}

@@ -5,6 +5,8 @@ import java.util.Map;
 import org.tdc.config.book.BookConfig;
 import org.tdc.config.book.DocIDRowConfig;
 import org.tdc.config.book.PageConfig;
+import org.tdc.message.TestDocMessages;
+import org.w3c.dom.Document;
 
 /**
  * Defines core functionality for a Test Doc.
@@ -17,7 +19,11 @@ import org.tdc.config.book.PageConfig;
 public interface TestDoc {
 	PageConfig getPageConfig();
 	int getColNum();
+	String getColLetter(); 
 	int getCaseNum();
 	String getSetName();
 	Map<String, String> getDocVariables();
+	Document getDOMDocument();
+	void setDOMDocument(Document domDocument);
+	TestDocMessages getMessages();
 }

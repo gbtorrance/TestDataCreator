@@ -18,7 +18,7 @@ public class TestCaseImpl implements TestCase {
 	private final String setName;
 	private final List<TestDoc> testDocs;
 	
-	public TestCaseImpl(Builder builder) {
+	private TestCaseImpl(Builder builder) {
 		this.caseNum = builder.caseNum;
 		this.setName = builder.setName;
 		this.testDocs = Collections.unmodifiableList(builder.testDocs); // unmodifiable

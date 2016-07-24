@@ -1,5 +1,6 @@
 package org.tdc.schemaparse;
 
+import java.nio.file.Path;
 import java.util.List;
 import java.util.ListIterator;
 
@@ -33,8 +34,9 @@ import org.tdc.schemaparse.extractor.SchemaDataTypeExtractor;
 import org.tdc.schemaparse.extractor.SchemaExtractor;
 
 /**
- * Parser that takes an Apache Xerces {@link XSModel} representation of a Schema, and
- * constructs a {@link ModelDef} object tree, returning the root {@link ElementNodeDef}.
+ * Takes an Apache Xerces {@link XSModel} representation of a Schema 
+ * (built using an {@link ModelDefXSModelBuilder}), and uses this to 
+ * construct a {@link ModelDef} object tree, returning the root {@link ElementNodeDef}.
  */
 public class ModelDefSchemaParser {
 
@@ -48,11 +50,11 @@ public class ModelDefSchemaParser {
 	
 	private int rowOffset;
 
-	public ModelDefSchemaParser(XSModel xsModel, MPathIndex<NodeDef> mpathIndex, ModelDefSharedState sharedState, List<SchemaExtractor> schemaExtractors) {
-		this.xsModel = xsModel;
-		this.mpathIndex = mpathIndex;
-		this.sharedState = sharedState;
-		this.schemaExtractors = schemaExtractors;
+	private ModelDefSchemaParser(Builder builder) {
+		this.xsModel = builder.xsModel;
+		this.mpathIndex = builder.mpathIndex;
+		this.sharedState = builder.sharedState;
+		this.schemaExtractors = builder.schemaExtractors;
 	}
 	
 	public ElementNodeDef buildModelDefTreeFromSchema(String rootElementName, String rootElementNamespace) {
@@ -71,7 +73,6 @@ public class ModelDefSchemaParser {
 	}
 	
 	private void processElementDeclaration(XSElementDeclaration xsElementDecl, ElementNodeDef elementNodeDef, int colOffset) {
-
 		// set the name
 		elementNodeDef.setName(xsElementDecl.getName());
 		elementNodeDef.setMPath(buildMPath(elementNodeDef));
@@ -156,7 +157,6 @@ public class ModelDefSchemaParser {
 	}
 	
 	private void processParticle(XSParticle xsParticle, NonAttribNodeDef nonAttribNodeDef, int colOffset) {
-		
 		// get term
 		XSTerm xsTerm = (XSTerm)xsParticle.getTerm();
 		
@@ -211,7 +211,6 @@ public class ModelDefSchemaParser {
 	}
 	
 	private void processModelGroup(XSModelGroup xsModelGroup, CompositorNodeDef compositorNodeDef, int colOffset) {
-		
 		// note: model groups do not have names; leave as null
 		
 		// iterate through particle children of model group
@@ -292,4 +291,45 @@ public class ModelDefSchemaParser {
 		mpathIndex.addMPath(mpath, nodeDef);
 		return mpath;
 	}
+	
+	public static class Builder {
+		private final Path rootSchemaFile;
+		private final MPathIndex<NodeDef> mpathIndex; 
+		private final ModelDefSharedState sharedState;
+		private final List<SchemaExtractor> schemaExtractors;
+
+		private boolean failOnParserWarning;
+		private boolean failOnParserNonFatalError;
+		private MPathBuilder mpathBuilder;
+		private XSModel xsModel;
+
+		public Builder(
+				Path rootSchemaFile, MPathIndex<NodeDef> mpathIndex, ModelDefSharedState sharedState, 
+				List<SchemaExtractor> schemaExtractors) {
+			
+			this.rootSchemaFile = rootSchemaFile;
+			this.mpathIndex = mpathIndex;
+			this.sharedState = sharedState;
+			this.schemaExtractors = schemaExtractors;
+		}
+		
+		public Builder setFailOnParserWarning(boolean failOnParserWarning) {
+			this.failOnParserWarning = failOnParserWarning;
+			return this;
+		}
+		
+		public Builder setFailOnParserNonFatalError(boolean failOnParserNonFatalError) {
+			this.failOnParserNonFatalError = failOnParserNonFatalError;
+			return this;
+		}
+		
+		public ModelDefSchemaParser build() {
+			mpathBuilder = new MPathBuilder();
+			ModelDefXSModelBuilder xsModelBuilder = new ModelDefXSModelBuilder(
+					failOnParserWarning, failOnParserNonFatalError);
+			xsModel = xsModelBuilder.buildXSModelFromSchemas(rootSchemaFile);
+			return new ModelDefSchemaParser(this);
+		}
+	}
 }
+

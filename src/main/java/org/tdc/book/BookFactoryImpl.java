@@ -1,13 +1,11 @@
 package org.tdc.book;
 
-import java.nio.file.Path;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.tdc.config.book.BookConfigFactory;
 import org.tdc.modelinst.ModelInst;
 import org.tdc.modelinst.ModelInstFactory;
-import org.tdc.spreadsheet.SpreadsheetFileFactory;
+import org.tdc.spreadsheet.SpreadsheetFile;
 
 /**
  * A {@link BookFactory} implementation.
@@ -20,22 +18,17 @@ public class BookFactoryImpl implements BookFactory {
 
 	private final BookConfigFactory bookConfigFactory;
 	private final ModelInstFactory modelInstFactory;
-	private final SpreadsheetFileFactory spreadsheetFileFactory;
 	
-	public BookFactoryImpl(
-			BookConfigFactory bookConfigFactory, 
-			ModelInstFactory modelInstFactory, 
-			SpreadsheetFileFactory spreadsheetFileFactory) {
-		
+	public BookFactoryImpl(BookConfigFactory bookConfigFactory, ModelInstFactory modelInstFactory) {
 		this.bookConfigFactory = bookConfigFactory;
 		this.modelInstFactory = modelInstFactory;
-		this.spreadsheetFileFactory = spreadsheetFileFactory;
 	}
 
 	@Override
-	public Book getBook(Path bookFile) {
+	public Book getBook(SpreadsheetFile spreadsheetFile) {
 		return new BookImpl.Builder(
-				bookFile, spreadsheetFileFactory, 
-				bookConfigFactory, modelInstFactory).build();
+				spreadsheetFile, 
+				bookConfigFactory, 
+				modelInstFactory).build();
 	}
 }

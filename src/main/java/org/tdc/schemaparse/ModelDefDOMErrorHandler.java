@@ -10,7 +10,7 @@ import org.w3c.dom.DOMErrorHandler;
  * A {@link DOMErrorHandler} implementation used by {@link ModelDefBuilderImpl} 
  * in the Schema parsing process.
  */
-public class ModelDefDOMErrorHandler implements DOMErrorHandler {
+class ModelDefDOMErrorHandler implements DOMErrorHandler {
 
 	private static final Logger log = LoggerFactory.getLogger(ModelDefDOMErrorHandler.class);
 	

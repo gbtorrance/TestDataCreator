@@ -1,6 +1,7 @@
 package org.tdc.spreadsheet.excel;
 
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Map;
@@ -13,15 +14,15 @@ import org.tdc.spreadsheet.SpreadsheetFile;
  * A {@link SpreadsheetFile} implementation for Excel workbooks.
  */
 public class ExcelSpreadsheetFile implements SpreadsheetFile {
-	
+
 	private final XSSFWorkbook workbook;
 	private final Map<String, Spreadsheet> spreadsheets;
-	
+
 	private ExcelSpreadsheetFile(Builder builder) {
 		this.workbook = builder.workbook;
 		this.spreadsheets = builder.spreadsheets;
 	}
-	
+
 	@Override
 	public Spreadsheet getSpreadsheet(String name) {
 		return spreadsheets.get(name);
@@ -33,18 +34,18 @@ public class ExcelSpreadsheetFile implements SpreadsheetFile {
 		spreadsheets.put(spreadsheet.getName(), spreadsheet);
 		return spreadsheet;
 	}
-	
+
 	@Override
 	public void save(Path path) {
 		try (FileOutputStream fileOut = new FileOutputStream(path.toFile())) {
 			workbook.write(fileOut);
 			workbook.close();
 		}
-		catch(Exception ex) {
+		catch (Exception ex) {
 			throw new RuntimeException("Unable to save Excel file: " + path.toString(), ex);
 		}
 	}
-	
+
 	@Override
 	public void saveAsNew(Path path) {
 		if (Files.exists(path)) {
@@ -52,7 +53,18 @@ public class ExcelSpreadsheetFile implements SpreadsheetFile {
 		}
 		save(path);
 	}
-	
+
+	@Override
+	public void close() {
+		try {
+			workbook.close();
+		}
+		catch (IOException e) {
+			throw new RuntimeException("Unable to close ExcelSpreadsheetFile", e);
+		}
+
+	}
+
 	@Override
 	public void setSpreadsheetHidden(String name, boolean hide) {
 		int index = workbook.getSheetIndex(name);
@@ -64,13 +76,13 @@ public class ExcelSpreadsheetFile implements SpreadsheetFile {
 
 	public static class Builder {
 		private final XSSFWorkbook workbook;
-		
+
 		private Map<String, Spreadsheet> spreadsheets;
-		
+
 		public Builder(XSSFWorkbook workbook) {
 			this.workbook = workbook;
 		}
-		
+
 		public SpreadsheetFile build() {
 			spreadsheets = new ExcelSpreadsheet.Builder(workbook).buildAll();
 			return new ExcelSpreadsheetFile(this);

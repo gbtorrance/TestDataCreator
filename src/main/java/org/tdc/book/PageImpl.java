@@ -17,12 +17,12 @@ import org.tdc.spreadsheet.SpreadsheetFile;
 public class PageImpl implements Page {
 	
 	private final PageConfig config;
-	private final ModelInstFactory modelInstFactory;
+	private final ModelInst modelInst;
 	private final List<TestDoc> testDocs;
 	
 	private PageImpl(Builder builder) {
 		this.config = builder.config;
-		this.modelInstFactory = builder.modelInstFactory;
+		this.modelInst = builder.modelInst;
 		this.testDocs = Collections.unmodifiableList(builder.testDocs); // unmodifiable
 	}
 
@@ -38,11 +38,7 @@ public class PageImpl implements Page {
 	
 	@Override
 	public ModelInst getModelInst() {
-		// intentionally not storing a reference to the actual ModelInst;
-		// that way we can keep Books/Pages in memory without necessarily
-		// keeping the very heavy-weight ModelInsts in memory all the time;
-		// allows for better memory management
-		return modelInstFactory.getModelInst(config.getModelConfig());
+		return modelInst;
 	}
 	
 	@Override 
@@ -56,6 +52,7 @@ public class PageImpl implements Page {
 		private final SpreadsheetFile spreadsheetFile;
 		
 		private PageConfig config;
+		private ModelInst modelInst;
 		private List<TestDoc> testDocs;
 		
 		public Builder(
@@ -79,6 +76,7 @@ public class PageImpl implements Page {
 
 		private Page build(PageConfig config) {
 			this.config = config;
+			modelInst = modelInstFactory.getModelInst(config.getModelConfig());
 			testDocs = new TestDocImpl.Builder(config, spreadsheetFile).buildAll();
 			return new PageImpl(this);
 		}

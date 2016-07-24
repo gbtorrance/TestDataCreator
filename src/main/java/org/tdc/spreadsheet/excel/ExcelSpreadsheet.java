@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import org.apache.poi.ss.util.CellReference;
 import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.apache.poi.xssf.usermodel.XSSFCellStyle;
 import org.apache.poi.xssf.usermodel.XSSFColor;
@@ -43,7 +44,7 @@ public class ExcelSpreadsheet implements Spreadsheet {
 	@Override 
 	public String getCellValue(int rowNum, int colNum) {
 		XSSFCell cell = getCell(rowNum, colNum);
-		return getCellValue(cell);
+		return cell == null ? "" : getCellValue(cell);
 	}
 
 	@Override
@@ -53,7 +54,7 @@ public class ExcelSpreadsheet implements Spreadsheet {
 	
 	@Override
 	public void setCellValue(String value, int rowNum, int colNum, CellStyle cellStyle) {
-		XSSFCell cell = getCell(rowNum, colNum);
+		XSSFCell cell = getCellCreateIfNotExist(rowNum, colNum);
 		cell.setCellValue(value);
 		if (cellStyle != null) {
 			cell.setCellStyle(poiCellStyleLookup.getPOICellStyle(cellStyle));
@@ -104,17 +105,31 @@ public class ExcelSpreadsheet implements Spreadsheet {
 		return xssfSheet.getRow(rowNum-1).getLastCellNum();
 	}
 	
+	@Override
+	public String getColLetter(int colNum) {
+		// Whereas the public methods in this class use 1-based index values, 
+		// Apache POI libraries use 0-based indexes;
+		// this method accepts 1-based indexes and converts to 0-based indexes for POI (as necessary)
+		
+		return CellReference.convertNumToColString(colNum-1);
+	}
+
 	private String getCellValue(XSSFCell cell) {
 		return getCellValueByType(cell, cell.getCellType());
 	}
 	
 	private XSSFCell getCell(int rowNum, int colNum) {
-		XSSFRow row = getRow(rowNum);
-		XSSFCell cell = getCell(row, colNum);
+		XSSFRow row = xssfSheet.getRow(rowNum-1);
+		return row == null ? null : row.getCell(colNum-1);
+	}
+	
+	private XSSFCell getCellCreateIfNotExist(int rowNum, int colNum) {
+		XSSFRow row = getRowCreateIfNotExist(rowNum);
+		XSSFCell cell = getCellCreateIfNotExist(row, colNum);
 		return cell;
 	}
 	
-	private XSSFCell getCell(XSSFRow row, int colNum) {
+	private XSSFCell getCellCreateIfNotExist(XSSFRow row, int colNum) {
 		// Whereas the public methods in this class use 1-based index values, 
 		// Apache POI libraries use 0-based indexes;
 		// this method accepts 1-based indexes and converts to 0-based indexes for POI (as necessary)
@@ -126,7 +141,7 @@ public class ExcelSpreadsheet implements Spreadsheet {
 		return cell;
 	}
 	
-	private XSSFRow getRow(int rowNum) {
+	private XSSFRow getRowCreateIfNotExist(int rowNum) {
 		// Whereas the public methods in this class use 1-based index values, 
 		// Apache POI libraries use 0-based indexes;
 		// this method accepts 1-based indexes and converts to 0-based indexes for POI (as necessary)

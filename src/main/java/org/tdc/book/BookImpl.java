@@ -1,6 +1,5 @@
 package org.tdc.book;
 
-import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -12,7 +11,6 @@ import org.tdc.config.book.BookConfigFactory;
 import org.tdc.modelinst.ModelInstFactory;
 import org.tdc.spreadsheet.Spreadsheet;
 import org.tdc.spreadsheet.SpreadsheetFile;
-import org.tdc.spreadsheet.SpreadsheetFileFactory;
 import org.tdc.util.Addr;
 
 /**
@@ -48,38 +46,34 @@ public class BookImpl implements Book {
 	}
 	
 	public static class Builder {
-		private final Path bookFile; 
-		private final SpreadsheetFileFactory spreadsheetFileFactory; 
+		private final SpreadsheetFile spreadsheetFile;
 		private final BookConfigFactory bookConfigFactory; 
 		private final ModelInstFactory modelInstFactory;
-
+		
 		private BookConfig config;
 		private Map<String, Page> pages;
 		public List<TestSet> testSets;
 		
 		public Builder(
-				Path bookFile, 
-				SpreadsheetFileFactory spreadsheetFileFactory, 
+				SpreadsheetFile spreadsheetFile,
 				BookConfigFactory bookConfigFactory, 
 				ModelInstFactory modelInstFactory) {
 			
-			log.info("Creating Book from Book file: {}", bookFile.toAbsolutePath());
-			this.bookFile = bookFile;
-			this.spreadsheetFileFactory = spreadsheetFileFactory;
+			log.info("Creating Book from SpreadsheetFile object");
+			this.spreadsheetFile = spreadsheetFile;
 			this.bookConfigFactory = bookConfigFactory;
 			this.modelInstFactory = modelInstFactory;
 		}
 		
 		public Book build() {
-			SpreadsheetFile spreadsheetFile = spreadsheetFileFactory.getSpreadsheetFileFromPath(bookFile);
-			Addr addr = getBookAddrFromConfigSheet(bookFile, spreadsheetFile);
+			Addr addr = getBookAddrFromConfigSheet(spreadsheetFile);
 			config = bookConfigFactory.getBookConfig(addr);
 			pages = new PageImpl.Builder(config.getPageConfigs(), modelInstFactory, spreadsheetFile).buildAll();
 			testSets = new TestSetImpl.Builder(pages, config.getDocTypeConfigs()).buildAll();
 			return new BookImpl(this);
 		}
 		
-		private Addr getBookAddrFromConfigSheet(Path bookFile, SpreadsheetFile spreadsheetFile) {
+		private Addr getBookAddrFromConfigSheet(SpreadsheetFile spreadsheetFile) {
 			Spreadsheet sheet = spreadsheetFile.getSpreadsheet(BookUtil.CONFIG_SHEET_NAME);
 			if (sheet == null) {
 				throw new RuntimeException("Configuration worksheet '" + BookUtil.CONFIG_SHEET_NAME + "' does not exist");

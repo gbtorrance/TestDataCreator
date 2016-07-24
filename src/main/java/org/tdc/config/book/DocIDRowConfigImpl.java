@@ -15,7 +15,7 @@ public class DocIDRowConfigImpl implements DocIDRowConfig {
 	private final int index;
 	private final int rowNum;
 	
-	public DocIDRowConfigImpl(Builder builder) {
+	private DocIDRowConfigImpl(Builder builder) {
 		this.docIDType = builder.docIDType;
 		this.docVariableName = builder.docVariableName;
 		this.label = builder.label;
