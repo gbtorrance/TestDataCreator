@@ -10,14 +10,14 @@ import org.tdc.config.XMLConfigWrapper;
  */
 public class DocIDRowConfigImpl implements DocIDRowConfig {
 	private final DocIDType docIDType;
-	private final String docVariableName;
+	private final String variableName;
 	private final String label;
 	private final int index;
 	private final int rowNum;
 	
 	private DocIDRowConfigImpl(Builder builder) {
 		this.docIDType = builder.docIDType;
-		this.docVariableName = builder.docVariableName;
+		this.variableName = builder.variableName;
 		this.label = builder.label;
 		this.index = builder.index;
 		this.rowNum = builder.docIDRowStart + index;
@@ -29,8 +29,8 @@ public class DocIDRowConfigImpl implements DocIDRowConfig {
 	}
 
 	@Override
-	public String getDocVariableName() {
-		return docVariableName;
+	public String getVariableName() {
+		return variableName;
 	}
 
 	@Override
@@ -56,7 +56,7 @@ public class DocIDRowConfigImpl implements DocIDRowConfig {
 		private final int docIDRowStart;
 		
 		private DocIDType docIDType;
-		private String docVariableName;
+		private String variableName;
 		private String label;
 		private int index;
 		
@@ -102,12 +102,12 @@ public class DocIDRowConfigImpl implements DocIDRowConfig {
 				throw new IllegalStateException("DocIDRow type '" + type + 
 						"' invalid for config key: " + indexPrefix);
 			}
-			docVariableName = config.getString(indexPrefix + "[@variableName]", 
-					null, docIDType == DocIDType.DOC_VARIABLE);
-			if (docVariableName != null && docIDType != DocIDType.DOC_VARIABLE) {
+			variableName = config.getString(indexPrefix + "[@variableName]", 
+					null, docIDType.isVariableType());
+			if (variableName != null && !docIDType.isVariableType()) {
 				throw new IllegalStateException(
-						"DocIDRow variableName can only be specified for a row of type 'doc-variable': " + 
-						indexPrefix);
+						"DocIDRow 'variableName' cannot be specified for rows of type '" + 
+						docIDType.getConfigType() + "': " + indexPrefix);
 			}
 			label = config.getString(indexPrefix + ".Label", "", false);
 			return new DocIDRowConfigImpl(this);

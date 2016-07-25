@@ -5,7 +5,7 @@ package org.tdc.config.book;
  */
 public interface DocIDRowConfig {
 	DocIDType getType();
-	String getDocVariableName();
+	String getVariableName();
 	String getLabel();
 	int getIndex();
 	int getRowNum();

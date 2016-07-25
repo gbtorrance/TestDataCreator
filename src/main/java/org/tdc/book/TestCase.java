@@ -1,6 +1,7 @@
 package org.tdc.book;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Defines core functionality for a Test Case.
@@ -14,4 +15,5 @@ public interface TestCase {
 	int getCaseNum();
 	String getSetName();
 	List<TestDoc> getTestDocs();
+	Map<String, String> getCaseVariables();
 }

@@ -13,8 +13,8 @@ import org.w3c.dom.Document;
  * 
  * <p> A TestDoc represents a single column of test data on a {@link Page}.
  * 
- * <p>TestDocs can contain Doc Variables if support for these is defined using
- * {@link DocIDRowConfig} entries in the {@link BookConfig} file 
+ * <p>TestDocs can contain Doc Variables or Case Variables if support for these is 
+ * defined using {@link DocIDRowConfig} entries in the {@link BookConfig} file. 
  */
 public interface TestDoc {
 	PageConfig getPageConfig();
@@ -23,6 +23,7 @@ public interface TestDoc {
 	int getCaseNum();
 	String getSetName();
 	Map<String, String> getDocVariables();
+	Map<String, String> getCaseVariables();
 	Document getDOMDocument();
 	void setDOMDocument(Document domDocument);
 	TestDocMessages getMessages();

@@ -223,8 +223,8 @@ public class PageConfigImpl implements PageConfig {
 					.filter(docIDRowConfig -> docIDRowConfig.getType() == DocIDType.SET_NAME)
 					.findFirst().orElse(null); // SET_NAME may not exist
 			varDocIDRowConfigs = docIDRowConfigs.stream()
-					.filter(docIDRowConfig -> docIDRowConfig.getType() == DocIDType.DOC_VARIABLE)
-					.collect(Collectors.toList()); // collect all of DOC_VARIABLE rows
+					.filter(docIDRowConfig -> docIDRowConfig.getType().isVariableType())
+					.collect(Collectors.toList()); // collect all variable rows
 		}
 	}
 }

@@ -26,7 +26,7 @@
 				<Row type="set-name">
 					<Label>Test Set Name (optional)</Label>
 				</Row>
-				<Row type="doc-variable" variableName="SUBMISSION_ID">
+				<Row type="case-variable" variableName="SUBMISSION_ID">
 					<Label>Submission ID</Label>
 				</Row>
 				<Row type="doc-variable" variableName="NOTE_1">

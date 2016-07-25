@@ -2,6 +2,7 @@ package org.tdc.book;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -17,11 +18,13 @@ public class TestCaseImpl implements TestCase {
 	private final int caseNum;
 	private final String setName;
 	private final List<TestDoc> testDocs;
+	private final Map<String, String> caseVariables;
 	
 	private TestCaseImpl(Builder builder) {
 		this.caseNum = builder.caseNum;
 		this.setName = builder.setName;
 		this.testDocs = Collections.unmodifiableList(builder.testDocs); // unmodifiable
+		this.caseVariables = Collections.unmodifiableMap(builder.caseVariables); // unmodifiable
 	}
 
 	@Override
@@ -39,6 +42,11 @@ public class TestCaseImpl implements TestCase {
 		return testDocs;
 	}
 
+	@Override
+	public Map<String, String> getCaseVariables() {
+		return caseVariables;
+	}
+
 	public static class Builder {
 		private final String setName;
 		private final List<TestDoc> allTestDocsInSet;
@@ -46,6 +54,7 @@ public class TestCaseImpl implements TestCase {
 		
 		private int caseNum;
 		private List<TestDoc> testDocs;
+		private Map<String, String> caseVariables;
 		
 		public Builder(
 				String setName, 
@@ -72,10 +81,18 @@ public class TestCaseImpl implements TestCase {
 		private TestCase build(int caseNum, List<TestDoc> allTestDocsInCase) {
 			this.caseNum = caseNum;
 			this.testDocs = allTestDocsInCase;
+			buildVariables();
 			verifyDocTypeMinMax();
 			return new TestCaseImpl(this);
 		}
 		
+		private void buildVariables() {
+			// populate caseVariables with all case variables defined 
+			// for TestDocs belonging to this TestCase
+			caseVariables = new HashMap<>();
+			testDocs.stream().forEach(td -> caseVariables.putAll(td.getCaseVariables()));
+		}
+
 		private void verifyDocTypeMinMax() {
 			// count the number of each DocType among the TestDocs for this TestCase
 			Map<DocTypeConfig, Long> docTypeConfigToDocTypeCountMap = testDocs

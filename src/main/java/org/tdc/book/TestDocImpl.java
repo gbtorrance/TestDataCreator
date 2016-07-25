@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.tdc.config.book.DocIDRowConfig;
+import org.tdc.config.book.DocIDType;
 import org.tdc.config.book.PageConfig;
 import org.tdc.message.TestDocMessages;
 import org.tdc.spreadsheet.Spreadsheet;
@@ -23,6 +24,7 @@ public class TestDocImpl implements TestDoc {
 	private final int caseNum;
 	private final String setName;
 	private final Map<String, String> docVariables;
+	private final Map<String, String> caseVariables;
 	private final TestDocMessages messages;
 	
 	private Document domDocument;
@@ -34,6 +36,7 @@ public class TestDocImpl implements TestDoc {
 		this.caseNum = builder.caseNum;
 		this.setName = builder.setName;
 		this.docVariables = Collections.unmodifiableMap(builder.docVariables); // unmodifiable
+		this.caseVariables = Collections.unmodifiableMap(builder.caseVariables); // unmodifiable
 		this.messages = new TestDocMessages();
 	}
 	
@@ -68,6 +71,11 @@ public class TestDocImpl implements TestDoc {
 	}
 
 	@Override
+	public Map<String, String> getCaseVariables() {
+		return caseVariables;
+	}
+
+	@Override
 	public Document getDOMDocument() {
 		return domDocument;
 	}
@@ -91,6 +99,7 @@ public class TestDocImpl implements TestDoc {
 		private int caseNum;
 		private String setName;
 		private Map<String, String> docVariables;
+		private Map<String, String> caseVariables;
 		
 		public Builder(PageConfig pageConfig, SpreadsheetFile spreadsheetFile) {
 			this.pageConfig = pageConfig;
@@ -129,14 +138,24 @@ public class TestDocImpl implements TestDoc {
 			}
 			DocIDRowConfig setNameConfig = pageConfig.getSetNameDocIDRowConfig();
 			setName = setNameConfig == null ? "" : sheet.getCellValue(setNameConfig.getRowNum(), colNum);
+			buildVariables(sheet);
+			return new TestDocImpl(this);
+		}
+
+		private void buildVariables(Spreadsheet sheet) {
 			docVariables = new HashMap<>();
+			caseVariables = new HashMap<>();
 			List<DocIDRowConfig> varConfigs = pageConfig.getVarDocIDRowConfigs();
 			for (DocIDRowConfig var : varConfigs) {
-				String varName = var.getDocVariableName();
+				String varName = var.getVariableName();
 				String value = sheet.getCellValue(var.getRowNum(), colNum).trim();
-				docVariables.put(varName, value);
+				if (var.getType() == DocIDType.DOC_VARIABLE) {
+					docVariables.put(varName, value);
+				}
+				else { // DocIDType.CASE_VARIABLE
+					caseVariables.put(varName, value);
+				}
 			}
-			return new TestDocImpl(this);
 		}
 	}
 }
