@@ -80,5 +80,8 @@ public class BookReaderTest {
 		
 		BookValidator validator = new BookValidator(book, schemaValidatorFactory);
 		validator.validate();
+
+		BookTestDataGenerator generator = new BookTestDataGenerator(book);
+		generator.generateTestData();
 	}
 }

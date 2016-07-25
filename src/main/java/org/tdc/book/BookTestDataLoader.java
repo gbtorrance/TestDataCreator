@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.tdc.config.book.PageConfig;
 import org.tdc.config.model.ModelConfig;
+import org.tdc.dom.TestDocDOMBuilder;
 import org.tdc.modelinst.ModelInst;
 import org.tdc.spreadsheet.Spreadsheet;
 import org.tdc.spreadsheet.SpreadsheetFile;

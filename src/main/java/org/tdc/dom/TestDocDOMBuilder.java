@@ -1,4 +1,4 @@
-package org.tdc.book;
+package org.tdc.dom;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,6 +9,8 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.tdc.book.BookUtil;
+import org.tdc.book.TestDoc;
 import org.tdc.message.Message;
 import org.tdc.message.TestDocMessageType;
 import org.tdc.message.TestDocMessages;
@@ -120,7 +122,7 @@ public class TestDocDOMBuilder {
 
 	private Element createElement(ElementNodeInst elementInst) {
 		Element element = document.createElementNS(namespace, elementInst.getName());
-		element.setUserData(BookUtil.DOM_USER_DATA_RELATED_TDC_NODE, elementInst, null);
+		element.setUserData(DOMUtil.DOM_USER_DATA_RELATED_TDC_NODE, elementInst, null);
 		return element;
 	}
 
@@ -169,7 +171,7 @@ public class TestDocDOMBuilder {
 
 	private Attr createAttr(AttribNodeInst attribInstChild, String value) {
 		Attr attr = document.createAttributeNS(null,  attribInstChild.getNodeDef().getName());
-		attr.setUserData(BookUtil.DOM_USER_DATA_RELATED_TDC_NODE, attribInstChild, null);
+		attr.setUserData(DOMUtil.DOM_USER_DATA_RELATED_TDC_NODE, attribInstChild, null);
 		attr.setValue(value);
 		return attr;
 	}
