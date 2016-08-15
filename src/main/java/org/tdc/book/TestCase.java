@@ -11,7 +11,7 @@ import java.util.Map;
  * <P>A TestCase will always have a Case Number and may have
  * an optional Set Name. (An empty string for Set Name is the default.)
  */
-public interface TestCase {
+public interface TestCase extends CanHaveResults {
 	int getCaseNum();
 	String getSetName();
 	List<TestDoc> getTestDocs();

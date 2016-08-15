@@ -11,14 +11,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.tdc.book.BookUtil;
 import org.tdc.book.TestDoc;
-import org.tdc.message.Message;
-import org.tdc.message.TestDocMessageType;
-import org.tdc.message.TestDocMessages;
 import org.tdc.modelinst.AttribNodeInst;
 import org.tdc.modelinst.CompositorNodeInst;
 import org.tdc.modelinst.ElementNodeInst;
 import org.tdc.modelinst.ModelInst;
 import org.tdc.modelinst.NonAttribNodeInst;
+import org.tdc.result.Message;
+import org.tdc.result.Result;
 import org.tdc.spreadsheet.Spreadsheet;
 import org.tdc.spreadsheet.SpreadsheetFile;
 import org.w3c.dom.Attr;
@@ -35,6 +34,7 @@ import org.w3c.dom.Node;
 public class TestDocDOMBuilder {
 	
 	private static final Logger log = LoggerFactory.getLogger(TestDocDOMBuilder.class);
+	private static final String MESSAGE_TYPE_WARNING = "warning";
 	
 	private final DocumentBuilder documentBuilder;
 	
@@ -44,7 +44,7 @@ public class TestDocDOMBuilder {
 	private int testDocColNum;
 	private String testDocColLetter;
 	private String namespace;
-	private TestDocMessages messages;
+	private Result result;
 	private Document document;
 	
 	public TestDocDOMBuilder() {
@@ -78,9 +78,9 @@ public class TestDocDOMBuilder {
 		this.namespace = namespace;
 		return this;
 	}
-	
-	public TestDocDOMBuilder setMessages(TestDocMessages messages) {
-		this.messages = messages;
+
+	public TestDocDOMBuilder setResult(Result result) {
+		this.result = result;
 		return this;
 	}
 	
@@ -232,14 +232,14 @@ public class TestDocDOMBuilder {
 	}
 	
 	private void warning(String messageStr, int rowNum, String value) {
-		if (messages != null) {
+		if (result != null) {
 			Message message = new Message
-					.Builder(TestDocMessageType.WARNING, messageStr)
+					.Builder(MESSAGE_TYPE_WARNING, messageStr)
 					.setRowNumColNum(rowNum, testDocColNum)
 					.setCellRef(testDocColLetter + rowNum)
 					.setValue(value)
 					.build();
-			messages.addMessage(message);
+			result.addMessage(message);
 		}
 	}
 }

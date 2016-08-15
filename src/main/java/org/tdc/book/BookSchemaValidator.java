@@ -1,24 +1,26 @@
 package org.tdc.book;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.tdc.config.model.ModelConfig;
+import org.tdc.result.Result;
 import org.tdc.schemavalidate.SchemaValidator;
 import org.tdc.schemavalidate.SchemaValidatorFactory;
 
 /**
- * Validates all {@link TestDoc}s in a particular {@link Book}.
+ * Schema validates all {@link TestDoc}s in a particular {@link Book}.
  */
-public class BookValidator {
+public class BookSchemaValidator {
 	
-	private static final Logger log = LoggerFactory.getLogger(BookValidator.class);
+	private static final Logger log = LoggerFactory.getLogger(BookSchemaValidator.class);
 	
 	private final Book book;
 	private final SchemaValidatorFactory schemaValidatorFactory;
 	
-	public BookValidator(Book book, SchemaValidatorFactory schemaValidatorFactory) {
+	public BookSchemaValidator(Book book, SchemaValidatorFactory schemaValidatorFactory) {
 		this.book = book;
 		this.schemaValidatorFactory = schemaValidatorFactory;
 	}
@@ -49,8 +51,15 @@ public class BookValidator {
 	private void validateTestDoc(TestDoc testDoc) {
 		log.debug("Schema validating TestCase num {}, TestSet name '{}', column {}", 
 				testDoc.getCaseNum(), testDoc.getSetName(), testDoc.getColNum());
-		ModelConfig modelConfig = testDoc.getPageConfig().getModelConfig(); 
-		SchemaValidator schemaValidator = schemaValidatorFactory.getSchemaValidator(modelConfig);
-		schemaValidator.validate(testDoc);
+		Optional<Result> schemaValidateResult = testDoc.getResults().getSchemaValidateResult();
+		if (schemaValidateResult.isPresent()) {
+			log.debug("Schema validation already complete for this TestDoc; skipping!");
+		}
+		else {
+			ModelConfig modelConfig = testDoc.getPageConfig().getModelConfig(); 
+			SchemaValidator schemaValidator = schemaValidatorFactory.getSchemaValidator(modelConfig);
+			testDoc.getResults().setSchemaValidateResult(new Result());
+			schemaValidator.validate(testDoc);
+		}
 	}
 }

@@ -8,7 +8,7 @@ import java.util.List;
  * <p>A TestSet can have one or more {@link TestCase}s,
  * which each, in turn, can have one or more {@link TestDoc}s.
  */
-public interface TestSet {
+public interface TestSet extends CanHaveResults {
 	String getSetName();
 	List<TestCase> getTestCases();
 }

@@ -9,6 +9,7 @@ import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
 import org.tdc.config.book.DocTypeConfig;
+import org.tdc.result.Results;
 
 /**
  * A {@link TestCase} implementation.
@@ -19,12 +20,14 @@ public class TestCaseImpl implements TestCase {
 	private final String setName;
 	private final List<TestDoc> testDocs;
 	private final Map<String, String> caseVariables;
+	private final Results results;
 	
 	private TestCaseImpl(Builder builder) {
 		this.caseNum = builder.caseNum;
 		this.setName = builder.setName;
 		this.testDocs = Collections.unmodifiableList(builder.testDocs); // unmodifiable
 		this.caseVariables = Collections.unmodifiableMap(builder.caseVariables); // unmodifiable
+		this.results = builder.results;
 	}
 
 	@Override
@@ -46,6 +49,11 @@ public class TestCaseImpl implements TestCase {
 	public Map<String, String> getCaseVariables() {
 		return caseVariables;
 	}
+	
+	@Override
+	public Results getResults() {
+		return results;
+	}
 
 	public static class Builder {
 		private final String setName;
@@ -55,6 +63,7 @@ public class TestCaseImpl implements TestCase {
 		private int caseNum;
 		private List<TestDoc> testDocs;
 		private Map<String, String> caseVariables;
+		private Results results;
 		
 		public Builder(
 				String setName, 
@@ -81,6 +90,7 @@ public class TestCaseImpl implements TestCase {
 		private TestCase build(int caseNum, List<TestDoc> allTestDocsInCase) {
 			this.caseNum = caseNum;
 			this.testDocs = allTestDocsInCase;
+			results = new Results();
 			buildVariables();
 			verifyDocTypeMinMax();
 			return new TestCaseImpl(this);

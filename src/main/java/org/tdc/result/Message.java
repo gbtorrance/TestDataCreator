@@ -1,13 +1,18 @@
-package org.tdc.message;
+package org.tdc.result;
+
+import org.tdc.book.TestCase;
+import org.tdc.book.TestDoc;
+import org.tdc.book.TestSet;
 
 /**
  * A Message is used for storing information about a particular item of information, 
  * an error, or a warning that needs to, ultimately, be communicated back to the user. 
  * 
- * <p>They are created, typically, when validating {@link TestDoc}s and {@link TestCase}s.
+ * <p>They are created, typically, when validating or processing 
+ * {@link TestDoc}s , {@link TestCase}s, or {@link TestSet}s.  
  */
 public class Message {
-	private final MessageType type;
+	private final String type;
 	private final String message;
 	private final String pageName;
 	private final Integer rowNum;
@@ -27,7 +32,7 @@ public class Message {
 		this.value = builder.value;
 	}
 	
-	public MessageType getType() {
+	public String getType() {
 		return type;
 	}
 	
@@ -63,7 +68,7 @@ public class Message {
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
 		sb.append("[");
-		sb.append(type.getLabel());
+		sb.append(type);
 		if (rowNum != null) {
 			sb.append(", row: ").append(rowNum);
 		}
@@ -87,7 +92,7 @@ public class Message {
 	}
 	
 	public static class Builder {
-		private final MessageType type;
+		private final String type;
 		private final String message;
 
 		private String pageName;
@@ -97,7 +102,7 @@ public class Message {
 		private String xpath;
 		private String value;
 
-		public Builder(MessageType type, String message) {
+		public Builder(String type, String message) {
 			this.type = type;
 			this.message = message;
 		}

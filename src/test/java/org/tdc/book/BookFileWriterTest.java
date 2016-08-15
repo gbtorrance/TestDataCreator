@@ -8,6 +8,8 @@ import org.junit.Test;
 import org.tdc.config.book.BookConfig;
 import org.tdc.config.book.BookConfigFactory;
 import org.tdc.config.book.BookConfigFactoryImpl;
+import org.tdc.config.book.TaskConfigFactory;
+import org.tdc.config.book.TaskConfigFactoryImpl;
 import org.tdc.config.model.ModelConfig;
 import org.tdc.config.model.ModelConfigFactory;
 import org.tdc.config.model.ModelConfigFactoryImpl;
@@ -37,6 +39,7 @@ public class BookFileWriterTest {
 	
 	private static SchemaConfigFactory schemaConfigFactory;
 	private static ModelConfigFactory modelConfigFactory;
+	private static TaskConfigFactory taskConfigFactory;
 	private static BookConfigFactory bookConfigFactory;
 	private static SpreadsheetFileFactory spreadsheetFileFactory;
 	private static SchemaFactory schemaFactory;
@@ -50,7 +53,9 @@ public class BookFileWriterTest {
 		
 		schemaConfigFactory = new SchemaConfigFactoryImpl(schemasRoot);
 		modelConfigFactory = new ModelConfigFactoryImpl(schemaConfigFactory);
-		bookConfigFactory = new BookConfigFactoryImpl(booksRoot, modelConfigFactory);
+		taskConfigFactory = new TaskConfigFactoryImpl();
+		bookConfigFactory = new BookConfigFactoryImpl(
+				booksRoot, modelConfigFactory, taskConfigFactory);
 		
 		spreadsheetFileFactory = new ExcelSpreadsheetFileFactory();
 		

@@ -9,6 +9,8 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.tdc.config.book.BookConfigFactory;
 import org.tdc.config.book.BookConfigFactoryImpl;
+import org.tdc.config.book.TaskConfigFactory;
+import org.tdc.config.book.TaskConfigFactoryImpl;
 import org.tdc.config.model.ModelConfigFactory;
 import org.tdc.config.model.ModelConfigFactoryImpl;
 import org.tdc.config.schema.SchemaConfigFactory;
@@ -35,6 +37,7 @@ public class BookReaderTest {
 	
 	private static SchemaConfigFactory schemaConfigFactory;
 	private static ModelConfigFactory modelConfigFactory;
+	private static TaskConfigFactory taskConfigFactory;
 	private static BookConfigFactory bookConfigFactory;
 	private static SpreadsheetFileFactory spreadsheetFileFactory;
 	private static SchemaFactory schemaFactory;
@@ -50,7 +53,9 @@ public class BookReaderTest {
 		
 		schemaConfigFactory = new SchemaConfigFactoryImpl(schemasRoot);
 		modelConfigFactory = new ModelConfigFactoryImpl(schemaConfigFactory);
-		bookConfigFactory = new BookConfigFactoryImpl(booksRoot, modelConfigFactory);
+		taskConfigFactory = new TaskConfigFactoryImpl();
+		bookConfigFactory = new BookConfigFactoryImpl(
+				booksRoot, modelConfigFactory, taskConfigFactory);
 		
 		spreadsheetFileFactory = new ExcelSpreadsheetFileFactory();
 		
@@ -78,10 +83,7 @@ public class BookReaderTest {
 		BookTestDataLoader loader = new BookTestDataLoader(book, spreadsheetFile);
 		loader.loadTestData();
 		
-		BookValidator validator = new BookValidator(book, schemaValidatorFactory);
+		BookSchemaValidator validator = new BookSchemaValidator(book, schemaValidatorFactory);
 		validator.validate();
-
-		BookTestDataGenerator generator = new BookTestDataGenerator(book);
-		generator.generateTestData();
 	}
 }

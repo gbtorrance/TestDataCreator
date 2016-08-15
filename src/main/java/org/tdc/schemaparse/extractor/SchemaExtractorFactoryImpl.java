@@ -19,7 +19,6 @@ public class SchemaExtractorFactoryImpl implements SchemaExtractorFactory {
 		Class<?> classy = getClass(className);
 		Method buildMethod = getBuildMethod(classy);
 		SchemaExtractor extractor = buildExtractor(buildMethod, config, extractorKey);
-		ensureExtractorImplementsInterface(extractor);
 		return extractor;
 	}
 
@@ -47,8 +46,7 @@ public class SchemaExtractorFactoryImpl implements SchemaExtractorFactory {
 			className = getDefaultClassName(type);
 		}
 		if (className == null) {
-			throw new RuntimeException("Unable to locate class '" + className + 
-					"' for SchemaExtractor '" + extractorKey + "'");
+			throw new RuntimeException("Unable to locate class for SchemaExtractor '" + extractorKey + "'");
 		}
 		return className;
 	}
@@ -94,20 +92,17 @@ public class SchemaExtractorFactoryImpl implements SchemaExtractorFactory {
 	}
 
 	private SchemaExtractor buildExtractor(Method buildMethod, XMLConfigWrapper config, String extractorKey) {
-		SchemaExtractor extractor = null;
+		Object extractor = null;
 		try {
-			extractor = (SchemaExtractor)buildMethod.invoke(null, config, extractorKey);
+			extractor = buildMethod.invoke(null, config, extractorKey);
 		} 
 		catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
 			throw new RuntimeException("Unable to execute static build() method for '" + extractorKey + "'", ex);
 		}
-		return extractor;
-	}
-
-	private void ensureExtractorImplementsInterface(SchemaExtractor extractor) {
 		if (!(extractor instanceof SchemaExtractor)) {
 			throw new RuntimeException("Class '" + extractor.getClass().getName() + 
 					"' must implement SchemaExtractor interface");
 		}
+		return (SchemaExtractor)extractor;
 	}
 }

@@ -4,9 +4,9 @@ import javax.xml.validation.Validator;
 
 import org.tdc.book.TestDoc;
 import org.tdc.dom.DOMUtil;
-import org.tdc.message.Message;
-import org.tdc.message.TestDocMessageType;
 import org.tdc.modelinst.NodeInst;
+import org.tdc.result.Message;
+import org.tdc.result.Result;
 import org.w3c.dom.Element;
 import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXException;
@@ -21,31 +21,37 @@ import org.xml.sax.SAXParseException;
 class SchemaValidatorErrorHandler implements ErrorHandler {
 	
 	private static final String CURRENT_ELEMENT_PROPERTY = "http://apache.org/xml/properties/dom/current-element-node";
+	private static final String MESSAGE_TYPE_SCHEMA_ERROR = "schema-error";
+	private static final String MESSAGE_TYPE_SCHEMA_FATAL_ERROR = "schema-fatal-error";
+	private static final String MESSAGE_TYPE_SCHEMA_WARNING = "schema-warning";
 	
 	private final Validator validator;
 	private final TestDoc testDoc;
+	private final Result result;
 	
 	public SchemaValidatorErrorHandler(Validator validator, TestDoc testDoc) {
 		this.validator = validator;
 		this.testDoc = testDoc;
+		result = testDoc.getResults().getSchemaValidateResult()
+				.orElseThrow(() -> new IllegalStateException("SchemaValidateResult not set"));
 	}
 	
 	@Override
 	public void error(SAXParseException ex) throws SAXException {
-		logParseException(ex, TestDocMessageType.SCHEMA_ERROR);
+		logParseException(ex, MESSAGE_TYPE_SCHEMA_ERROR);
 	}
 
 	@Override
 	public void fatalError(SAXParseException ex) throws SAXException {
-		logParseException(ex, TestDocMessageType.SCHEMA_FATAL_ERROR);
+		logParseException(ex, MESSAGE_TYPE_SCHEMA_FATAL_ERROR);
 	}
 
 	@Override
 	public void warning(SAXParseException ex) throws SAXException {
-		logParseException(ex, TestDocMessageType.SCHEMA_WARNING);
+		logParseException(ex, MESSAGE_TYPE_SCHEMA_WARNING);
 	}
 	
-	private void logParseException(SAXParseException ex, TestDocMessageType type) {
+	private void logParseException(SAXParseException ex, String type) {
 		try {
 			Element currentElement = (Element)validator.getProperty(CURRENT_ELEMENT_PROPERTY);
 			NodeInst currentNodeInst = (NodeInst)currentElement.getUserData(DOMUtil.DOM_USER_DATA_RELATED_TDC_NODE);
@@ -58,7 +64,7 @@ class SchemaValidatorErrorHandler implements ErrorHandler {
 					.setCellRef(cellRef)
 					.setValue(currentElement.getNodeValue())
 					.build();
-			testDoc.getMessages().addMessage(message);
+			result.addMessage(message);
 		}
 		catch (SAXNotRecognizedException | SAXNotSupportedException e) {
 			throw new UnsupportedOperationException(e);

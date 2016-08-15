@@ -24,17 +24,23 @@ public class BookConfigFactoryImpl implements BookConfigFactory {
 	private final Cache<BookConfig> cache = new CacheImpl<>();
 	private final Path booksConfigRoot;
 	private final ModelConfigFactory modelConfigFactory;
+	private final TaskConfigFactory taskConfigFactory;
 	
-	public BookConfigFactoryImpl(Path booksConfigRoot, ModelConfigFactory modelConfigFactory) {
+	public BookConfigFactoryImpl(Path booksConfigRoot, 
+			ModelConfigFactory modelConfigFactory,
+			TaskConfigFactory taskConfigFactory) {
+		
 		this.booksConfigRoot = booksConfigRoot;
 		this.modelConfigFactory = modelConfigFactory;
+		this.taskConfigFactory = taskConfigFactory;
 	}
 
 	@Override
 	public synchronized BookConfig getBookConfig(Addr addr) {
 		BookConfig bookConfig = cache.get(addr);
 		if (bookConfig == null) {
-			bookConfig = new BookConfigImpl.Builder(booksConfigRoot, addr, modelConfigFactory).build();
+			bookConfig = new BookConfigImpl.Builder(
+					booksConfigRoot, addr, modelConfigFactory, taskConfigFactory).build();
 			cache.put(addr, bookConfig);
 		}
 		else {

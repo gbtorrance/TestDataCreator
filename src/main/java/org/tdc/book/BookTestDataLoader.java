@@ -9,6 +9,7 @@ import org.tdc.config.book.PageConfig;
 import org.tdc.config.model.ModelConfig;
 import org.tdc.dom.TestDocDOMBuilder;
 import org.tdc.modelinst.ModelInst;
+import org.tdc.result.Result;
 import org.tdc.spreadsheet.Spreadsheet;
 import org.tdc.spreadsheet.SpreadsheetFile;
 import org.w3c.dom.Document;
@@ -76,8 +77,10 @@ public class BookTestDataLoader {
 	}
 
 	private Document buildDOMDocument(TestDoc testDoc) {
+		Result testLoadResult = new Result();
+		testDoc.getResults().setTestLoadResult(testLoadResult);
+		testDocDOMBuilder.setResult(testLoadResult);
 		testDocDOMBuilder.setTestDocColNumAndLetter(testDoc.getColNum(), testDoc.getColLetter());
-		testDocDOMBuilder.setMessages(testDoc.getMessages());
 		return testDocDOMBuilder.build();
 	}
 }

@@ -9,7 +9,7 @@ import java.util.Map;
 import org.tdc.config.book.DocIDRowConfig;
 import org.tdc.config.book.DocIDType;
 import org.tdc.config.book.PageConfig;
-import org.tdc.message.TestDocMessages;
+import org.tdc.result.Results;
 import org.tdc.spreadsheet.Spreadsheet;
 import org.tdc.spreadsheet.SpreadsheetFile;
 import org.w3c.dom.Document;
@@ -25,7 +25,7 @@ public class TestDocImpl implements TestDoc {
 	private final String setName;
 	private final Map<String, String> docVariables;
 	private final Map<String, String> caseVariables;
-	private final TestDocMessages messages;
+	private final Results results;
 	
 	private Document domDocument;
 	
@@ -37,7 +37,7 @@ public class TestDocImpl implements TestDoc {
 		this.setName = builder.setName;
 		this.docVariables = Collections.unmodifiableMap(builder.docVariables); // unmodifiable
 		this.caseVariables = Collections.unmodifiableMap(builder.caseVariables); // unmodifiable
-		this.messages = new TestDocMessages();
+		this.results = builder.results;
 	}
 	
 	@Override
@@ -86,8 +86,8 @@ public class TestDocImpl implements TestDoc {
 	}
 	
 	@Override
-	public TestDocMessages getMessages() {
-		return messages;
+	public Results getResults() {
+		return results;
 	}
 
 	public static class Builder {
@@ -100,6 +100,7 @@ public class TestDocImpl implements TestDoc {
 		private String setName;
 		private Map<String, String> docVariables;
 		private Map<String, String> caseVariables;
+		private Results results;
 		
 		public Builder(PageConfig pageConfig, SpreadsheetFile spreadsheetFile) {
 			this.pageConfig = pageConfig;
@@ -139,6 +140,7 @@ public class TestDocImpl implements TestDoc {
 			DocIDRowConfig setNameConfig = pageConfig.getSetNameDocIDRowConfig();
 			setName = setNameConfig == null ? "" : sheet.getCellValue(setNameConfig.getRowNum(), colNum);
 			buildVariables(sheet);
+			results = new Results();
 			return new TestDocImpl(this);
 		}
 

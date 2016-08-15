@@ -12,6 +12,8 @@ import javax.ws.rs.core.Context;
 import org.tdc.config.book.BookConfig;
 import org.tdc.config.book.BookConfigFactory;
 import org.tdc.config.book.BookConfigFactoryImpl;
+import org.tdc.config.book.TaskConfigFactory;
+import org.tdc.config.book.TaskConfigFactoryImpl;
 import org.tdc.config.model.ModelConfig;
 import org.tdc.config.model.ModelConfigFactory;
 import org.tdc.config.model.ModelConfigFactoryImpl;
@@ -48,7 +50,9 @@ public class TDCApplication extends Application {
 		
 		SchemaConfigFactory schemaConfigFactory = new SchemaConfigFactoryImpl(schemasConfigRoot);
 		ModelConfigFactory modelConfigFactory = new ModelConfigFactoryImpl(schemaConfigFactory);
-		BookConfigFactory bookConfigFactory = new BookConfigFactoryImpl(booksConfigRoot, modelConfigFactory);
+		TaskConfigFactory taskConfigFactory = new TaskConfigFactoryImpl();
+		BookConfigFactory bookConfigFactory = new BookConfigFactoryImpl(
+				booksConfigRoot, modelConfigFactory, taskConfigFactory);
 		List<SchemaConfig> schemaConfigs = schemaConfigFactory.getAllSchemaConfigs();
 		List<ModelConfig> modelConfigs = modelConfigFactory.getAllModelConfigs();
 		List<BookConfig> bookConfigs = bookConfigFactory.getAllBookConfigs();

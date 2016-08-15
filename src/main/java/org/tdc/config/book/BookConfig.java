@@ -1,6 +1,7 @@
 package org.tdc.config.book;
 
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Map;
 
 import org.tdc.spreadsheet.CellStyle;
@@ -15,6 +16,7 @@ public interface BookConfig {
 	Path getBookConfigRoot();
 	Map<String, DocTypeConfig> getDocTypeConfigs();
 	Map<String, PageConfig> getPageConfigs();
+	List<TaskConfig> getTaskConfigs();
 	CellStyle getDefaultStyle();
 	CellStyle getDefaultHeaderStyle();
 	CellStyle getDefaultNodeDetailColumnStyle();

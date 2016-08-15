@@ -25,6 +25,7 @@ public class BookConfigTest {
 	private static Path schemasConfigRoot;
 	private static SchemaConfigFactory schemaConfigFactory;
 	private static ModelConfigFactory modelConfigFactory;
+	private static TaskConfigFactory taskConfigFactory;
 	private static Path booksConfigRoot;
 	private static BookConfigFactory bookConfigFactory;
 	private static Addr bookAddr;
@@ -37,9 +38,10 @@ public class BookConfigTest {
 		schemasConfigRoot = Paths.get("testfiles/TDCFiles/Schemas");
 		schemaConfigFactory = new SchemaConfigFactoryImpl(schemasConfigRoot);
 		modelConfigFactory = new ModelConfigFactoryImpl(schemaConfigFactory);
-
+		taskConfigFactory = new TaskConfigFactoryImpl();
 		booksConfigRoot = Paths.get("testfiles/TDCFiles/Books");
-		bookConfigFactory = new BookConfigFactoryImpl(booksConfigRoot, modelConfigFactory);
+		bookConfigFactory = new BookConfigFactoryImpl(
+				booksConfigRoot, modelConfigFactory, taskConfigFactory);
 		bookAddr = new Addr("/ConfigTest/BookConfigTest");
 	}
 	

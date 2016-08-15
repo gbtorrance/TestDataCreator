@@ -148,7 +148,7 @@ public class PageConfigImpl implements PageConfig {
 		private List<DocIDRowConfig> docIDRowConfigs;
 		public DocIDRowConfig caseNumDocIDRowConfig;
 		public DocIDRowConfig setNameDocIDRowConfig;
-		public List varDocIDRowConfigs;
+		public List<DocIDRowConfig> varDocIDRowConfigs;
 		private int headerRowStart;
 		private int nodeRowStart;
 		private int testDocColStart;

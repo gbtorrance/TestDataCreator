@@ -3,6 +3,7 @@ package org.tdc.config.book;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 import org.slf4j.Logger;
@@ -28,6 +29,7 @@ public class BookConfigImpl implements BookConfig {
 	private final Path bookConfigRoot;
 	private final Map<String, DocTypeConfig> docTypeConfigs;
 	private final Map<String, PageConfig> pageConfigs;
+	private final List<TaskConfig> taskConfigs;
 	private final CellStyle defaultStyle;
 	private final CellStyle defaultHeaderStyle;
 	private final CellStyle defaultNodeDetailColumnStyle;
@@ -48,6 +50,7 @@ public class BookConfigImpl implements BookConfig {
 		this.bookConfigRoot = builder.bookConfigRoot;
 		this.docTypeConfigs = Collections.unmodifiableMap(builder.docTypeConfigs); // unmodifiable
 		this.pageConfigs = Collections.unmodifiableMap(builder.pageConfigs); // unmodifiable
+		this.taskConfigs = Collections.unmodifiableList(builder.taskConfigs); // unmodifiable
 		this.defaultStyle = builder.defaultStyle;
 		this.defaultHeaderStyle = builder.defaultHeaderStyle;
 		this.defaultNodeDetailColumnStyle = builder.defaultNodeDetailColumnStyle;
@@ -88,6 +91,11 @@ public class BookConfigImpl implements BookConfig {
 		return pageConfigs;
 	}
 	
+	@Override
+	public List<TaskConfig> getTaskConfigs() {
+		return taskConfigs;
+	}
+
 	@Override
 	public CellStyle getDefaultStyle() {
 		return defaultStyle;
@@ -156,12 +164,14 @@ public class BookConfigImpl implements BookConfig {
 	public static class Builder {
 		private final XMLConfigWrapper config;
 		private final ModelConfigFactory modelConfigFactory;
+		private final TaskConfigFactory taskConfigFactory;
 		private final Path booksConfigRoot;
 		private final Addr addr;
 		private final Path bookConfigRoot;
 		
 		private Map<String, DocTypeConfig> docTypeConfigs;
 		private Map<String, PageConfig> pageConfigs;
+		private List<TaskConfig> taskConfigs;
 		private CellStyle defaultStyle;
 		private CellStyle defaultHeaderStyle;
 		private CellStyle defaultNodeDetailColumnStyle;
@@ -176,7 +186,10 @@ public class BookConfigImpl implements BookConfig {
 		private int headerRowCount;
 		private String[] nodeHeaderLabels;
 		
-		public Builder(Path booksConfigRoot, Addr addr, ModelConfigFactory modelConfigFactory) {
+		public Builder(Path booksConfigRoot, Addr addr, 
+				ModelConfigFactory modelConfigFactory, 
+				TaskConfigFactory taskConfigFactory) {
+			
 			log.info("Creating BookConfig: {}", addr);
 			this.booksConfigRoot = booksConfigRoot;
 			this.addr = addr;
@@ -187,6 +200,7 @@ public class BookConfigImpl implements BookConfig {
 			Path bookConfigFile = bookConfigRoot.resolve(CONFIG_FILE);
 			this.config = new XMLConfigWrapper(bookConfigFile);
 			this.modelConfigFactory = modelConfigFactory;
+			this.taskConfigFactory = taskConfigFactory;
 		}
 
 		public BookConfig build() {
@@ -207,6 +221,7 @@ public class BookConfigImpl implements BookConfig {
 					"NodeHeaderLabels", headerRowCount);
 			pageConfigs = new PageConfigImpl.Builder(config, docTypeConfigs, modelConfigFactory, 
 					nodeColumnCount, headerRowCount, defaultNodeDetailColumnStyle).buildAll();
+			taskConfigs = taskConfigFactory.createTaskConfigs(config, "Tasks");
 			return new BookConfigImpl(this);
 		}
 	}

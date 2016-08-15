@@ -2,11 +2,15 @@ package org.tdc.util;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.time.format.DateTimeFormatter;
 
 /**
- * Static helper methods.
+ * Static helper members and methods.
  */
 public class Util {
+	
+	public static final DateTimeFormatter EXPORT_DATE_TIME_FORMATTER = 
+			DateTimeFormatter.ofPattern("yyMMdd_kkmmss_SSS");
 	
 	/**
 	 * Returns a certain number of spaces.
@@ -18,6 +22,20 @@ public class Util {
 		return new String(new char[count]).replace('\0', ' ');
 	}
 	
+	/**
+	 * Replaces any character in a string that is not a 
+	 * letter, number, or underscore with an underscore.
+	 * 
+	 * <p>This doesn't guaranteed that any resulting folder or file name will be legal;
+	 * the various file system rules about legal names are extremely complex, but it's a start.
+	 * 
+	 * @param name A name that might contain illegal characters.
+	 * @return The name with potentially illegal characters stripped out.
+	 */
+	public static String legalizeName(String name) {
+		return name.replaceAll("\\W+", "_");
+	}
+
 	/**
 	 * Extracts a "property" value from an object using Reflection. 
 	 * The property name prefixed with "get" indicates the name of the method to call.
