@@ -8,6 +8,11 @@ import org.slf4j.LoggerFactory;
 import org.tdc.config.book.PageConfig;
 import org.tdc.config.model.ModelConfig;
 import org.tdc.dom.TestDocDOMBuilder;
+import org.tdc.model.AttribNode;
+import org.tdc.model.CompositorNode;
+import org.tdc.model.ElementNode;
+import org.tdc.model.ModelVisitor;
+import org.tdc.model.TDCNode;
 import org.tdc.modelinst.ModelInst;
 import org.tdc.result.Result;
 import org.tdc.spreadsheet.Spreadsheet;
@@ -55,6 +60,9 @@ public class BookTestDataLoader {
 		testDocDOMBuilder.setNamespace(namespace);
 		testDocDOMBuilder.setNodeRowStart(nodeRowStart);
 		
+		PageStructureVerifier verifier = new PageStructureVerifier(modelInst, pageConfig, sheet);
+		verifier.verifyStructure();
+		
 		List<TestDoc> testDocs = page.getTestDocs();
 		for (TestDoc testDoc : testDocs) {
 			loadTestDocData(testDoc);
@@ -82,5 +90,49 @@ public class BookTestDataLoader {
 		testDocDOMBuilder.setResult(testLoadResult);
 		testDocDOMBuilder.setTestDocColNumAndLetter(testDoc.getColNum(), testDoc.getColLetter());
 		return testDocDOMBuilder.build();
+	}
+
+	private static class PageStructureVerifier implements ModelVisitor {
+		private final ModelInst modelInst;
+		private final PageConfig pageConfig;
+		private final Spreadsheet sheet;
+		
+		public PageStructureVerifier(ModelInst modelInst, PageConfig pageConfig, Spreadsheet sheet) {
+			this.modelInst = modelInst;
+			this.pageConfig = pageConfig;
+			this.sheet = sheet;
+		}
+		
+		public void verifyStructure() {
+			modelInst.getRootElement().accept(this);
+		}
+		
+		@Override
+		public void visit(AttribNode attribNode) {
+			validateNodeName(attribNode);
+		}
+
+		@Override
+		public void visit(CompositorNode compositorNode) {
+			validateNodeName(compositorNode);
+		}
+
+		@Override
+		public void visit(ElementNode elementNode) {
+			validateNodeName(elementNode);
+		}
+		
+		private void validateNodeName(TDCNode node) {
+			int row = pageConfig.getNodeRowStart() +  node.getRowOffset();
+			int col = pageConfig.getNodeColStart() + node.getColOffset();
+			String expectedValue = node.getDispName();
+			String actualValue = sheet.getCellValue(row, col);
+			if (!actualValue.equals(expectedValue)) {
+				String msg = "Page structure invalid for page '" + pageConfig.getPageName() + 
+						"'; actual value '" + actualValue + "' at row " + row + " col " + col + 
+						"; expected value '" + expectedValue + "'"; 
+				throw new RuntimeException(msg);
+			}
+		}
 	}
 }
