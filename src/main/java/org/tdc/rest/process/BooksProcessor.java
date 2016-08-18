@@ -10,5 +10,5 @@ import org.tdc.rest.resource.BooksResource;
  * that will be handled by {@link BooksResource}).
  */
 public interface BooksProcessor {
-	int uploadBookFile(File bookFile);
+	String uploadBookFile(File bookFile);
 }

@@ -16,11 +16,13 @@ public class ServerConfigImpl implements ServerConfig {
 	public static final String CONFIG_FILE = "TDCServerConfig.xml";
 	
 	private static final Logger log = LoggerFactory.getLogger(ServerConfigImpl.class);
+	private static final String BOOKS_WORKING_DIR = "Books";
 
 	private final Path serverConfigRoot;
 	private final Path schemasConfigRoot;
 	private final Path booksConfigRoot;
 	private final Path workingRoot;
+	private final Path booksWorkingRoot;
 	private final int serverPort;
 	
 	private ServerConfigImpl(Builder builder) {
@@ -28,6 +30,7 @@ public class ServerConfigImpl implements ServerConfig {
 		this.schemasConfigRoot = builder.schemasConfigRoot;
 		this.booksConfigRoot = builder.booksConfigRoot;
 		this.workingRoot = builder.workingRoot;
+		this.booksWorkingRoot = builder.booksWorkingRoot;
 		this.serverPort = builder.serverPort;
 	}
 	
@@ -52,6 +55,11 @@ public class ServerConfigImpl implements ServerConfig {
 	}
 	
 	@Override
+	public Path getBooksWorkingRoot() {
+		return booksWorkingRoot;
+	}
+	
+	@Override
 	public int getServerPort() {
 		return serverPort;
 	}
@@ -63,6 +71,7 @@ public class ServerConfigImpl implements ServerConfig {
 		private Path schemasConfigRoot;
 		private Path booksConfigRoot;
 		private Path workingRoot;
+		private Path booksWorkingRoot;
 		private int serverPort;
 		
 		public Builder(Path serverConfigRoot) {
@@ -88,6 +97,7 @@ public class ServerConfigImpl implements ServerConfig {
 			if (!Files.isDirectory(workingRoot)) {
 				throw new IllegalStateException("WorkingRoot dir does not exist: " + workingRoot.toString());
 			}
+			booksWorkingRoot = workingRoot.resolve(BOOKS_WORKING_DIR); // will be created as needed
 			serverPort = config.getInt("ServerPort", 0, true);
 			return new ServerConfigImpl(this);
 		}

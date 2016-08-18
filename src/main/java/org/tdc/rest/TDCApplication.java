@@ -54,8 +54,7 @@ public class TDCApplication extends Application {
 		List<ModelConfig> modelConfigs = modelConfigFactory.getAllModelConfigs();
 		List<BookConfig> bookConfigs = bookConfigFactory.getAllBookConfigs();
 		
-		BooksProcessor booksProcessor = new BooksProcessorImpl(
-				serverConfig.getWorkingRoot());
+		BooksProcessor booksProcessor = new BooksProcessorImpl(serverConfig);
 
 		singletons.add(new ConfigSchemasResource(schemaConfigs));
 		singletons.add(new ConfigModelsResource(modelConfigs));

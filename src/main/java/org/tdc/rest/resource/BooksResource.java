@@ -35,7 +35,7 @@ public class BooksResource {
 	public Response uploadExcelBookFile(MultipartInput input) {
 		List<InputPart> parts = input.getParts();
 		InputPart part = parts.get(0);
-		int bookID;
+		String bookID;
 		try {
 			File bookFile = part.getBody(new GenericType<File>(){});
 			bookID = processor.uploadBookFile(bookFile);

@@ -27,6 +27,7 @@ import org.tdc.config.server.ServerConfigImpl;
 import org.tdc.rest.dto.BookConfigDTO;
 import org.tdc.rest.dto.ModelConfigDTO;
 import org.tdc.rest.dto.SchemaConfigDTO;
+import org.tdc.util.Util;
 
 /**
  * Unit tests for REST services.
@@ -41,6 +42,7 @@ public class RestTest {
 
 	private static final Logger log = LoggerFactory.getLogger(RestTest.class);
 
+	private static ServerConfig serverConfig;
 	private static TDCServer server;
 	private static Client client;
 	private static String urlPrefix;
@@ -48,7 +50,7 @@ public class RestTest {
 	@BeforeClass
 	public static void setup() throws Exception {
 		Path serverConfigRoot = Paths.get("testfiles/TDCServer");
-		ServerConfig serverConfig = new ServerConfigImpl.Builder(serverConfigRoot).build();
+		serverConfig = new ServerConfigImpl.Builder(serverConfigRoot).build();
 		server = new TDCServer(serverConfig);
 		server.start();
 		client = ClientBuilder.newClient();
@@ -59,6 +61,7 @@ public class RestTest {
 	public static void shutdown() throws Exception {
 		server.stop();
 		client.close();
+		Util.purgeDirectory(serverConfig.getBooksWorkingRoot());
 	}
 	
 	@Test
@@ -124,6 +127,6 @@ public class RestTest {
 			response = client.target(target).request().post(Entity.entity(entity, MediaType.MULTIPART_FORM_DATA));
 		}
 		assertThat(response.getStatus()).isEqualTo(Response.Status.CREATED.getStatusCode());
-		assertThat(response.getLocation().toString()).isEqualTo(urlPrefix + "/tdc/books/123"); // TODO remove hardcoding; just temporary
+		assertThat(response.getLocation().toString()).startsWith(urlPrefix + "/tdc/books/");
 	}
 }

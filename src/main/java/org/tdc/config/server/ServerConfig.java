@@ -12,5 +12,6 @@ public interface ServerConfig {
 	Path getSchemasConfigRoot();
 	Path getBooksConfigRoot();
 	Path getWorkingRoot();
+	Path getBooksWorkingRoot();
 	int getServerPort();
 }
