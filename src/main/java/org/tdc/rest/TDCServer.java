@@ -11,6 +11,8 @@ import org.eclipse.jetty.servlet.ServletHolder;
 import org.jboss.resteasy.plugins.server.servlet.HttpServletDispatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.tdc.config.server.ServerConfig;
+import org.tdc.config.server.ServerConfigImpl;
 
 /**
  * This is the "main" class for the system when running in server mode.
@@ -21,19 +23,15 @@ import org.slf4j.LoggerFactory;
 public class TDCServer {
 	private static final Logger log = LoggerFactory.getLogger(TDCServer.class);
 
-	private final Path schemasConfigRoot;
-	private final Path booksConfigRoot;
-	private final Path workingRoot;
+	private final ServerConfig serverConfig;
 	private final Server server;
 	private final Servlet servlet;
 	private final ServletHolder servletHolder; 
 	private final ServletContextHandler servletContextHandler;
 	
-	public TDCServer(int port, Path schemasConfigRoot, Path booksConfigRoot, Path workingRoot) {
-		this.schemasConfigRoot = schemasConfigRoot;
-		this.booksConfigRoot = booksConfigRoot;
-		this.workingRoot = workingRoot;
-		server = new Server(port);
+	public TDCServer(ServerConfig serverConfig) {
+		this.serverConfig = serverConfig;
+		server = new Server(serverConfig.getServerPort());
 		servlet = new HttpServletDispatcher();
 		servletHolder = new ServletHolder(servlet);
 		servletHolder.setInitParameter("javax.ws.rs.Application", TDCApplication.class.getName());
@@ -57,23 +55,29 @@ public class TDCServer {
 	}
 	
 	private final void initResourceParams() {
-		servletContextHandler.setAttribute(TDCApplication.ATTRIB_SCHEMAS_CONFIG_ROOT, schemasConfigRoot);
-		servletContextHandler.setAttribute(TDCApplication.ATTRIB_BOOKS_CONFIG_ROOT, booksConfigRoot);
-		servletContextHandler.setAttribute(TDCApplication.ATTRIB_WORKING_ROOT, workingRoot);
+		servletContextHandler.setAttribute(TDCApplication.ATTRIB_SERVER_CONFIG, serverConfig);
 	}
 	
 	public static void main(String args[]) {
-		// TODO parameterize these appropriately
-		Path schemasConfigRoot = Paths.get("testfiles/TDCFiles/Schemas");
-		Path booksConfigRoot = Paths.get("testfiles/TDCFiles/Books");
-		Path workingRoot = Paths.get("testfiles/TDCServer/Working");
-		int port = 8080;
-		TDCServer server = new TDCServer(port, schemasConfigRoot, booksConfigRoot, workingRoot);
 		try {
+			ServerConfig serverConfig = loadServerConfig(args);
+			TDCServer server = new TDCServer(serverConfig);
 			server.startAndWait();
 		}
 		catch(Exception ex) {
 			log.error("Exception encountered:", ex);
+			System.exit(1);
 		}
+	}
+
+	private static ServerConfig loadServerConfig(String[] args) {
+		if (args.length != 1) {
+			throw new RuntimeException(
+					"TDCServer must be started with single parameter specifying " + 
+					"server config root directory path (e.g. TDCServer C:\\TDCServerConfig)");
+		}
+		String serverConfigRootStr = args[0];
+		Path serverConfigRoot = Paths.get(serverConfigRootStr);
+		return new ServerConfigImpl.Builder(serverConfigRoot).build();
 	}
 }

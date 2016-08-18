@@ -22,6 +22,8 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.tdc.config.server.ServerConfig;
+import org.tdc.config.server.ServerConfigImpl;
 import org.tdc.rest.dto.BookConfigDTO;
 import org.tdc.rest.dto.ModelConfigDTO;
 import org.tdc.rest.dto.SchemaConfigDTO;
@@ -45,14 +47,12 @@ public class RestTest {
 	
 	@BeforeClass
 	public static void setup() throws Exception {
-		Path schemasConfigRoot = Paths.get("testfiles/TDCFiles/Schemas");
-		Path booksConfigRoot = Paths.get("testfiles/TDCFiles/Books");
-		Path workingRoot = Paths.get("testfiles/TDCServer/Working");
-		int port = 8080;
-		server = new TDCServer(port, schemasConfigRoot, booksConfigRoot, workingRoot);
+		Path serverConfigRoot = Paths.get("testfiles/TDCServer");
+		ServerConfig serverConfig = new ServerConfigImpl.Builder(serverConfigRoot).build();
+		server = new TDCServer(serverConfig);
 		server.start();
 		client = ClientBuilder.newClient();
-		urlPrefix = "http://localhost:" + port;
+		urlPrefix = "http://localhost:" + serverConfig.getServerPort();
 	}
 	
 	@AfterClass

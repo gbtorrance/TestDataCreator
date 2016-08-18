@@ -1,6 +1,5 @@
 package org.tdc.rest;
 
-import java.nio.file.Path;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -20,6 +19,7 @@ import org.tdc.config.model.ModelConfigFactoryImpl;
 import org.tdc.config.schema.SchemaConfig;
 import org.tdc.config.schema.SchemaConfigFactory;
 import org.tdc.config.schema.SchemaConfigFactoryImpl;
+import org.tdc.config.server.ServerConfig;
 import org.tdc.rest.process.BooksProcessor;
 import org.tdc.rest.process.BooksProcessorImpl;
 import org.tdc.rest.resource.BooksResource;
@@ -31,9 +31,7 @@ import org.tdc.rest.resource.ConfigSchemasResource;
  * REST application for providing TDC services.
  */
 public class TDCApplication extends Application {
-	public final static String ATTRIB_SCHEMAS_CONFIG_ROOT = "tdc.schemasConfigRoot";
-	public final static String ATTRIB_BOOKS_CONFIG_ROOT = "tdc.booksConfigRoot";
-	public final static String ATTRIB_WORKING_ROOT = "tdc.workingRoot";
+	public final static String ATTRIB_SERVER_CONFIG = "tdc.serverConfig";
 	
 	private final Set<Object> singletons = new HashSet<>();
 	private final ServletContext servletContext;
@@ -42,22 +40,22 @@ public class TDCApplication extends Application {
 		this.servletContext = servletContext;
 		
 		@SuppressWarnings("unchecked")
-		Path schemasConfigRoot = (Path)servletContext.getAttribute(ATTRIB_SCHEMAS_CONFIG_ROOT);
-		@SuppressWarnings("unchecked")
-		Path booksConfigRoot = (Path)servletContext.getAttribute(ATTRIB_BOOKS_CONFIG_ROOT);
-		@SuppressWarnings("unchecked")
-		Path workingRoot = (Path)servletContext.getAttribute(ATTRIB_WORKING_ROOT);
+		ServerConfig serverConfig = (ServerConfig)servletContext.getAttribute(ATTRIB_SERVER_CONFIG);
 		
-		SchemaConfigFactory schemaConfigFactory = new SchemaConfigFactoryImpl(schemasConfigRoot);
+		SchemaConfigFactory schemaConfigFactory = new SchemaConfigFactoryImpl(
+				serverConfig.getSchemasConfigRoot());
 		ModelConfigFactory modelConfigFactory = new ModelConfigFactoryImpl(schemaConfigFactory);
 		TaskConfigFactory taskConfigFactory = new TaskConfigFactoryImpl();
 		BookConfigFactory bookConfigFactory = new BookConfigFactoryImpl(
-				booksConfigRoot, modelConfigFactory, taskConfigFactory);
+				serverConfig.getBooksConfigRoot(), 
+				modelConfigFactory, 
+				taskConfigFactory);
 		List<SchemaConfig> schemaConfigs = schemaConfigFactory.getAllSchemaConfigs();
 		List<ModelConfig> modelConfigs = modelConfigFactory.getAllModelConfigs();
 		List<BookConfig> bookConfigs = bookConfigFactory.getAllBookConfigs();
 		
-		BooksProcessor booksProcessor = new BooksProcessorImpl(workingRoot);
+		BooksProcessor booksProcessor = new BooksProcessorImpl(
+				serverConfig.getWorkingRoot());
 
 		singletons.add(new ConfigSchemasResource(schemaConfigs));
 		singletons.add(new ConfigModelsResource(modelConfigs));
