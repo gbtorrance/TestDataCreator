@@ -5,7 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.tdc.config.schema.SchemaConfig;
 import org.tdc.util.Addr;
 import org.tdc.util.Cache;
-import org.tdc.util.CacheImpl;
+import org.tdc.util.SimpleCache;
 
 /**
  * A {@link SchemaFactory} implementation.
@@ -16,7 +16,7 @@ public class SchemaFactoryImpl implements SchemaFactory {
 
 	private static final Logger log = LoggerFactory.getLogger(SchemaFactoryImpl.class);
 	
-	private final Cache<Schema> cache = new CacheImpl<>();
+	private final Cache<Addr,Schema> cache = new SimpleCache<>();
 	
 	@Override
 	public synchronized Schema getSchema(SchemaConfig config) {

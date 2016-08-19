@@ -7,7 +7,7 @@ import org.slf4j.LoggerFactory;
 import org.tdc.config.model.ModelConfig;
 import org.tdc.util.Addr;
 import org.tdc.util.Cache;
-import org.tdc.util.CacheImpl;
+import org.tdc.util.SimpleCache;
 
 /**
  * A {@link SchemaValidatorFactory} implementation.
@@ -18,7 +18,7 @@ public class SchemaValidatorFactoryImpl implements SchemaValidatorFactory {
 
 	private static final Logger log = LoggerFactory.getLogger(SchemaValidatorFactoryImpl.class);
 
-	private final Cache<SchemaValidator> cache = new CacheImpl<>();
+	private final Cache<Addr,SchemaValidator> cache = new SimpleCache<>();
 
 	@Override
 	public synchronized SchemaValidator getSchemaValidator(ModelConfig config) {

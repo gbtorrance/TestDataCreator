@@ -7,7 +7,7 @@ import org.tdc.modeldef.ModelDef;
 import org.tdc.modeldef.ModelDefFactory;
 import org.tdc.util.Addr;
 import org.tdc.util.Cache;
-import org.tdc.util.CacheImpl;
+import org.tdc.util.SimpleCache;
 
 /**
  * A {@link ModelInstFactory} implementation.
@@ -22,7 +22,7 @@ public class ModelInstFactoryImpl implements ModelInstFactory {
 
 	private static final Logger log = LoggerFactory.getLogger(ModelInstFactoryImpl.class);
 	
-	private final Cache<ModelInst> cache = new CacheImpl<>();
+	private final Cache<Addr,ModelInst> cache = new SimpleCache<>();
 	private final ModelDefFactory modelDefFactory;
 	
 	public ModelInstFactoryImpl(ModelDefFactory modelDefFactory) {

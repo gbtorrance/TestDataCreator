@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory;
 import org.tdc.config.model.ModelConfigFactory;
 import org.tdc.util.Addr;
 import org.tdc.util.Cache;
-import org.tdc.util.CacheImpl;
+import org.tdc.util.SimpleCache;
 import org.tdc.util.ConfigFinder;
 
 /**
@@ -21,7 +21,7 @@ public class BookConfigFactoryImpl implements BookConfigFactory {
 
 	private static final Logger log = LoggerFactory.getLogger(BookConfigFactoryImpl.class);
 
-	private final Cache<BookConfig> cache = new CacheImpl<>();
+	private final Cache<Addr,BookConfig> cache = new SimpleCache<>();
 	private final Path booksConfigRoot;
 	private final ModelConfigFactory modelConfigFactory;
 	private final TaskConfigFactory taskConfigFactory;

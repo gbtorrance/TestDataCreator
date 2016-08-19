@@ -8,7 +8,7 @@ import org.tdc.schema.SchemaFactory;
 import org.tdc.spreadsheet.SpreadsheetFileFactory;
 import org.tdc.util.Addr;
 import org.tdc.util.Cache;
-import org.tdc.util.CacheImpl;
+import org.tdc.util.SimpleCache;
 
 /**
  * A {@link ModelDefFactory} implementation.
@@ -23,7 +23,7 @@ public class ModelDefFactoryImpl implements ModelDefFactory {
 
 	private static final Logger log = LoggerFactory.getLogger(ModelDefFactoryImpl.class);
 
-	private final Cache<ModelDef> cache = new CacheImpl<>();
+	private final Cache<Addr,ModelDef> cache = new SimpleCache<>();
 	private final SchemaFactory schemaFactory;
 	private final SpreadsheetFileFactory spreadsheetFileFactory;
 	

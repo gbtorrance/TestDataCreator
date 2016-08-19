@@ -8,7 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.tdc.util.Addr;
 import org.tdc.util.Cache;
-import org.tdc.util.CacheImpl;
+import org.tdc.util.SimpleCache;
 import org.tdc.util.ConfigFinder;
 
 /**
@@ -20,7 +20,7 @@ public class SchemaConfigFactoryImpl implements SchemaConfigFactory {
 
 	private static final Logger log = LoggerFactory.getLogger(SchemaConfigFactoryImpl.class);
 
-	private final Cache<SchemaConfig> cache = new CacheImpl<>();
+	private final Cache<Addr,SchemaConfig> cache = new SimpleCache<>();
 	private final Path schemasConfigRoot;
 	
 	public SchemaConfigFactoryImpl(Path schemasConfigRoot) {

@@ -1,11 +1,10 @@
 package org.tdc.util;
 
 /**
- * Defines support for {@linkplain Addr address}-based object caching. 
- * 
- * <p>Used by Factories to share object instances.
+ * Defines support for caching objects for reuse. 
  */
-public interface Cache<T> {
-	T get(Addr addr);
-	void put(Addr addr, T value);
+public interface Cache<K,V> {
+	V get(K key);
+	void put(K key, V value);
+	int size();
 }

@@ -13,7 +13,7 @@ import org.tdc.schemaparse.extractor.SchemaExtractorFactory;
 import org.tdc.schemaparse.extractor.SchemaExtractorFactoryImpl;
 import org.tdc.util.Addr;
 import org.tdc.util.Cache;
-import org.tdc.util.CacheImpl;
+import org.tdc.util.SimpleCache;
 import org.tdc.util.ConfigFinder;
 
 /**
@@ -27,7 +27,7 @@ public class ModelConfigFactoryImpl implements ModelConfigFactory {
 
 	private static final Logger log = LoggerFactory.getLogger(ModelConfigFactoryImpl.class);
 
-	private final Cache<ModelConfig> cache = new CacheImpl<>();
+	private final Cache<Addr,ModelConfig> cache = new SimpleCache<>();
 	private final SchemaConfigFactory schemaConfigFactory;
 
 	public ModelConfigFactoryImpl(SchemaConfigFactory schemaConfigFactory) {
