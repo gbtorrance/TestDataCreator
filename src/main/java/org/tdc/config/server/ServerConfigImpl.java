@@ -17,6 +17,7 @@ public class ServerConfigImpl implements ServerConfig {
 	
 	private static final Logger log = LoggerFactory.getLogger(ServerConfigImpl.class);
 	private static final String BOOKS_WORKING_DIR = "Books";
+	private static final int DEFAULT_BOOK_CACHE_MAX_SIZE = 10;
 
 	private final Path serverConfigRoot;
 	private final Path schemasConfigRoot;
@@ -24,6 +25,7 @@ public class ServerConfigImpl implements ServerConfig {
 	private final Path workingRoot;
 	private final Path booksWorkingRoot;
 	private final int serverPort;
+	private final int bookCacheMaxSize;
 	
 	private ServerConfigImpl(Builder builder) {
 		this.serverConfigRoot = builder.serverConfigRoot;
@@ -32,6 +34,7 @@ public class ServerConfigImpl implements ServerConfig {
 		this.workingRoot = builder.workingRoot;
 		this.booksWorkingRoot = builder.booksWorkingRoot;
 		this.serverPort = builder.serverPort;
+		this.bookCacheMaxSize = builder.bookCacheMaxSize;
 	}
 	
 	@Override
@@ -63,6 +66,11 @@ public class ServerConfigImpl implements ServerConfig {
 	public int getServerPort() {
 		return serverPort;
 	}
+	
+	@Override 
+	public int getBookCacheMaxSize() {
+		return bookCacheMaxSize;
+	}
 
 	public static class Builder {
 		private final XMLConfigWrapper config;
@@ -73,6 +81,7 @@ public class ServerConfigImpl implements ServerConfig {
 		private Path workingRoot;
 		private Path booksWorkingRoot;
 		private int serverPort;
+		private int bookCacheMaxSize;
 		
 		public Builder(Path serverConfigRoot) {
 			log.info("Creating ServerConfig: {}", serverConfigRoot);
@@ -99,6 +108,7 @@ public class ServerConfigImpl implements ServerConfig {
 			}
 			booksWorkingRoot = workingRoot.resolve(BOOKS_WORKING_DIR); // will be created as needed
 			serverPort = config.getInt("ServerPort", 0, true);
+			bookCacheMaxSize = config.getInt("BookCacheMaxSize", DEFAULT_BOOK_CACHE_MAX_SIZE, false);
 			return new ServerConfigImpl(this);
 		}
 	}

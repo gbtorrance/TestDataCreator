@@ -11,7 +11,15 @@ import java.time.format.DateTimeFormatter;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.tdc.book.Book;
+import org.tdc.book.BookFactory;
+import org.tdc.book.BookTestDataLoader;
 import org.tdc.config.server.ServerConfig;
+import org.tdc.schemavalidate.SchemaValidatorFactory;
+import org.tdc.spreadsheet.SpreadsheetFile;
+import org.tdc.spreadsheet.SpreadsheetFileFactory;
+import org.tdc.util.Cache;
+import org.tdc.util.LRUCache;
 
 /**
  * Implementation of {@link BooksProcessor}.
@@ -23,35 +31,32 @@ public class BooksProcessorImpl implements BooksProcessor {
 	private static final String BOOK_FILE_NAME = "Book.xlsx"; // TODO use correct file extension; might be xlsm
 	
 	private final ServerConfig serverConfig;
+	private final BookFactory bookFactory;
+	private final SpreadsheetFileFactory spreadsheetFileFactory;
+	private final SchemaValidatorFactory schemaValidatorFactory;
+	private final Cache<String,Book> bookCache;
 	
 	private int currentYearPlusDay;
 	private int seq;
 
-	public BooksProcessorImpl(ServerConfig serverConfig) {
-		this.serverConfig = serverConfig;
-		ensureBooksWorkingRootExists();
+	private BooksProcessorImpl(Builder builder) {
+		this.serverConfig = builder.serverConfig;
+		this.bookFactory = builder.bookFactory;
+		this. spreadsheetFileFactory = builder.spreadsheetFileFactory;
+		this.schemaValidatorFactory = builder.schemaValidatorFactory;
+		this.bookCache = builder.bookCache;
 	}
 
 	@Override
 	public String uploadBookFile(File bookFile) {
-		String bookID = createNewBookIDAndDir();
-		Path bookWorkingRoot = serverConfig.getBooksWorkingRoot().resolve(bookID);
-		try (FileInputStream bookInput = new FileInputStream(bookFile)) {
-			Path target = bookWorkingRoot.resolve(BOOK_FILE_NAME);
-			Files.copy(bookInput, target, StandardCopyOption.REPLACE_EXISTING);
-		}
-		catch (IOException e) {
-			throw new RuntimeException("Unable to save uploaded file", e);
-		}
+		String bookID = createNewBookIDAndWorkingDir();
+		saveBookFileToLocalBookWorkingDir(bookFile, bookID);
+		// don't need Book object now; just ensure it loads correctly and cache for future
+		getBook(bookID); 
 		return bookID;
 	}
 	
-	/**
-	 * Attempts to find an unused Book ID, and when one is found, 
-	 * a corresponding directory will be created in which book-specific
-	 * files can be stored. 
-	 */
-	private synchronized String createNewBookIDAndDir() {
+	private synchronized String createNewBookIDAndWorkingDir() {
 		boolean success = false;
 		String bookID = null;
 		while (!success) {
@@ -60,13 +65,54 @@ public class BooksProcessorImpl implements BooksProcessor {
 			if (!Files.exists(bookWorkingRoot)) {
 				try {
 					Files.createDirectory(bookWorkingRoot);
-				} catch (IOException e) {
+				} 
+				catch (IOException e) {
 					throw new RuntimeException(e);
 				}
 				success = true;
 			}
 		}
 		return bookID;
+	}
+	
+	private void saveBookFileToLocalBookWorkingDir(File bookFile, String bookID) {
+		Path bookWorkingRoot = serverConfig.getBooksWorkingRoot().resolve(bookID);
+		try (FileInputStream bookInput = new FileInputStream(bookFile)) {
+			Path target = bookWorkingRoot.resolve(BOOK_FILE_NAME);
+			Files.copy(bookInput, target, StandardCopyOption.REPLACE_EXISTING);
+		}
+		catch (IOException e) {
+			throw new RuntimeException("Unable to save uploaded file", e);
+		}
+	}
+
+	private synchronized Book getBook(String bookID) {
+		Book book = bookCache.get(bookID);
+		if (book == null) {
+			book = loadBook(bookID);
+			bookCache.put(bookID, book);
+		}
+		return book;
+	}
+
+	private Book loadBook(String bookID) {
+		Path spreadsheetPath = getSpreadsheetFilePath(bookID);
+		SpreadsheetFile spreadsheetFile = 
+				spreadsheetFileFactory.getSpreadsheetFileFromPath(spreadsheetPath);
+		Book book = bookFactory.getBook(spreadsheetFile);
+		BookTestDataLoader loader = new BookTestDataLoader(book, spreadsheetFile);
+		loader.loadTestData();
+		return book;
+	}
+
+	private Path getSpreadsheetFilePath(String bookID) {
+		Path spreadsheetPath = serverConfig.getBooksWorkingRoot()
+				.resolve(bookID)
+				.resolve(BOOK_FILE_NAME);
+		if (!Files.exists(spreadsheetPath)) {
+			throw new RuntimeException("Unable to locate spreadsheet file: " + spreadsheetPath);
+		}
+		return spreadsheetPath;
 	}
 	
 	/**
@@ -103,12 +149,40 @@ public class BooksProcessorImpl implements BooksProcessor {
 		return Integer.toString(convert, 36);
 	}
 	
-	private void ensureBooksWorkingRootExists() {
-		if (!Files.isDirectory(serverConfig.getBooksWorkingRoot())) {
-			try {
-				Files.createDirectory(serverConfig.getBooksWorkingRoot());
-			} catch (IOException e) {
-				throw new RuntimeException(e);
+	public static class Builder {
+		private final ServerConfig serverConfig;
+		private final BookFactory bookFactory;
+		private final SpreadsheetFileFactory spreadsheetFileFactory;
+		private final SchemaValidatorFactory schemaValidatorFactory;
+		
+		private Cache<String,Book> bookCache;
+		
+		public Builder(
+				ServerConfig serverConfig, 
+				BookFactory bookFactory, 
+				SpreadsheetFileFactory spreadsheetFileFactory,
+				SchemaValidatorFactory schemaValidatorFactory) {
+			
+			this.serverConfig = serverConfig;
+			this.bookFactory = bookFactory;
+			this.spreadsheetFileFactory = spreadsheetFileFactory;
+			this.schemaValidatorFactory = schemaValidatorFactory;
+		}
+		
+		public BooksProcessor build() {
+			ensureBooksWorkingRootExists();
+			bookCache = new LRUCache<>(serverConfig.getBookCacheMaxSize());
+			return new BooksProcessorImpl(this);
+		}
+		
+		private void ensureBooksWorkingRootExists() {
+			if (!Files.isDirectory(serverConfig.getBooksWorkingRoot())) {
+				try {
+					Files.createDirectory(serverConfig.getBooksWorkingRoot());
+				}
+				catch (IOException e) {
+					throw new RuntimeException(e);
+				}
 			}
 		}
 	}

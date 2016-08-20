@@ -71,14 +71,9 @@ public class BookReaderTest {
 	public void testReadBookAndValidate() {
 		Path bookFilePath = Paths.get("testfiles/SampleFiles/TestBook.xlsx"); 
 		SpreadsheetFile spreadsheetFile = spreadsheetFileFactory.getSpreadsheetFileFromPath(bookFilePath);
-		Book book = null;
-		try {
-			book = bookFactory.getBook(spreadsheetFile);
-			assertThat(book.getConfig().getAddr()).isEqualTo(new Addr("Tax/IndividualIncome2012v1"));
-		}
-		finally {
-			spreadsheetFile.close();
-		}
+		
+		Book book = bookFactory.getBook(spreadsheetFile);
+		assertThat(book.getConfig().getAddr()).isEqualTo(new Addr("Tax/IndividualIncome2012v1"));
 		
 		BookTestDataLoader loader = new BookTestDataLoader(book, spreadsheetFile);
 		loader.loadTestData();

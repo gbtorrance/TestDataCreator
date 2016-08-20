@@ -1,31 +1,39 @@
 package org.tdc.rest;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import javax.servlet.ServletContext;
 import javax.ws.rs.core.Application;
 import javax.ws.rs.core.Context;
 
-import org.tdc.config.book.BookConfig;
+import org.tdc.book.BookFactory;
+import org.tdc.book.BookFactoryImpl;
 import org.tdc.config.book.BookConfigFactory;
 import org.tdc.config.book.BookConfigFactoryImpl;
 import org.tdc.config.book.TaskConfigFactory;
 import org.tdc.config.book.TaskConfigFactoryImpl;
-import org.tdc.config.model.ModelConfig;
 import org.tdc.config.model.ModelConfigFactory;
 import org.tdc.config.model.ModelConfigFactoryImpl;
-import org.tdc.config.schema.SchemaConfig;
 import org.tdc.config.schema.SchemaConfigFactory;
 import org.tdc.config.schema.SchemaConfigFactoryImpl;
 import org.tdc.config.server.ServerConfig;
+import org.tdc.modeldef.ModelDefFactory;
+import org.tdc.modeldef.ModelDefFactoryImpl;
+import org.tdc.modelinst.ModelInstFactory;
+import org.tdc.modelinst.ModelInstFactoryImpl;
 import org.tdc.rest.process.BooksProcessor;
 import org.tdc.rest.process.BooksProcessorImpl;
 import org.tdc.rest.resource.BooksResource;
 import org.tdc.rest.resource.ConfigBooksResource;
 import org.tdc.rest.resource.ConfigModelsResource;
 import org.tdc.rest.resource.ConfigSchemasResource;
+import org.tdc.schema.SchemaFactory;
+import org.tdc.schema.SchemaFactoryImpl;
+import org.tdc.schemavalidate.SchemaValidatorFactory;
+import org.tdc.schemavalidate.SchemaValidatorFactoryImpl;
+import org.tdc.spreadsheet.SpreadsheetFileFactory;
+import org.tdc.spreadsheet.excel.ExcelSpreadsheetFileFactory;
 
 /**
  * REST application for providing TDC services.
@@ -35,31 +43,60 @@ public class TDCApplication extends Application {
 	
 	private final Set<Object> singletons = new HashSet<>();
 	private final ServletContext servletContext;
+	private final ServerConfig serverConfig;
+	private final SchemaConfigFactory schemaConfigFactory;
+	private final ModelConfigFactory modelConfigFactory;
+	private final TaskConfigFactory taskConfigFactory;
+	private final BookConfigFactory bookConfigFactory;
+	private final SpreadsheetFileFactory spreadsheetFileFactory;
+	private final SchemaFactory schemaFactory;
+	private final ModelDefFactory modelDefFactory;
+	private final ModelInstFactory modelInstFactory;
+	private final BookFactory bookFactory;
+	private final SchemaValidatorFactory schemaValidatorFactory;
+	private final BooksProcessor booksProcessor;
 	
 	public TDCApplication(@Context ServletContext servletContext) {
 		this.servletContext = servletContext;
 		
-		@SuppressWarnings("unchecked")
-		ServerConfig serverConfig = (ServerConfig)servletContext.getAttribute(ATTRIB_SERVER_CONFIG);
+		serverConfig = (ServerConfig)servletContext.getAttribute(ATTRIB_SERVER_CONFIG);
 		
-		SchemaConfigFactory schemaConfigFactory = new SchemaConfigFactoryImpl(
+		schemaConfigFactory = new SchemaConfigFactoryImpl(
 				serverConfig.getSchemasConfigRoot());
-		ModelConfigFactory modelConfigFactory = new ModelConfigFactoryImpl(schemaConfigFactory);
-		TaskConfigFactory taskConfigFactory = new TaskConfigFactoryImpl();
-		BookConfigFactory bookConfigFactory = new BookConfigFactoryImpl(
+		modelConfigFactory = new ModelConfigFactoryImpl(schemaConfigFactory);
+		taskConfigFactory = new TaskConfigFactoryImpl();
+		bookConfigFactory = new BookConfigFactoryImpl(
 				serverConfig.getBooksConfigRoot(), 
 				modelConfigFactory, 
 				taskConfigFactory);
-		List<SchemaConfig> schemaConfigs = schemaConfigFactory.getAllSchemaConfigs();
-		List<ModelConfig> modelConfigs = modelConfigFactory.getAllModelConfigs();
-		List<BookConfig> bookConfigs = bookConfigFactory.getAllBookConfigs();
 		
-		BooksProcessor booksProcessor = new BooksProcessorImpl(serverConfig);
+		spreadsheetFileFactory = new ExcelSpreadsheetFileFactory();
+		
+		schemaFactory = new SchemaFactoryImpl();
+		modelDefFactory = new ModelDefFactoryImpl(schemaFactory, spreadsheetFileFactory);
+		modelInstFactory = new ModelInstFactoryImpl(modelDefFactory);
+		bookFactory = new BookFactoryImpl(bookConfigFactory, modelInstFactory);
+		
+		schemaValidatorFactory = new SchemaValidatorFactoryImpl();
+		
+		booksProcessor = new BooksProcessorImpl.Builder(
+				serverConfig, 
+				bookFactory, 
+				spreadsheetFileFactory, 
+				schemaValidatorFactory).build();
+		
+		ConfigSchemasResource configSchemasResource = new ConfigSchemasResource(
+				schemaConfigFactory.getAllSchemaConfigs());
+		ConfigModelsResource configModelsResource = new ConfigModelsResource(
+				modelConfigFactory.getAllModelConfigs());
+		ConfigBooksResource configBooksResource = new ConfigBooksResource(
+				bookConfigFactory.getAllBookConfigs());
+		BooksResource booksResource = new BooksResource(booksProcessor); 
 
-		singletons.add(new ConfigSchemasResource(schemaConfigs));
-		singletons.add(new ConfigModelsResource(modelConfigs));
-		singletons.add(new ConfigBooksResource(bookConfigs));
-		singletons.add(new BooksResource(booksProcessor));
+		singletons.add(configSchemasResource);
+		singletons.add(configModelsResource);
+		singletons.add(configBooksResource);
+		singletons.add(booksResource);
 	}
 
 	@Override

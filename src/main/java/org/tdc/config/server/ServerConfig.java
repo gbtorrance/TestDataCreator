@@ -14,4 +14,5 @@ public interface ServerConfig {
 	Path getWorkingRoot();
 	Path getBooksWorkingRoot();
 	int getServerPort();
+	int getBookCacheMaxSize();
 }

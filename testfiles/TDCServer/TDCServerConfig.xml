@@ -4,4 +4,5 @@
 	<BooksConfigRoot>../TDCFiles/Books</BooksConfigRoot>
 	<WorkingRoot>Working</WorkingRoot>
 	<ServerPort>8080</ServerPort>
+	<BookCacheMaxSize>5</BookCacheMaxSize>
 </Config>

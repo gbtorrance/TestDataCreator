@@ -24,14 +24,22 @@ public class ExcelSpreadsheetFileFactory implements SpreadsheetFileFactory {
 
 	@Override
 	public SpreadsheetFile getSpreadsheetFileFromPath(Path path) {
+		XSSFWorkbook workbook = createWorkbookFromPath(path);
+		return new ExcelSpreadsheetFile.Builder(workbook).build();
+	}
+	
+	private XSSFWorkbook createWorkbookFromPath(Path path) {
 		try {
 			// loading from a file rather than a stream, as less memory is used that way
-			Workbook workbook = WorkbookFactory.create(path.toFile());
+			Workbook workbook = WorkbookFactory.create(path.toFile(), "", true);
+			// closing underlying package references; 
+			// workbook is still usable and contains all data from underlying file 
+			workbook.close();
 			if (!(workbook instanceof XSSFWorkbook)) {
 				throw new RuntimeException(
 						"Only XML-based Excel workbooks are supported (.XLSX, .XLSM): " + path.toString());
 			}
-			return new ExcelSpreadsheetFile.Builder((XSSFWorkbook)workbook).build();
+			return (XSSFWorkbook)workbook;
 		}
 		catch (EncryptedDocumentException | InvalidFormatException | IOException e) {
 			throw new RuntimeException("Unable to read Excel file: " + path.toString(), e);

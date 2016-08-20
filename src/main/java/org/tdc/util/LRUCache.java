@@ -18,7 +18,7 @@ public class LRUCache<K,V> implements Cache<K,V> {
 	private static final Logger log = LoggerFactory.getLogger(LRUCache.class);
 	
 	private final int maxSize;
-	private final Map<K,V> map = new InternalMap<>();
+	private final Map<K,V> sizeLimitedMap = new SizeLimitedMap<>();
 	
 	public LRUCache(int maxSize) {
 		this.maxSize = maxSize;
@@ -26,22 +26,22 @@ public class LRUCache<K,V> implements Cache<K,V> {
 	
 	@Override
 	public V get(K key) {
-		return map.get(key);
+		return sizeLimitedMap.get(key);
 	}
 	
 	@Override
 	public void put(K key, V value) {
-		map.put(key, value);
+		sizeLimitedMap.put(key, value);
 	}
 	
 	@Override
 	public int size() {
-		return map.size();
+		return sizeLimitedMap.size();
 	}
 
 	@SuppressWarnings("serial")
-	private class InternalMap<K,V> extends LinkedHashMap<K,V> {
-		public InternalMap() {
+	private class SizeLimitedMap<K,V> extends LinkedHashMap<K,V> {
+		public SizeLimitedMap() {
 			// true for 3rd param indicates use of 'access' order rather than 'insert' order
 			super(16, 0.75f, true); 
 		}
