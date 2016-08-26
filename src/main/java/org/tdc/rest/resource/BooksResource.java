@@ -7,14 +7,19 @@ import java.net.URISyntaxException;
 import java.util.List;
 
 import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
 import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import org.jboss.resteasy.annotations.providers.jackson.Formatted;
 import org.jboss.resteasy.plugins.providers.multipart.InputPart;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
+import org.tdc.rest.dto.BookDTO;
 import org.tdc.rest.process.BooksProcessor;
 
 /**
@@ -22,7 +27,6 @@ import org.tdc.rest.process.BooksProcessor;
  */
 @Path("/tdc/books")
 public class BooksResource {
-	
 	private final BooksProcessor processor;
 	
 	public BooksResource(BooksProcessor processor) {
@@ -53,5 +57,13 @@ public class BooksResource {
 			throw new RuntimeException("Unable to create location URI", e);
 		}
 		return response;
+	}
+
+	@GET
+	@Path("/{bookID}")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Formatted
+	public BookDTO getBook(@PathParam("bookID") String bookID) {
+		return processor.getBookInfo(bookID);
 	}
 }

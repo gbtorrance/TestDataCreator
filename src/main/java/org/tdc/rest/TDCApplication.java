@@ -24,6 +24,8 @@ import org.tdc.modelinst.ModelInstFactory;
 import org.tdc.modelinst.ModelInstFactoryImpl;
 import org.tdc.rest.process.BooksProcessor;
 import org.tdc.rest.process.BooksProcessorImpl;
+import org.tdc.rest.process.ConfigsProcessor;
+import org.tdc.rest.process.ConfigsProcessorImpl;
 import org.tdc.rest.resource.BooksResource;
 import org.tdc.rest.resource.ConfigBooksResource;
 import org.tdc.rest.resource.ConfigModelsResource;
@@ -54,6 +56,7 @@ public class TDCApplication extends Application {
 	private final ModelInstFactory modelInstFactory;
 	private final BookFactory bookFactory;
 	private final SchemaValidatorFactory schemaValidatorFactory;
+	private final ConfigsProcessor configsProcessor;
 	private final BooksProcessor booksProcessor;
 	
 	public TDCApplication(@Context ServletContext servletContext) {
@@ -79,19 +82,25 @@ public class TDCApplication extends Application {
 		
 		schemaValidatorFactory = new SchemaValidatorFactoryImpl();
 		
+		configsProcessor = new ConfigsProcessorImpl.Builder(
+				schemaConfigFactory, 
+				modelConfigFactory, 
+				bookConfigFactory).build();
+		
 		booksProcessor = new BooksProcessorImpl.Builder(
 				serverConfig, 
 				bookFactory, 
 				spreadsheetFileFactory, 
 				schemaValidatorFactory).build();
 		
-		ConfigSchemasResource configSchemasResource = new ConfigSchemasResource(
-				schemaConfigFactory.getAllSchemaConfigs());
-		ConfigModelsResource configModelsResource = new ConfigModelsResource(
-				modelConfigFactory.getAllModelConfigs());
-		ConfigBooksResource configBooksResource = new ConfigBooksResource(
-				bookConfigFactory.getAllBookConfigs());
-		BooksResource booksResource = new BooksResource(booksProcessor); 
+		ConfigSchemasResource configSchemasResource = 
+				new ConfigSchemasResource(configsProcessor);
+		ConfigModelsResource configModelsResource = 
+				new ConfigModelsResource(configsProcessor);
+		ConfigBooksResource configBooksResource = 
+				new ConfigBooksResource(configsProcessor);
+		BooksResource booksResource = 
+				new BooksResource(booksProcessor); 
 
 		singletons.add(configSchemasResource);
 		singletons.add(configModelsResource);

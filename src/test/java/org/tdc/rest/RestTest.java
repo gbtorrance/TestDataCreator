@@ -25,8 +25,12 @@ import org.slf4j.LoggerFactory;
 import org.tdc.config.server.ServerConfig;
 import org.tdc.config.server.ServerConfigImpl;
 import org.tdc.rest.dto.BookConfigDTO;
+import org.tdc.rest.dto.BookDTO;
 import org.tdc.rest.dto.ModelConfigDTO;
 import org.tdc.rest.dto.SchemaConfigDTO;
+import org.tdc.rest.dto.TestCaseDTO;
+import org.tdc.rest.dto.TestDocDTO;
+import org.tdc.rest.dto.TestSetDTO;
 import org.tdc.util.Util;
 
 /**
@@ -69,6 +73,7 @@ public class RestTest {
 		String target = urlPrefix + "/tdc/config/schemas";
 		Response response = client.target(target).request().get();
 		List<SchemaConfigDTO> list = response.readEntity(new GenericType<List<SchemaConfigDTO>>(){});
+		response.close();
 		int foundCount = 0;
 		for (SchemaConfigDTO dto : list) {
 			if (dto.getSchemaAddress().equals("ConfigTest/SchemaConfigTest")) {
@@ -86,6 +91,7 @@ public class RestTest {
 		String target = urlPrefix + "/tdc/config/models";
 		Response response = client.target(target).request().get();
 		List<ModelConfigDTO> list = response.readEntity(new GenericType<List<ModelConfigDTO>>(){});
+		response.close();
 		int foundCount = 0;
 		for (ModelConfigDTO dto : list) {
 			if (dto.getModelAddress().equals("ConfigTest/SchemaConfigTest/ModelConfigTest")) {
@@ -103,6 +109,7 @@ public class RestTest {
 		String target = urlPrefix + "/tdc/config/books";
 		Response response = client.target(target).request().get();
 		List<BookConfigDTO> list = response.readEntity(new GenericType<List<BookConfigDTO>>(){});
+		response.close();
 		int foundCount = 0;
 		for (BookConfigDTO dto : list) {
 			if (dto.getBookAddress().equals("ConfigTest/BookConfigTest")) {
@@ -117,6 +124,7 @@ public class RestTest {
 	
 	@Test
 	public void testBookUpload() throws IOException {
+		// upload book
 		String target = urlPrefix + "/tdc/books";
 		MultipartFormDataOutput mdo = new MultipartFormDataOutput();
 		Response response;
@@ -126,7 +134,41 @@ public class RestTest {
 					new GenericEntity<MultipartFormDataOutput>(mdo) {};
 			response = client.target(target).request().post(Entity.entity(entity, MediaType.MULTIPART_FORM_DATA));
 		}
-		assertThat(response.getStatus()).isEqualTo(Response.Status.CREATED.getStatusCode());
-		assertThat(response.getLocation().toString()).startsWith(urlPrefix + "/tdc/books/");
+		int uploadStatus = response.getStatus();
+		String bookLocation = response.getLocation().toString();
+		response.close();
+		assertThat(uploadStatus).isEqualTo(Response.Status.CREATED.getStatusCode());
+		assertThat(bookLocation).startsWith(urlPrefix + "/tdc/books/");
+		
+		// get book info after upload
+		System.out.println("************************");
+		System.out.println("************************");
+		System.out.println("************************");
+		System.out.println("************************");
+		Response response2 = client.target(bookLocation).request().get();
+//		String json = response2.readEntity(String.class);
+//		log.debug("Book Info: status = {} / {}" + response2.getStatus(), json);
+		BookDTO bookDTO = response2.readEntity(BookDTO.class);
+		assertThat(bookDTO.getBookAddress()).isEqualTo("Tax/IndividualIncome2012v1");
+		outputBookDTO(bookDTO);
+	}
+	
+	private void outputBookDTO(BookDTO book) {
+		log.debug("Address: {}",  book.getBookAddress());
+		for (TestSetDTO testSet : book.getTestSets()) {
+			log.debug("  SetName: {}", testSet.getSetName());
+			for (TestCaseDTO testCase : testSet.getTestCases()) {
+				log.debug("    CaseNum: {}", testCase.getCaseNum());
+				for (TestDocDTO testDoc : testCase.getTestDocs()) {
+					log.debug("      ColNum: {}", testDoc.getColNum());
+					int testLoadCount = testDoc.getResults().getTestLoadResult() == null ? 
+							0 : testDoc.getResults().getTestLoadResult().getMessages().size();
+					int schemaValidateCount = testDoc.getResults().getSchemaValidateResult() == null ? 
+							0 : testDoc.getResults().getSchemaValidateResult().getMessages().size();
+					log.debug("      Test load count: {}", testLoadCount);
+					log.debug("      Schema validate count: {}", schemaValidateCount);
+				}
+			}
+		}
 	}
 }

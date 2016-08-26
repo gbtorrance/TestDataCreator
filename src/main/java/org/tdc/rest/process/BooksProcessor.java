@@ -2,6 +2,7 @@ package org.tdc.rest.process;
 
 import java.io.File;
 
+import org.tdc.rest.dto.BookDTO;
 import org.tdc.rest.resource.BooksResource;
 
 /**
@@ -11,4 +12,5 @@ import org.tdc.rest.resource.BooksResource;
  */
 public interface BooksProcessor {
 	String uploadBookFile(File bookFile);
+	BookDTO getBookInfo(String bookID);
 }

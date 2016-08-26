@@ -17,6 +17,7 @@ target/
 # Eclipse
 .classpath
 .project
+.factorypath
 .settings/
 .metadata/
 
@@ -27,3 +28,4 @@ out/
 *.iws
 *.iml
 
+/.apt_generated/

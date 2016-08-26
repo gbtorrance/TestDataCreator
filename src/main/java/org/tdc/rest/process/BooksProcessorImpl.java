@@ -13,8 +13,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.tdc.book.Book;
 import org.tdc.book.BookFactory;
+import org.tdc.book.BookSchemaValidator;
 import org.tdc.book.BookTestDataLoader;
 import org.tdc.config.server.ServerConfig;
+import org.tdc.rest.dto.BookDTO;
+import org.tdc.rest.mapper.BookMapper;
 import org.tdc.schemavalidate.SchemaValidatorFactory;
 import org.tdc.spreadsheet.SpreadsheetFile;
 import org.tdc.spreadsheet.SpreadsheetFileFactory;
@@ -42,7 +45,7 @@ public class BooksProcessorImpl implements BooksProcessor {
 	private BooksProcessorImpl(Builder builder) {
 		this.serverConfig = builder.serverConfig;
 		this.bookFactory = builder.bookFactory;
-		this. spreadsheetFileFactory = builder.spreadsheetFileFactory;
+		this.spreadsheetFileFactory = builder.spreadsheetFileFactory;
 		this.schemaValidatorFactory = builder.schemaValidatorFactory;
 		this.bookCache = builder.bookCache;
 	}
@@ -52,27 +55,34 @@ public class BooksProcessorImpl implements BooksProcessor {
 		String bookID = createNewBookIDAndWorkingDir();
 		saveBookFileToLocalBookWorkingDir(bookFile, bookID);
 		// don't need Book object now; just ensure it loads correctly and cache for future
-		getBook(bookID); 
+		getBook(bookID);
 		return bookID;
 	}
 	
-	private synchronized String createNewBookIDAndWorkingDir() {
-		boolean success = false;
-		String bookID = null;
-		while (!success) {
-			bookID = getTrialBookID();
-			Path bookWorkingRoot = serverConfig.getBooksWorkingRoot().resolve(bookID);
-			if (!Files.exists(bookWorkingRoot)) {
-				try {
-					Files.createDirectory(bookWorkingRoot);
-				} 
-				catch (IOException e) {
-					throw new RuntimeException(e);
+	@Override
+	public BookDTO getBookInfo(String bookID) {
+		Book book = getBook(bookID);
+		synchronized(book) {
+			return BookMapper.INSTANCE.bookToBookDTO(book);
+		}
+	}
+	
+	private String createNewBookIDAndWorkingDir() {
+		synchronized(serverConfig.getBooksWorkingRoot()) {
+			while (true) {
+				String bookID = getTrialBookID();
+				Path bookWorkingRoot = serverConfig.getBooksWorkingRoot().resolve(bookID);
+				if (!Files.exists(bookWorkingRoot)) {
+					try {
+						Files.createDirectory(bookWorkingRoot);
+						return bookID;
+					} 
+					catch (IOException e) {
+						throw new RuntimeException(e);
+					}
 				}
-				success = true;
 			}
 		}
-		return bookID;
 	}
 	
 	private void saveBookFileToLocalBookWorkingDir(File bookFile, String bookID) {
@@ -86,13 +96,15 @@ public class BooksProcessorImpl implements BooksProcessor {
 		}
 	}
 
-	private synchronized Book getBook(String bookID) {
-		Book book = bookCache.get(bookID);
-		if (book == null) {
-			book = loadBook(bookID);
-			bookCache.put(bookID, book);
+	private Book getBook(String bookID) {
+		synchronized(bookCache) {
+			Book book = bookCache.get(bookID);
+			if (book == null) {
+				book = loadBook(bookID);
+				bookCache.put(bookID, book);
+			}
+			return book;
 		}
-		return book;
 	}
 
 	private Book loadBook(String bookID) {
@@ -102,7 +114,14 @@ public class BooksProcessorImpl implements BooksProcessor {
 		Book book = bookFactory.getBook(spreadsheetFile);
 		BookTestDataLoader loader = new BookTestDataLoader(book, spreadsheetFile);
 		loader.loadTestData();
+		// TODO possibly move validation elsewhere; leave it here for now
+		schemaValidateBook(book);
 		return book;
+	}
+	
+	private void schemaValidateBook(Book book) {
+		BookSchemaValidator validator = new BookSchemaValidator(book, schemaValidatorFactory);
+		validator.validate();
 	}
 
 	private Path getSpreadsheetFilePath(String bookID) {
