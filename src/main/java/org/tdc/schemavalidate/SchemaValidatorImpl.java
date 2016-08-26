@@ -24,10 +24,12 @@ public class SchemaValidatorImpl implements SchemaValidator {
 	private static final Logger log = LoggerFactory.getLogger(SchemaValidatorImpl.class);
 	
 	private final Schema schema;
+	private final int maxMessages;
 	
 	private SchemaValidatorImpl(Builder builder) {
 		// Schema objects are safe to use in a multi-threaded environment
 		this.schema = builder.schema;
+		this.maxMessages = builder.maxMessages;
 	}
 	
 	@Override
@@ -36,10 +38,13 @@ public class SchemaValidatorImpl implements SchemaValidator {
 		
 		Validator validator = schema.newValidator();
 		SchemaValidatorErrorHandler errorHandler = 
-				new SchemaValidatorErrorHandler(validator, testDoc);
+				new SchemaValidatorErrorHandler(validator, testDoc, maxMessages);
 		validator.setErrorHandler(errorHandler);
 		try {
 			validator.validate(new DOMSource(domDocument));
+		}
+		catch(SchemaValidatorErrorHandler.MaxMessagesExceededException e) {
+			// maximum messages exceeded; do nothing
 		}
 		catch (SAXException | IOException e) {
 			throw new RuntimeException("Unable to validate document", e);
@@ -49,11 +54,13 @@ public class SchemaValidatorImpl implements SchemaValidator {
 	public static class Builder {
 		
 		private final Path schemaRootFile;
+		private final int maxMessages;
 		
 		private Schema schema;
 		
-		public Builder(Path schemaRootFile) {
+		public Builder(Path schemaRootFile, int maxMessages) {
 			this.schemaRootFile = schemaRootFile;
+			this.maxMessages = maxMessages;
 		}
 		
 		public SchemaValidator build() {

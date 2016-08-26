@@ -14,6 +14,7 @@ import org.tdc.model.TDCNode;
 import org.tdc.modeldef.ElementNodeDef;
 import org.tdc.modeldef.NodeDef;
 import org.tdc.spreadsheet.SpreadsheetFile;
+import org.tdc.util.Util;
 
 /**
  * Implementation of class with functionality for reading an existing customizer spreadsheet
@@ -87,7 +88,7 @@ public class ModelCustomizerReader extends AbstractModelCustomizer {
 		int row = getNodeRow(node);
 		String overrideVariable = getConfig().getReadOccursCountOverrideFromVariable();
 		String overrideStr = node.getVariable(overrideVariable).trim();
-		int override = -1;
+		int override = Util.UNDEFINED;
 		if (overrideStr.length() > 0) {
 			boolean allowInvalid = getConfig().getAllowMinMaxInvalidOccursCountOverride();
 			AttribNode attrib = isAttrib ? (AttribNode)node : null;
@@ -131,11 +132,11 @@ public class ModelCustomizerReader extends AbstractModelCustomizer {
 	}
 	
 	private void exception(int row, String invalidMsg, String actualValue, String expectedMsg) {
-		exception(row, -1, invalidMsg, actualValue, expectedMsg);
+		exception(row, Util.UNDEFINED, invalidMsg, actualValue, expectedMsg);
 	}
 
 	private void exception(int row, int col, String invalidMsg, String actualValue, String expectedMsg) {
 		throw new RuntimeException(invalidMsg + " '" + actualValue + 
-				"' at row " + row + (col == -1 ? "" : " col " + col) + "; " + expectedMsg);
+				"' at row " + row + (col == Util.UNDEFINED ? "" : " col " + col) + "; " + expectedMsg);
 	}
 }

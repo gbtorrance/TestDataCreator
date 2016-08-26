@@ -81,6 +81,6 @@ public abstract class NonAttribNodeDef extends NodeDef implements NonAttribNode 
 
 	@Override 
 	public String getDispOccurs() {
-		return minOccurs + ".." + (maxOccurs == -1 ? "n" : maxOccurs);
+		return minOccurs + ".." + (maxOccurs == MAX_UNBOUNDED ? "n" : maxOccurs);
 	}
 }

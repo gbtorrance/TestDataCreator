@@ -18,6 +18,9 @@ public class Util {
 	public static final DateTimeFormatter EXPORT_DATE_TIME_FORMATTER = 
 			DateTimeFormatter.ofPattern("yyMMdd_kkmmss_SSS");
 	
+	public static final int UNDEFINED = -1;
+	public static final int NO_LIMIT = -1;
+	
 	/**
 	 * Returns a certain number of spaces.
 	 * 

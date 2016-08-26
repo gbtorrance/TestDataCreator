@@ -7,6 +7,7 @@ import org.tdc.dom.DOMUtil;
 import org.tdc.modelinst.NodeInst;
 import org.tdc.result.Message;
 import org.tdc.result.Result;
+import org.tdc.util.Util;
 import org.w3c.dom.Element;
 import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXException;
@@ -27,11 +28,13 @@ class SchemaValidatorErrorHandler implements ErrorHandler {
 	
 	private final Validator validator;
 	private final TestDoc testDoc;
+	private final int maxMessages;
 	private final Result result;
 	
-	public SchemaValidatorErrorHandler(Validator validator, TestDoc testDoc) {
+	public SchemaValidatorErrorHandler(Validator validator, TestDoc testDoc, int maxMessages) {
 		this.validator = validator;
 		this.testDoc = testDoc;
+		this.maxMessages = maxMessages;
 		result = testDoc.getResults().getSchemaValidateResult()
 				.orElseThrow(() -> new IllegalStateException("SchemaValidateResult not set"));
 	}
@@ -68,6 +71,16 @@ class SchemaValidatorErrorHandler implements ErrorHandler {
 		}
 		catch (SAXNotRecognizedException | SAXNotSupportedException e) {
 			throw new UnsupportedOperationException(e);
+		}
+		if (maxMessages != Util.NO_LIMIT && result.getMessages().size() >= maxMessages) {
+			throw new MaxMessagesExceededException();
+		}
+	}
+	
+	@SuppressWarnings("serial")
+	class MaxMessagesExceededException extends RuntimeException {
+		public MaxMessagesExceededException() {
+			super();
 		}
 	}
 }

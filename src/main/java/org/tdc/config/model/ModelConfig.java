@@ -25,4 +25,6 @@ public interface ModelConfig {
 	List<SchemaExtractor> getSchemaExtractors();
 	ModelCustomizerConfig getModelCustomizerConfig();
 	boolean hasModelCustomizerConfig();
+	int getTestLoadMaxMessages();
+	int getSchemaValidateMaxMessages();
 }

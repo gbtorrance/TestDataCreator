@@ -13,6 +13,7 @@ import org.tdc.evaluator.factory.GeneralEvaluatorFactory;
 import org.tdc.schemaparse.extractor.SchemaExtractor;
 import org.tdc.schemaparse.extractor.SchemaExtractorFactory;
 import org.tdc.util.Addr;
+import org.tdc.util.Util;
 
 /**
  * A {@link ModelConfig} implementation.
@@ -36,6 +37,8 @@ public class ModelConfigImpl implements ModelConfig {
 	private final int defaultOccursCount;
 	private final List<SchemaExtractor> schemaExtractors;
 	private final ModelCustomizerConfig modelCustomizerConfig;
+	private final int testLoadMaxMessages;
+	private final int schemaValidateMaxMessages;
 	
 	private ModelConfigImpl(Builder builder) {
 		this.schemaConfig = builder.schemaConfig;
@@ -49,6 +52,8 @@ public class ModelConfigImpl implements ModelConfig {
 		this.defaultOccursCount = builder.defaultOccursCount;
 		this.schemaExtractors = Collections.unmodifiableList(builder.schemaExtractors); // unmodifiable
 		this.modelCustomizerConfig = builder.modelCustomizerConfig;
+		this.testLoadMaxMessages = builder.testLoadMaxMessages;
+		this.schemaValidateMaxMessages = builder.schemaValidateMaxMessages;
 	}
 	
 	@Override
@@ -116,6 +121,16 @@ public class ModelConfigImpl implements ModelConfig {
 		return modelCustomizerConfig != null;
 	}
 	
+	@Override
+	public int getTestLoadMaxMessages() {
+		return testLoadMaxMessages;
+	}
+	
+	@Override
+	public int getSchemaValidateMaxMessages() {
+		return schemaValidateMaxMessages;
+	}
+	
 	public static class Builder {
 		private final XMLConfigWrapper config;
 		private final SchemaConfig schemaConfig;
@@ -132,6 +147,8 @@ public class ModelConfigImpl implements ModelConfig {
 		private int defaultOccursCount;
 		private List<SchemaExtractor> schemaExtractors;
 		private ModelCustomizerConfig modelCustomizerConfig;
+		private int testLoadMaxMessages;
+		private int schemaValidateMaxMessages;
 		
 		public Builder(SchemaConfig schemaConfig, String name, 
 				SchemaExtractorFactory schemaExtractorFactory, GeneralEvaluatorFactory evaluatorFactory) {
@@ -158,6 +175,8 @@ public class ModelConfigImpl implements ModelConfig {
 			schemaExtractors = schemaExtractorFactory.createSchemaExtractors(config, "SchemaExtractors");
 			modelCustomizerConfig = new ModelCustomizerConfigImpl.Builder(
 					config, modelConfigRoot, defaultOccursCount, evaluatorFactory).build();
+			testLoadMaxMessages = config.getInt("TestLoadMaxMessages", Util.NO_LIMIT, false);
+			schemaValidateMaxMessages = config.getInt("SchemaValidateMaxMessages", Util.NO_LIMIT, false);
 			return new ModelConfigImpl(this);
 		}
 	}

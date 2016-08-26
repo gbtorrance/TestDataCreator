@@ -9,6 +9,7 @@ import java.util.Map;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.tdc.spreadsheet.Spreadsheet;
 import org.tdc.spreadsheet.SpreadsheetFile;
+import org.tdc.util.Util;
 
 /**
  * A {@link SpreadsheetFile} implementation for Excel workbooks.
@@ -68,7 +69,7 @@ public class ExcelSpreadsheetFile implements SpreadsheetFile {
 	@Override
 	public void setSpreadsheetHidden(String name, boolean hide) {
 		int index = workbook.getSheetIndex(name);
-		if (index == -1) {
+		if (index == Util.UNDEFINED) {
 			throw new IllegalStateException("Unable to hide worksheet '" + name + "'; does not exist");
 		}
 		workbook.setSheetHidden(index, hide);

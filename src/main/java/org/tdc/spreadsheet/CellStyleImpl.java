@@ -2,6 +2,8 @@ package org.tdc.spreadsheet;
 
 import java.awt.Color;
 
+import org.tdc.util.Util;
+
 /**
  * A {@link CellStyle} implementation.
  */
@@ -49,17 +51,17 @@ public class CellStyleImpl implements CellStyle {
 
 	@Override
 	public int getColorRed() {
-		return color == null ? -1 : color.getRed();
+		return color == null ? Util.UNDEFINED : color.getRed();
 	}
 
 	@Override
 	public int getColorGreen() {
-		return color == null ? -1 : color.getGreen();
+		return color == null ? Util.UNDEFINED : color.getGreen();
 	}
 
 	@Override
 	public int getColorBlue() {
-		return color == null ? -1 : color.getBlue();
+		return color == null ? Util.UNDEFINED : color.getBlue();
 	}
 
 	@Override
@@ -74,17 +76,17 @@ public class CellStyleImpl implements CellStyle {
 
 	@Override
 	public int getFillColorRed() {
-		return fillColor == null ? -1 : fillColor.getRed();
+		return fillColor == null ? Util.UNDEFINED : fillColor.getRed();
 	}
 
 	@Override
 	public int getFillColorGreen() {
-		return fillColor == null ? -1 : fillColor.getGreen();
+		return fillColor == null ? Util.UNDEFINED : fillColor.getGreen();
 	}
 
 	@Override
 	public int getFillColorBlue() {
-		return fillColor == null ? -1 : fillColor.getBlue();
+		return fillColor == null ? Util.UNDEFINED : fillColor.getBlue();
 	}
 
 	@Override

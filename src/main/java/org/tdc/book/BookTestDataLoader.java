@@ -55,10 +55,12 @@ public class BookTestDataLoader {
 		String namespace = modelConfig.getSchemaRootElementNamespace();
 		PageConfig pageConfig = page.getConfig();
 		int nodeRowStart = pageConfig.getNodeRowStart();
+		int testLoadMaxMessages = modelConfig.getTestLoadMaxMessages();
 		testDocDOMBuilder.setModelInst(modelInst);
 		testDocDOMBuilder.setSpreadsheet(sheet);
 		testDocDOMBuilder.setNamespace(namespace);
 		testDocDOMBuilder.setNodeRowStart(nodeRowStart);
+		testDocDOMBuilder.setMaxMessages(testLoadMaxMessages);
 		
 		PageStructureVerifier verifier = new PageStructureVerifier(modelInst, pageConfig, sheet);
 		verifier.verifyStructure();

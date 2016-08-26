@@ -6,6 +6,8 @@
 	<SchemaFailOnParserWarning>true</SchemaFailOnParserWarning>
 	<SchemaFailOnParserNonFatalError>true</SchemaFailOnParserNonFatalError>
 	<DefaultOccursCount>3</DefaultOccursCount>
+	<TestLoadMaxMessages>25</TestLoadMaxMessages>
+	<SchemaValidateMaxMessages>50</SchemaValidateMaxMessages>
 	
 	<SchemaExtractors>
 		<SchemaExtractor type="dataType">

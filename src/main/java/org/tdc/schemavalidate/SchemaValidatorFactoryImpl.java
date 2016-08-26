@@ -26,7 +26,8 @@ public class SchemaValidatorFactoryImpl implements SchemaValidatorFactory {
 		SchemaValidator schemaValidator = cache.get(addr);
 		if (schemaValidator == null) {
 			Path rootFile = config.getSchemaRootFileFullPath();
-			schemaValidator = new SchemaValidatorImpl.Builder(rootFile).build();
+			int maxMessages = config.getSchemaValidateMaxMessages();
+			schemaValidator = new SchemaValidatorImpl.Builder(rootFile, maxMessages).build();
 			cache.put(addr, schemaValidator);
 		}
 		else {

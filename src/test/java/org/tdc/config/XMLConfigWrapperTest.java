@@ -12,6 +12,7 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.tdc.spreadsheet.CellStyle;
 import org.tdc.spreadsheet.CellStyleImpl;
+import org.tdc.util.Util;
 
 /**
  * Unit tests for {@link XMLConfigWrapper} and its related classes.
@@ -148,7 +149,7 @@ public class XMLConfigWrapperTest {
 
 	@Test
 	public void testMaxIndexOfElementThatDoesNotExist() {
-		assertThat(config.getMaxIndex("RepeatingElement_DoesNotExist")).isEqualTo(-1);
+		assertThat(config.getMaxIndex("RepeatingElement_DoesNotExist")).isEqualTo(Util.UNDEFINED);
 	}
 	
 	@Test

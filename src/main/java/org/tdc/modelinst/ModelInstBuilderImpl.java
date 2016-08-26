@@ -16,6 +16,7 @@ import org.tdc.modeldef.ElementNodeDef;
 import org.tdc.modeldef.ModelDef;
 import org.tdc.modeldef.NodeDef;
 import org.tdc.modeldef.NonAttribNodeDef;
+import org.tdc.util.Util;
 
 /**
  * A {@link ModelInstBuilder} implementation.
@@ -172,7 +173,7 @@ public class ModelInstBuilderImpl implements ModelInstBuilder {
 	private int getOccursCount(NodeDef nodeDef) {
 		int override = nodeDef.getOccursCountOverride();
 		int occursCount = override;
-		if (override == -1) {
+		if (override == Util.UNDEFINED) {
 			int maxOccurs;
 			int minOccurs;
 			boolean isUnbounded = false;
