@@ -67,8 +67,8 @@ public class TaskConfigFactoryImpl implements TaskConfigFactory {
 
 	protected String getDefaultClassName(String type) {
 		switch (type) {
-//		case "default": 
-//			return "...class name...";
+		case "default-export": 
+			return "org.tdc.export.DefaultExportTaskConfig";
 		}
 		return null;
 	}

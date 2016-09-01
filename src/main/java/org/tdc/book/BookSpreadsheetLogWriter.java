@@ -85,7 +85,6 @@ public class BookSpreadsheetLogWriter {
 			writeTestDoc(testDoc);
 		}
 		writeResults(testCase.getResults());
-		rowNum++;
 		colNum--;
 	}
 
@@ -105,7 +104,7 @@ public class BookSpreadsheetLogWriter {
 		results.getTestLoadResult().ifPresent(r -> writePhase(r, "Load"));
 		results.getSchemaValidateResult().ifPresent(r -> writePhase(r, "Schema"));
 		for (TaskConfig task : book.getConfig().getTaskConfigs()) {
-			results.getTaskResult(task.getTaskID()).ifPresent(r -> writePhase(r, task.getTaskID()));
+			results.getTaskResult(task.getTaskID()).ifPresent(r -> writePhase(r, "Task: " + task.getTaskID()));
 		}
 	}
 

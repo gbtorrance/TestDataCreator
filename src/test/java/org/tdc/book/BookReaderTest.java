@@ -28,7 +28,11 @@ import org.tdc.schemavalidate.SchemaValidatorFactoryImpl;
 import org.tdc.spreadsheet.SpreadsheetFile;
 import org.tdc.spreadsheet.SpreadsheetFileFactory;
 import org.tdc.spreadsheet.excel.ExcelSpreadsheetFileFactory;
+import org.tdc.task.TaskFactory;
+import org.tdc.task.TaskFactoryImpl;
+import org.tdc.task.TaskProcessor;
 import org.tdc.util.Addr;
+import org.tdc.util.Util;
 
 /**
  * Unit tests for reading a {@link Book} from spreadsheet file, 
@@ -47,6 +51,7 @@ public class BookReaderTest {
 	private static ModelInstFactory modelInstFactory;
 	private static BookFactory bookFactory;
 	private static SchemaValidatorFactory schemaValidatorFactory; 
+	private static TaskFactory taskFactory;
 
 	@BeforeClass
 	public static void setup() {
@@ -67,6 +72,7 @@ public class BookReaderTest {
 		bookFactory = new BookFactoryImpl(bookConfigFactory, modelInstFactory);
 		
 		schemaValidatorFactory = new SchemaValidatorFactoryImpl();
+		taskFactory = new TaskFactoryImpl();
 	}
 	
 	@Test
@@ -80,8 +86,12 @@ public class BookReaderTest {
 		BookTestDataLoader loader = new BookTestDataLoader(book, spreadsheetFile);
 		loader.loadTestData();
 		
-		BookSchemaValidator validator = new BookSchemaValidator(book, schemaValidatorFactory);
-		validator.validate();
+		BookSchemaValidator schemaValidator = new BookSchemaValidator(book, schemaValidatorFactory);
+		schemaValidator.validate();
+		
+		Util.purgeDirectory(Paths.get("testfiles/Temp/ExportRoot"));
+		TaskProcessor taskProcessor = new TaskProcessor.Builder(taskFactory, book).build();
+		taskProcessor.processTasks();
 		
 		BookSpreadsheetLogWriter logWriter = new BookSpreadsheetLogWriter(book, spreadsheetFile);
 		logWriter.writeLog();

@@ -1,6 +1,7 @@
 package org.tdc.task;
 
 import org.tdc.book.Book;
+import org.tdc.config.book.TaskConfig;
 
 /**
  * Defines core functionality for custom Tasks that can be performed
@@ -8,5 +9,6 @@ import org.tdc.book.Book;
  * and file generation, exporting, etc..
  */
 public interface Task {
+	TaskConfig getConfig();
 	void process();
 }
