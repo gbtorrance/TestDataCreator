@@ -1,5 +1,6 @@
 package org.tdc.spreadsheet.excel;
 
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.Path;
 
@@ -17,32 +18,58 @@ import org.tdc.spreadsheet.SpreadsheetFileFactory;
 public class ExcelSpreadsheetFileFactory implements SpreadsheetFileFactory {
 
 	@Override
-	public SpreadsheetFile getSpreadsheetFile() {
+	public SpreadsheetFile createNewSpreadsheetFile() {
 		XSSFWorkbook workbook = new XSSFWorkbook();
 		return new ExcelSpreadsheetFile.Builder(workbook).build();
 	}
 
 	@Override
-	public SpreadsheetFile getSpreadsheetFileFromPath(Path path) {
-		XSSFWorkbook workbook = createWorkbookFromPath(path);
+	public SpreadsheetFile createReadOnlySpreadsheetFileFromPath(Path path) {
+		XSSFWorkbook workbook = createReadOnlyWorkbookFromPath(path);
 		return new ExcelSpreadsheetFile.Builder(workbook).build();
 	}
 	
-	private XSSFWorkbook createWorkbookFromPath(Path path) {
+	@Override
+	public SpreadsheetFile createEditableSpreadsheetFileFromPath(Path path) {
+		XSSFWorkbook workbook = createEditableWorkbookFromPath(path);
+		return new ExcelSpreadsheetFile.Builder(workbook).build();
+	}
+	
+	private XSSFWorkbook createReadOnlyWorkbookFromPath(Path path) {
 		try {
-			// loading from a file rather than a stream, as less memory is used that way
+			// load from a file rather than a stream; 
+			// uses less memory and is more efficient, but cannot be edited without
+			// having to keep the Workbook open (along with associate file references/locks);
+			// don't want to do this, therefore create Workbook as "read only"
 			Workbook workbook = WorkbookFactory.create(path.toFile(), "", true);
 			// closing underlying package references; 
-			// workbook is still usable and contains all data from underlying file 
+			// workbook is still usable and contains all needed data from underlying file 
 			workbook.close();
-			if (!(workbook instanceof XSSFWorkbook)) {
-				throw new RuntimeException(
-						"Only XML-based Excel workbooks are supported (.XLSX, .XLSM): " + path.toString());
-			}
-			return (XSSFWorkbook)workbook;
+			return confirmXSSFWorkbookFormat(workbook, path);
 		}
 		catch (EncryptedDocumentException | InvalidFormatException | IOException e) {
 			throw new RuntimeException("Unable to read Excel file: " + path.toString(), e);
 		}
+	}
+	
+	private XSSFWorkbook createEditableWorkbookFromPath(Path path) {
+		// load from a stream; uses more memory, but allows Workbook
+		// to be subsequently edited and saved *without* having to 
+		// keep open references to the file on disk
+		try (FileInputStream fis = new FileInputStream(path.toFile())) {
+			Workbook workbook = WorkbookFactory.create(fis);
+			return confirmXSSFWorkbookFormat(workbook, path);
+		}
+		catch (EncryptedDocumentException | InvalidFormatException | IOException e) {
+			throw new RuntimeException("Unable to read Excel file: " + path.toString(), e);
+		}
+	}
+	
+	private XSSFWorkbook confirmXSSFWorkbookFormat(Workbook workbook, Path path) {
+		if (!(workbook instanceof XSSFWorkbook)) {
+			throw new RuntimeException(
+					"Only XML-based Excel workbooks are supported (.XLSX, .XLSM): " + path.toString());
+		}
+		return (XSSFWorkbook)workbook;
 	}
 }

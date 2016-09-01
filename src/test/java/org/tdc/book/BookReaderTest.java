@@ -2,6 +2,8 @@ package org.tdc.book;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
@@ -68,9 +70,9 @@ public class BookReaderTest {
 	}
 	
 	@Test
-	public void testReadBookAndValidate() {
+	public void testReadBookAndValidate() throws IOException {
 		Path bookFilePath = Paths.get("testfiles/SampleFiles/TestBook.xlsx"); 
-		SpreadsheetFile spreadsheetFile = spreadsheetFileFactory.getSpreadsheetFileFromPath(bookFilePath);
+		SpreadsheetFile spreadsheetFile = spreadsheetFileFactory.createEditableSpreadsheetFileFromPath(bookFilePath);
 		
 		Book book = bookFactory.getBook(spreadsheetFile);
 		assertThat(book.getConfig().getAddr()).isEqualTo(new Addr("Tax/IndividualIncome2012v1"));
@@ -80,5 +82,12 @@ public class BookReaderTest {
 		
 		BookSchemaValidator validator = new BookSchemaValidator(book, schemaValidatorFactory);
 		validator.validate();
+		
+		BookSpreadsheetLogWriter logWriter = new BookSpreadsheetLogWriter(book, spreadsheetFile);
+		logWriter.writeLog();
+		Path newFile = Paths.get("testfiles/Temp/TestBookWithLog.xlsx");
+		Files.deleteIfExists(newFile);
+		spreadsheetFile.saveAsNew(newFile);
+		assertThat(Files.exists(newFile)).isEqualTo(true);
 	}
 }

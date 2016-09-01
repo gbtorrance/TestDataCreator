@@ -1,5 +1,8 @@
 package org.tdc.rest.mapper;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
@@ -48,9 +51,6 @@ public abstract class BookMapper {
 
 //  TODO sample of how filtering of lists can be done; 
 //       possibly pass in a Filter object to the mapper constructor
-//	@Mapping(expression = "java(testCaseFilter(testSet.getTestCases()))", target = "testCases")
-//	public abstract TestSetDTO testSetToTestSetDTO(TestSet testSet);
-//
 //	public List<TestCaseDTO> testCaseFilter(List<TestCase> testCases) {
 //		List<TestCaseDTO> dtos = new ArrayList<>();
 //		for (int i = 0; i < Math.min(testCases.size(), 5); i++) {

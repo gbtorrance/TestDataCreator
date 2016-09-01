@@ -68,7 +68,7 @@ public class ModelCustomizerTest {
 	
 	private void writeCustomizer(ElementNodeDef rootElement, ModelCustomizerConfig customizerConfig) {
 		ExcelSpreadsheetFileFactory factory = new ExcelSpreadsheetFileFactory();
-		SpreadsheetFile spreadsheetFile = factory.getSpreadsheetFile();
+		SpreadsheetFile spreadsheetFile = factory.createNewSpreadsheetFile();
 		
 		ModelCustomizerWriter writer = new ModelCustomizerWriter(
 				rootElement, customizerConfig, spreadsheetFile, null);
@@ -81,7 +81,7 @@ public class ModelCustomizerTest {
 	private void readCustomizer(ElementNodeDef rootElement, ModelCustomizerConfig customizerConfig) {
 		Path path = Paths.get("testfiles/Temp/TestModelCustomizer.xlsx");
 		ExcelSpreadsheetFileFactory factory = new ExcelSpreadsheetFileFactory();
-		SpreadsheetFile spreadsheetFile = factory.getSpreadsheetFileFromPath(path);
+		SpreadsheetFile spreadsheetFile = factory.createReadOnlySpreadsheetFileFromPath(path);
 		
 		ModelCustomizerReader reader = new ModelCustomizerReader(
 				rootElement, customizerConfig, spreadsheetFile);

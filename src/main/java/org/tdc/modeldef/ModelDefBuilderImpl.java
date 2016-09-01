@@ -88,7 +88,7 @@ public class ModelDefBuilderImpl implements ModelDefBuilder {
 		if (!Files.isRegularFile(path)) {
 			throw new IllegalStateException("Unable to locate or read customizer spreadsheet file: " + path.toString());
 		}
-		SpreadsheetFile spreadsheetFile = spreadsheetFileFactory.getSpreadsheetFileFromPath(path);
+		SpreadsheetFile spreadsheetFile = spreadsheetFileFactory.createReadOnlySpreadsheetFileFromPath(path);
 		ModelCustomizerReader reader = new ModelCustomizerReader(rootElement, 
 				config.getModelCustomizerConfig(), spreadsheetFile);
 		reader.readCustomizer();

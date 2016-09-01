@@ -68,7 +68,7 @@ public class BookFileWriterTest {
 	public void testWriteBook() {
 		Addr bookAddr = new Addr("/Tax/IndividualIncome2012v1");
 		BookConfig bookConfig = bookConfigFactory.getBookConfig(bookAddr);
-		SpreadsheetFile bookFile = spreadsheetFileFactory.getSpreadsheetFile();
+		SpreadsheetFile bookFile = spreadsheetFileFactory.createNewSpreadsheetFile();
 		
 		BookFileWriter bookFileWriter =  new BookFileWriter(bookConfig, bookFile, modelInstFactory);
 		bookFileWriter.write();
@@ -84,7 +84,7 @@ public class BookFileWriterTest {
 		ModelDef modelDef = modelDefFactory.getModelDef(config);
 		
 		ExcelSpreadsheetFileFactory factory = new ExcelSpreadsheetFileFactory();
-		SpreadsheetFile spreadsheetFile = factory.getSpreadsheetFile();
+		SpreadsheetFile spreadsheetFile = factory.createNewSpreadsheetFile();
 		
 		ModelCustomizerWriter writer = new ModelCustomizerWriter(
 				modelDef.getRootElement(), config.getModelCustomizerConfig(), spreadsheetFile, null);
@@ -105,7 +105,7 @@ public class BookFileWriterTest {
 		ModelDef prevModelDef = modelDefFactory.getModelDef(prevConfig);
 
 		ExcelSpreadsheetFileFactory factory = new ExcelSpreadsheetFileFactory();
-		SpreadsheetFile spreadsheetFile = factory.getSpreadsheetFile();
+		SpreadsheetFile spreadsheetFile = factory.createNewSpreadsheetFile();
 		
 		ModelCustomizerWriter writer = new ModelCustomizerWriter(
 				modelDef.getRootElement(), config.getModelCustomizerConfig(), spreadsheetFile, prevModelDef.getMPathIndex());

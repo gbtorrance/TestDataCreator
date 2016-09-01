@@ -110,7 +110,7 @@ public class BooksProcessorImpl implements BooksProcessor {
 	private Book loadBook(String bookID) {
 		Path spreadsheetPath = getSpreadsheetFilePath(bookID);
 		SpreadsheetFile spreadsheetFile = 
-				spreadsheetFileFactory.getSpreadsheetFileFromPath(spreadsheetPath);
+				spreadsheetFileFactory.createReadOnlySpreadsheetFileFromPath(spreadsheetPath);
 		Book book = bookFactory.getBook(spreadsheetFile);
 		BookTestDataLoader loader = new BookTestDataLoader(book, spreadsheetFile);
 		loader.loadTestData();

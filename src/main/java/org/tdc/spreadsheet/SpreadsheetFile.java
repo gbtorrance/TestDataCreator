@@ -9,6 +9,7 @@ import java.nio.file.Path;
 public interface SpreadsheetFile {
 	Spreadsheet getSpreadsheet(String name);
 	Spreadsheet createSpreadsheet(String name);
+	void deleteSpreadsheet(String name);
 	void save(Path path);
 	void saveAsNew(Path path);
 	void setSpreadsheetHidden(String name, boolean hide);

@@ -35,6 +35,17 @@ public class ExcelSpreadsheetFile implements SpreadsheetFile {
 		spreadsheets.put(spreadsheet.getName(), spreadsheet);
 		return spreadsheet;
 	}
+	
+	@Override
+	public void deleteSpreadsheet(String name) {
+		Spreadsheet spreadsheet = spreadsheets.get(name);
+		if (spreadsheet == null) {
+			throw new IllegalStateException("Unable to locate spreadsheet '" + name + "' to delete");
+		}
+		spreadsheets.remove(name);
+		int index = workbook.getSheetIndex(name);
+		workbook.removeSheetAt(index);
+	}
 
 	@Override
 	public void save(Path path) {
