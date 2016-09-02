@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Config>
 
+	<BookName>ConfigTest_DocTypeMissing</BookName>
+	<BookDescription>Book used for testing configuration; DocType is missing from TDCBookConfig</BookDescription>
+
 	<DocTypes>
 		<DocType>
 			<DocTypeName>DocType1</DocTypeName>

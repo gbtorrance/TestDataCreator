@@ -122,6 +122,7 @@ public class BookSpreadsheetLogWriter {
 		rowNum++;
 		// TODO add linking to error location
 		// TODO add detailed message information
+		// TODO add message "type"
 		// TODO add counts
 		// TODO possibly add summary info (with linking to details)
 	}

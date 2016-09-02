@@ -27,6 +27,8 @@ public class BookConfigImpl implements BookConfig {
 	private final Path booksConfigRoot;
 	private final Addr addr;
 	private final Path bookConfigRoot;
+	private final String bookName;
+	private final String bookDescription;
 	private final Map<String, DocTypeConfig> docTypeConfigs;
 	private final Map<String, PageConfig> pageConfigs;
 	private final List<TaskConfig> taskConfigs;
@@ -48,6 +50,8 @@ public class BookConfigImpl implements BookConfig {
 		this.booksConfigRoot = builder.booksConfigRoot;
 		this.addr = builder.addr;
 		this.bookConfigRoot = builder.bookConfigRoot;
+		this.bookName = builder.bookName;
+		this.bookDescription = builder.bookDescription;
 		this.docTypeConfigs = Collections.unmodifiableMap(builder.docTypeConfigs); // unmodifiable
 		this.pageConfigs = Collections.unmodifiableMap(builder.pageConfigs); // unmodifiable
 		this.taskConfigs = Collections.unmodifiableList(builder.taskConfigs); // unmodifiable
@@ -81,6 +85,16 @@ public class BookConfigImpl implements BookConfig {
 		return bookConfigRoot;
 	}
 	
+	@Override
+	public String getBookName() {
+		return bookName;
+	}
+
+	@Override
+	public String getBookDescription() {
+		return bookDescription;
+	}
+
 	@Override
 	public Map<String, DocTypeConfig> getDocTypeConfigs() {
 		return docTypeConfigs;
@@ -169,6 +183,8 @@ public class BookConfigImpl implements BookConfig {
 		private final Addr addr;
 		private final Path bookConfigRoot;
 		
+		public String bookName;
+		public String bookDescription;
 		private Map<String, DocTypeConfig> docTypeConfigs;
 		private Map<String, PageConfig> pageConfigs;
 		private List<TaskConfig> taskConfigs;
@@ -204,6 +220,8 @@ public class BookConfigImpl implements BookConfig {
 		}
 
 		public BookConfig build() {
+			bookName = config.getString("BookName", null, true);
+			bookDescription = config.getString("BookDescription", "", false);
 			docTypeConfigs = new DocTypeConfigImpl.Builder(config).buildAll();
 			defaultStyle = config.getCellStyle("DefaultStyle", null, true);
 			defaultHeaderStyle = config.getCellStyle("DefaultHeaderStyle", defaultStyle, false);
