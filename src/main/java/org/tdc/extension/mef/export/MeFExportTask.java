@@ -1,8 +1,9 @@
-package org.tdc.export;
+package org.tdc.extension.mef.export;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -21,24 +22,27 @@ import org.tdc.task.Task;
 import org.tdc.util.Util;
 
 /**
- * Default {@link Task} for exporting the contents of a {@link Book} 
- * as a series of XML files; one for each {@link TestDoc}. 
+ * MeF (Modernized eFile) {@link Task} for exporting MeF "Submissions". 
+ * Submissions are represented as {@link TestCase}s in a {@link Book}.
+ * Each of these Submissions will be exported to a directory 
+ * (named with the Submission ID) and will contain a set of one or more
+ * XML files (corresponding to the {@link TestDoc}s in the {@link TestCase}).
  */
-public class DefaultExportTask implements Task {
-	private static final Logger log = LoggerFactory.getLogger(DefaultExportTask.class);
+public class MeFExportTask implements Task {
+	private static final Logger log = LoggerFactory.getLogger(MeFExportTask.class);
 
-	public final DefaultExportTaskConfig config;
+	public final MeFExportTaskConfig config;
 	public final Book book;
 	public final TestDocXMLGenerator xmlGenerator;
 
-	public DefaultExportTask(DefaultExportTaskConfig config, Book book, TestDocXMLGenerator xmlGenerator) {
+	public MeFExportTask(MeFExportTaskConfig config, Book book, TestDocXMLGenerator xmlGenerator) {
 		this.config = config;
 		this.book = book;
 		this.xmlGenerator = xmlGenerator;
 	}
 	
 	@Override
-	public DefaultExportTaskConfig getConfig() {
+	public MeFExportTaskConfig getConfig() {
 		return config;
 	}
 	
@@ -71,11 +75,14 @@ public class DefaultExportTask implements Task {
 		log.debug("Exporting TestSet: {}", testSet.getSetName());
 		boolean success = false;
 		try {
+			StringBuilder submissionIDs = new StringBuilder();
 			Path setDir = createSetDir(batchDir, seq, testSet.getSetName());
 			List<TestCase> testCases = testSet.getTestCases();
 			for (TestCase testCase : testCases) {
-				exportTestCase(testCase, setDir);
+				String submissionID = exportTestCase(testCase, setDir);
+				submissionIDs.append(submissionID).append(System.lineSeparator());
 			}
+			writeSubmissionIDsToFile(setDir, submissionIDs.toString());
 			success = true;
 		}
 		finally {
@@ -83,33 +90,58 @@ public class DefaultExportTask implements Task {
 		}
 	}
 
-	private void exportTestCase(TestCase testCase, Path setDir) {
+	private void writeSubmissionIDsToFile(Path setDir, String submissionIDs) {
+		try {
+			Files.write(setDir.resolve("SubmissionIDs.txt"), 
+					submissionIDs.getBytes(), StandardOpenOption.CREATE_NEW);
+		}
+		catch (IOException e) {
+			throw new RuntimeException("Unable to create 'SubmissionIDs.txt' file in: " + 
+					setDir.toString(), e);
+		}
+	}
+
+	private String exportTestCase(TestCase testCase, Path setDir) {
 		log.debug("Exporting TestCase: {}", testCase.getCaseNum());
 		boolean success = false;
 		try {
-			Path caseDir = createCaseDir(setDir, testCase.getCaseNum());
+			String submissionID = getSubmissionID(testCase);
+			Path caseDir = createCaseDir(setDir, submissionID);
 			List<TestDoc> testDocs = testCase.getTestDocs();
-			int seq = 1;
 			for (TestDoc testDoc : testDocs) {
-				exportTestDoc(testDoc, caseDir, seq++);
+				exportTestDoc(testDoc, caseDir, submissionID);
 			}
 			success = true;
+			return submissionID;
 		}
 		finally {
 			logResult(testCase.getResults(), "Test Case", success);
 		}
 	}
 
-	private void exportTestDoc(TestDoc testDoc, Path caseDir, int seq) {
+	private void exportTestDoc(TestDoc testDoc, Path caseDir, String submissionID) {
 		log.debug("Exporting TestCase num {}, TestSet name '{}', column {}", 
 				testDoc.getCaseNum(), testDoc.getSetName(), testDoc.getColNum());
 		boolean success = false;
 		try {
-			String docTypeName = testDoc.getPageConfig().getDocTypeConfig().getDocTypeName();
-			String fileName =  seq + "_" + Util.legalizeName(docTypeName) + ".xml";
-			Path filePath = caseDir.resolve(fileName);
 			xmlGenerator.setDocument(testDoc.getDOMDocument());
-			xmlGenerator.generateXML(filePath);
+			String docType = testDoc.getPageConfig().getDocTypeConfig().getDocTypeName();
+			if (docType.equals(config.getStateDocTypeName())) {
+				Path filePath = caseDir.resolve("xml").resolve(submissionID + ".xml");
+				exportTestDocAndCheckExistence(docType, filePath);
+			}
+			else if (docType.equals(config.getManifestDocTypeName())) {
+				Path filePath = caseDir.resolve("manifest").resolve("manifest.xml");
+				exportTestDocAndCheckExistence(docType, filePath);
+			}
+			else if (docType.equals(config.getFederalDocTypeName())) {
+				Path filePath = caseDir.resolve("irs").resolve("xml").resolve("federal.xml");
+				exportTestDocAndCheckExistence(docType, filePath);
+			}
+			else {
+				throw new RuntimeException("DocType '" + docType + 
+						"' is an unknown for MeF; unable to export");
+			}
 			success = true;
 		}
 		finally {
@@ -117,6 +149,15 @@ public class DefaultExportTask implements Task {
 		}
 	}
 
+	private void exportTestDocAndCheckExistence(String docType, Path filePath) {
+		if (Files.exists(filePath)) {
+			throw new RuntimeException("File '" + filePath.toString() + 
+					"' of DocType '" + docType + 
+					"' already exists; only one document of each type is allowed");
+		}
+		xmlGenerator.generateXML(filePath);
+	}
+	
 	private void logResult(Results results, String type, boolean success) {
 		String taskID = config.getTaskID();
 		TaskResult taskResult = new TaskResult(taskID);
@@ -148,13 +189,23 @@ public class DefaultExportTask implements Task {
 		return setDir;
 	}
 	
-	private Path createCaseDir(Path setDir, int caseNum) {
-		String caseNumStr = 
-				caseNum < 1000 ? 
-				Integer.toString(1000 + caseNum).substring(1) :
-				Integer.toString(caseNum);
-		Path caseDir = setDir.resolve("Case_" + caseNumStr);
+	private String getSubmissionID(TestCase testCase) {
+		String subIDVar = config.getSubmissionIDVariable();
+		String subID = testCase.getCaseVariables().getOrDefault(subIDVar, "").trim();
+		if (subID.length() == 0) {
+			throw new RuntimeException("A Submission ID must exist for Test Case " + 
+					testCase.getCaseNum() + " in Test Set '" + testCase.getSetName() + "'");
+		}
+		return subID;
+	}
+
+	private Path createCaseDir(Path setDir, String submissionID) {
+		Path caseDir = setDir.resolve(submissionID);
 		createDirectory(caseDir);
+		createDirectory(caseDir.resolve("xml"));
+		createDirectory(caseDir.resolve("manifest"));
+		createDirectory(caseDir.resolve("irs"));
+		createDirectory(caseDir.resolve("irs").resolve("xml"));
 		return caseDir;
 	}
 
@@ -168,11 +219,11 @@ public class DefaultExportTask implements Task {
 	}
 	
 	public static Task build(TaskConfig taskConfig, Book book) {
-		if (!(taskConfig instanceof DefaultExportTaskConfig)) {
+		if (!(taskConfig instanceof MeFExportTaskConfig)) {
 			throw new IllegalStateException("TaskConfig '" + taskConfig.getTaskID() + 
-					"' must be an instance of " + DefaultExportTaskConfig.class.getName());
+					"' must be an instance of " + MeFExportTaskConfig.class.getName());
 		}
 		TestDocXMLGenerator xmlGenerator = new TestDocXMLGenerator();
-		return new DefaultExportTask((DefaultExportTaskConfig)taskConfig, book, xmlGenerator);
+		return new MeFExportTask((MeFExportTaskConfig)taskConfig, book, xmlGenerator);
 	}
 }

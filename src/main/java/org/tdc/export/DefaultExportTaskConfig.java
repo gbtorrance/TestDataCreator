@@ -17,12 +17,10 @@ public class DefaultExportTaskConfig implements TaskConfig {
 	
 	private final String taskID;
 	private final Path exportRoot;
-	private final String batchDirPrefix;
 
-	public DefaultExportTaskConfig(String taskID, Path exportRoot, String batchDirPrefix) {
+	public DefaultExportTaskConfig(String taskID, Path exportRoot) {
 		this.taskID = taskID;
 		this.exportRoot = exportRoot;
-		this.batchDirPrefix = batchDirPrefix;
 	}
 
 	@Override
@@ -39,16 +37,11 @@ public class DefaultExportTaskConfig implements TaskConfig {
 		return exportRoot;
 	}
 	
-	public String getBatchDirPrefix() {
-		return batchDirPrefix;
-	}
-
 	public static TaskConfig build(XMLConfigWrapper config, String key) {
-		String taskID = config.getString("[@id]", "export", false);
+		String taskID = config.getString(key + "[@id]", "export", false);
 		String exportRootStr = config.getString(key + ".ExportRoot", null, true);
-		String batchDirPrefix = config.getString(key + ".BatchDirPrefix", null, true);
 		Path exportRoot = getExportRootPath(exportRootStr);
-		return new DefaultExportTaskConfig(taskID, exportRoot, batchDirPrefix);
+		return new DefaultExportTaskConfig(taskID, exportRoot);
 	}
 	
 	private static Path getExportRootPath(String exportRootStr) {
