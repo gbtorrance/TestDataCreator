@@ -1,6 +1,11 @@
 package org.tdc.schemaparse.extractor;
 
+import java.util.Collection;
+import java.util.LinkedHashMap;
+
 import org.apache.xerces.xs.StringList;
+import org.apache.xerces.xs.XSComplexTypeDefinition;
+import org.apache.xerces.xs.XSConstants;
 import org.apache.xerces.xs.XSFacet;
 import org.apache.xerces.xs.XSSimpleTypeDefinition;
 import org.apache.xerces.xs.XSTypeDefinition;
@@ -29,99 +34,308 @@ public class DefaultSchemaDataTypeExtractor implements SchemaDataTypeExtractor {
 	}
 	
 	@Override
-	public void extractDataType(XSTypeDefinition xsTypeDef, NodeDef nodeDef) {
-		String dataType = getDataType(xsTypeDef);
+	public void extractDataType(XSTypeDefinition type, NodeDef nodeDef) {
+		String dataType = verbose ?
+				extractDataTypeVerbose(type) :
+				extractDataTypeSimple(type);
 		nodeDef.setVariable(variableName, dataType);
 	}
 	
-	private String getDataType(XSTypeDefinition xsTypeDef) {
-		String type = xsTypeDef.getName();
-		if (type == null) {
-			type = getDataType(xsTypeDef.getBaseType());
+	public String extractDataTypeVerbose(XSTypeDefinition type) {
+		String result = "";
+		String typeName = getTypeNamesCascadeBases(type, 2);
+		if (type instanceof XSSimpleTypeDefinition) {
+			XSSimpleTypeDefinition simpleType = (XSSimpleTypeDefinition)type;
+			String union = getUnionCascade(simpleType);
+			String list = getListCascade(simpleType);
+			String length = getFacetPlusLabelCascade(simpleType, XSSimpleTypeDefinition.FACET_LENGTH);
+			String minLength = getFacetPlusLabelCascade(simpleType, XSSimpleTypeDefinition.FACET_MINLENGTH);
+			String maxLength = getFacetPlusLabelCascade(simpleType, XSSimpleTypeDefinition.FACET_MAXLENGTH);
+			String totalDigits = getFacetPlusLabelCascade(simpleType, XSSimpleTypeDefinition.FACET_TOTALDIGITS);
+			String fractionDigits = getFacetPlusLabelCascade(simpleType, XSSimpleTypeDefinition.FACET_FRACTIONDIGITS);
+			String minInclusive = getFacetPlusLabelCascade(simpleType, XSSimpleTypeDefinition.FACET_MININCLUSIVE);
+			String minExclusive = getFacetPlusLabelCascade(simpleType, XSSimpleTypeDefinition.FACET_MINEXCLUSIVE);
+			String maxInclusive = getFacetPlusLabelCascade(simpleType, XSSimpleTypeDefinition.FACET_MAXINCLUSIVE);
+			String maxExclusive = getFacetPlusLabelCascade(simpleType, XSSimpleTypeDefinition.FACET_MAXEXCLUSIVE);
+			String whitespace = getFacetPlusLabelCascade(simpleType, XSSimpleTypeDefinition.FACET_WHITESPACE);
+			String pattern = getPatternPlusLabelCascade(simpleType);
+			String enumeration = getEnumerationPlusLabelCascade(simpleType);
+			result = formatResult(
+					typeName, union, list, 
+					length, minLength, maxLength, 
+					totalDigits, fractionDigits, 
+					minInclusive, minExclusive, maxInclusive, maxExclusive, 
+					whitespace, 
+					pattern, 
+					enumeration);
 		}
-		if (xsTypeDef instanceof XSSimpleTypeDefinition) {
-			XSSimpleTypeDefinition xsSimpleTypeDef = (XSSimpleTypeDefinition)xsTypeDef;
-			if (verbose) {
-				XSFacet facet;
-				facet = (XSFacet)xsSimpleTypeDef.getFacet(XSSimpleTypeDefinition.FACET_MINLENGTH);
-				String minLength = facet == null ? "" : "minLength:" + facet.getIntFacetValue() + ",";
-				facet = (XSFacet)xsSimpleTypeDef.getFacet(XSSimpleTypeDefinition.FACET_MAXLENGTH);
-				String maxLength = facet == null ? "" : "maxLength:" + facet.getIntFacetValue() + ",";
-				facet = (XSFacet)xsSimpleTypeDef.getFacet(XSSimpleTypeDefinition.FACET_LENGTH);
-				String length = facet == null ? "" : "length:" + facet.getIntFacetValue() + ",";
-				facet = (XSFacet)xsSimpleTypeDef.getFacet(XSSimpleTypeDefinition.FACET_TOTALDIGITS);
-				String totalDigits = facet == null ? "" : "totalDigits:" + facet.getIntFacetValue() + ",";
-				facet = (XSFacet)xsSimpleTypeDef.getFacet(XSSimpleTypeDefinition.FACET_FRACTIONDIGITS);
-				String fractionDigits = facet == null ? "" : "fractionDigits:" + facet.getIntFacetValue() + ",";
-				String enumeration = getEnumerationInfo(xsSimpleTypeDef);
-				String pattern = getPatternInfo(xsSimpleTypeDef);
-				String join = minLength + maxLength + length + totalDigits + fractionDigits + enumeration + pattern;
-				if (join.length() > 0) {
-					type = type + " {" + join.substring(0, join.length()-1) + "}";
-				}
-			}
-			else {
-				XSFacet facet;
-				facet = (XSFacet)xsSimpleTypeDef.getFacet(XSSimpleTypeDefinition.FACET_MAXLENGTH);
-				String maxLength = facet == null ? "" : "" + facet.getIntFacetValue();
-				facet = (XSFacet)xsSimpleTypeDef.getFacet(XSSimpleTypeDefinition.FACET_LENGTH);
-				String length = facet == null ? "" : "" + facet.getIntFacetValue();
-				facet = (XSFacet)xsSimpleTypeDef.getFacet(XSSimpleTypeDefinition.FACET_TOTALDIGITS);
-				String totalDigits = facet == null ? "" : "" + facet.getIntFacetValue();
-				String join = "";
-				if (join.length() == 0) {
-					join = maxLength;
-				}
-				if (join.length() == 0) {
-					join = length;
-				}
-				if (join.length() == 0) {
-					join = totalDigits;
-				}
-				if (join.length() > 0) {
-					type = type + " {" + join + "}";
-				}
-			}
+		else {
+			XSComplexTypeDefinition complexType = (XSComplexTypeDefinition)type;
+			String extension = complexType.getDerivationMethod() == 
+					XSConstants.DERIVATION_EXTENSION ? "extension" : "";
+			result = formatResult(typeName, extension);
 		}
-		return type.equals("anyType") ? "" : type;
+		return result;
+	}
+	
+	public String extractDataTypeSimple(XSTypeDefinition type) {
+		String result = "";
+		String typeName = getTypeNamesCascadeBases(type, 1);
+		if (type instanceof XSSimpleTypeDefinition) {
+			XSSimpleTypeDefinition simpleType = (XSSimpleTypeDefinition)type;
+			XSFacet len = getFacetCascade(simpleType, XSSimpleTypeDefinition.FACET_LENGTH);
+			XSFacet minLen = getFacetCascade(simpleType, XSSimpleTypeDefinition.FACET_MINLENGTH);
+			XSFacet maxLen = getFacetCascade(simpleType, XSSimpleTypeDefinition.FACET_MAXLENGTH);
+			String size = "";
+			if (len != null) {
+				size = " (" + len.getIntFacetValue() + ")";
+			}
+			else if (minLen != null || maxLen != null) {
+				size = " (" + 
+						(minLen != null ? minLen.getIntFacetValue() : 0) + 
+						"-" + 
+						(maxLen != null ? maxLen.getIntFacetValue() : "n") + 
+						")";
+			}
+			result = typeName + size;
+		}
+		else {
+			result = typeName;
+		}
+		return result;
+	}
+	
+	private String getTypeNamesCascadeBases(XSTypeDefinition type, int maxNames) {
+		String result = "";
+		int count = 0;
+		XSTypeDefinition currentType = type;
+		while (count < maxNames && currentType != null) {
+			String typeName = getTypeName(currentType);
+			if (typeName.length() != 0) {
+				count++;
+				if (result.length() != 0) {
+					result += " / ";
+				}
+				result += typeName;
+			}
+			XSTypeDefinition baseType = currentType.getBaseType();
+			currentType = ignoreBase(currentType, baseType) ? null : baseType;
+		}
+		return result;
+	}
+	
+	private String getTypeName(XSTypeDefinition type) {
+		return type.getName() == null ? "" : type.getName();
 	}
 
-	private String getEnumerationInfo(XSSimpleTypeDefinition xsSimpleTypeDef) {
-		StringList sl = xsSimpleTypeDef.getLexicalEnumeration();
-		StringBuilder sb = new StringBuilder();
-		String enumeration = "";
+	private boolean ignoreBase(XSTypeDefinition type, XSTypeDefinition baseType) {
+		return baseType == null ||
+				ignoreBaseTypeIfTypeOneOf(type, baseType) ||
+				ignoreBaseTypeIfBaseTypeOneOf(type, baseType);
+	}
+
+	private boolean ignoreBaseTypeIfTypeOneOf(XSTypeDefinition type, XSTypeDefinition baseType) {
+		// if the current type is a certain primitive type, then it is sufficiently
+		// descriptive that it is not necessary to report the base type;
+		// https://www.w3.org/TR/xmlschema-2/#built-in-datatypes
+		
+		// consider that this method will be executed along with ignoreBaseTypeIfBaseTypeOneOf()
+		// to determine if a particular baseType should be ignored; it is, therefore, not necessary
+		// to include types such as 'string' and 'decimal', as those are immediate children of
+		// 'anySimpleType', which will be handled by the other method.
+		
+		String name = type.getName();
+		String namespace = type.getNamespace();
+		boolean ignore = false;
+		if (name != null && namespace != null && namespace.equals("http://www.w3.org/2001/XMLSchema")) {
+			ignore = name.equals("byte") ||
+					name.equals("short") ||
+					name.equals("int") ||
+					name.equals("long") ||
+					name.equals("integer") ||
+					name.equals("negativeInteger") ||
+					name.equals("nonPositiveInteger") ||
+					name.equals("unsignedByte") ||
+					name.equals("unsignedShort") ||
+					name.equals("unsignedInt") ||
+					name.equals("unsignedLong") ||
+					name.equals("positiveInteger") ||
+					name.equals("nonNegativeInteger");
+		}
+		return ignore;
+	}
+	
+	private boolean ignoreBaseTypeIfBaseTypeOneOf(XSTypeDefinition type, XSTypeDefinition baseType) {
+		// certain primitive base types can be safely ignored;
+		// https://www.w3.org/TR/xmlschema-2/#built-in-datatypes
+		
+		String name = baseType.getName();
+		String namespace = baseType.getNamespace();
+		boolean ignore = false;
+		if (name != null && namespace != null && namespace.equals("http://www.w3.org/2001/XMLSchema")) {
+			ignore = name.equals("anySimpleType") ||
+					name.equals("anyType"); 
+		}
+		return ignore;
+	}
+
+	private String getUnionCascade(XSSimpleTypeDefinition simpleType) {
+		String result = "";
+		XSSimpleTypeDefinition currentSimpleType = simpleType;
+		while (currentSimpleType != null) {
+			if (currentSimpleType.getVariety() == XSSimpleTypeDefinition.VARIETY_UNION) {
+				result = "union: ";
+				for (int i = 0; i < currentSimpleType.getMemberTypes().getLength(); i++) {
+					XSSimpleTypeDefinition member = (XSSimpleTypeDefinition)currentSimpleType.getMemberTypes().get(i);
+					result += (i == 0 ? "{" : " + {") + extractDataTypeVerbose(member) + "}";
+				}
+				break;
+			}
+			currentSimpleType = (XSSimpleTypeDefinition)currentSimpleType.getBaseType(); 
+		}
+		return result;
+	}
+
+	private String getListCascade(XSSimpleTypeDefinition simpleType) {
+		String result = "";
+		XSSimpleTypeDefinition currentSimpleType = simpleType;
+		while (currentSimpleType != null) {
+			if (currentSimpleType.getVariety() == XSSimpleTypeDefinition.VARIETY_LIST) {
+				XSSimpleTypeDefinition item = (XSSimpleTypeDefinition)currentSimpleType.getItemType();
+				result = "list: {" + extractDataTypeVerbose(item) + "}";
+				break;
+			}
+			currentSimpleType = (XSSimpleTypeDefinition)currentSimpleType.getBaseType(); 
+		}
+		return result;
+	}
+	
+	private String getFacetPlusLabelCascade(XSSimpleTypeDefinition simpleType, short facetKind) {
+		String result = "";
+		XSFacet facet = getFacetCascade(simpleType, facetKind);
+		if (facet != null) {
+			result = facetKindToString(facetKind) + ": " + facet.getLexicalFacetValue();
+		}
+		return result;
+	}
+	
+	private XSFacet getFacetCascade(XSSimpleTypeDefinition simpleType, short facetKind) {
+		XSFacet facet = null;
+		if (facetKind == XSSimpleTypeDefinition.FACET_ENUMERATION || facetKind == XSSimpleTypeDefinition.FACET_PATTERN) {
+			throw new RuntimeException("Facet Kind " + facetKindToString(facetKind) + " not supported by this method");
+		}
+		XSSimpleTypeDefinition currentSimpleType = simpleType;
+		while (currentSimpleType != null) {
+			if (currentSimpleType.isDefinedFacet(facetKind)) {
+				facet = (XSFacet)currentSimpleType.getFacet(facetKind);
+				break;
+			}
+			currentSimpleType = (XSSimpleTypeDefinition)currentSimpleType.getBaseType();
+		}
+		return facet;
+	}
+	
+	private String getEnumerationPlusLabelCascade(XSSimpleTypeDefinition simpleType) {
+		String result = "";
+		XSSimpleTypeDefinition currentSimpleType = simpleType;
+		while (currentSimpleType != null) {
+			if (currentSimpleType.isDefinedFacet(XSSimpleTypeDefinition.FACET_ENUMERATION)) {
+				result = buildEnumerationString(currentSimpleType);
+				break;
+			}
+			currentSimpleType = (XSSimpleTypeDefinition)currentSimpleType.getBaseType();
+		}
+		return result;
+	}
+
+	private String buildEnumerationString(XSSimpleTypeDefinition simpleType) {
+		StringList sl = simpleType.getLexicalEnumeration();
+		StringBuilder enumSB = new StringBuilder();
 		for (int i = 0; i < sl.getLength(); i++) {
 			if (i != 0) {
-				sb.append(",");
+				enumSB.append(", ");
 			}
-			sb.append(sl.item(i));
+			enumSB.append(sl.item(i));
 		}
-		if (sb.length() > 0) {
-			sb.insert(0, "enum:(");
-			sb.append("),");
-			enumeration = sb.toString();
+		if (enumSB.length() > 0) {
+			enumSB.insert(0, ": (");
+			enumSB.insert(0, facetKindToString(XSSimpleTypeDefinition.FACET_ENUMERATION));
+			enumSB.append(")");
 		}
-		return enumeration;
+		return enumSB.toString();
 	}
 
-	private String getPatternInfo(XSSimpleTypeDefinition xsSimpleTypeDef) {
-		StringList sl = xsSimpleTypeDef.getLexicalPattern();
-		StringBuilder sb = new StringBuilder();
-		String pattern = "";
-		for (int i = 0; i < sl.getLength(); i++) {
-			if (i != 0) {
-				sb.append(",");
+	private String getPatternPlusLabelCascade(XSSimpleTypeDefinition simpleType) {
+		String result = "";
+		LinkedHashMap<String, String> map = null;
+		XSSimpleTypeDefinition currentSimpleType = simpleType;
+		while (currentSimpleType != null) {
+			if (currentSimpleType.isDefinedFacet(XSSimpleTypeDefinition.FACET_PATTERN)) {
+				if (map == null) {
+					map = new LinkedHashMap<>();
+				}
+				StringList patternList = simpleType.getLexicalPattern();
+				for (int i = 0; i < patternList.getLength(); i++) {
+					String pattern = patternList.item(i);
+					map.putIfAbsent(pattern, pattern);
+				}
 			}
-			sb.append(sl.item(i));
+			currentSimpleType = (XSSimpleTypeDefinition)currentSimpleType.getBaseType();
 		}
-		if (sb.length() > 0) {
-			sb.insert(0, "pattern:(");
-			sb.append("),");
-			pattern = sb.toString();
+		if (map != null) {
+			result = buildPatternString(map.values());
 		}
-		return pattern;
+		return result;
+	}
+	
+	private String buildPatternString(Collection<String> patterns) {
+		StringBuilder patternSB = new StringBuilder();
+		for (String pattern : patterns) {
+			if (patternSB.length() != 0) {
+				patternSB.append(", ");
+			}
+			patternSB.append(pattern);
+		}
+		if (patternSB.length() > 0) {
+			patternSB.insert(0, ": (");
+			patternSB.insert(0, facetKindToString(XSSimpleTypeDefinition.FACET_PATTERN));
+			patternSB.append(")");
+		}
+		return patternSB.toString();
 	}
 
+	private String facetKindToString(short facetKind) {
+		switch (facetKind) {
+		case XSSimpleTypeDefinition.FACET_NONE: return "none";
+		case XSSimpleTypeDefinition.FACET_LENGTH: return "len";
+		case XSSimpleTypeDefinition.FACET_MINLENGTH: return "minLen";
+		case XSSimpleTypeDefinition.FACET_MAXLENGTH: return "maxLen";
+		case XSSimpleTypeDefinition.FACET_TOTALDIGITS: return "totalDigits";
+		case XSSimpleTypeDefinition.FACET_FRACTIONDIGITS: return "fractionDigits";
+		case XSSimpleTypeDefinition.FACET_MININCLUSIVE: return "minIncl";
+		case XSSimpleTypeDefinition.FACET_MINEXCLUSIVE: return "minExcl";
+		case XSSimpleTypeDefinition.FACET_MAXINCLUSIVE: return "maxIncl";
+		case XSSimpleTypeDefinition.FACET_MAXEXCLUSIVE: return "maxExcl";
+		case XSSimpleTypeDefinition.FACET_WHITESPACE: return "space";
+		case XSSimpleTypeDefinition.FACET_ENUMERATION: return "enum";
+		case XSSimpleTypeDefinition.FACET_PATTERN: return "pattern";
+		default: throw new RuntimeException("Facet Kind " + facetKind + " not supported");
+		}
+	}
+
+	private String formatResult(String...strings) {
+		StringBuilder result = new StringBuilder();
+		for (String string : strings) {
+			if (string.length() != 0) {
+				if (result.length() != 0) {
+					result.append(", ");
+				}
+				result.append(string);
+			}
+		}
+		return result.toString();
+	}
+	
 	/**
 	 * Static builder method to create an instance of this class based on XML configuration settings.
 	 * 
