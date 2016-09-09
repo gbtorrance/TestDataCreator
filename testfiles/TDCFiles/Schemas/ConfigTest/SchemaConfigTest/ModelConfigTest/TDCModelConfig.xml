@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Config>
+	<ModelName>ConfigTest</ModelName>
+	<ModelDescription>Config Test Model</ModelDescription>
 	<SchemaRootFile>SchemaRootFile.xsd</SchemaRootFile>
 	<SchemaRootElementName>TestRoot</SchemaRootElementName>
 	<SchemaRootElementNamespace>http://org.tdc/test</SchemaRootElementNamespace>
@@ -8,7 +10,7 @@
 	<DefaultOccursCount>5</DefaultOccursCount>
 	
 	<Customizer>
-		<FileName>Customizer.xlsx</FileName>
+		<FileNamePrefix>Customizer_</FileNamePrefix>
 		<DefaultStyle>
 			<FontName>Calibri</FontName>
 			<FontHeight>11</FontHeight>

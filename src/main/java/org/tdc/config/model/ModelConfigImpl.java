@@ -29,6 +29,8 @@ public class ModelConfigImpl implements ModelConfig {
 	private final SchemaConfig schemaConfig;
 	private final Addr addr;
 	private final Path modelConfigRoot;
+	private final String modelName;
+	private final String modelDescription;
 	private final String schemaRootFile;
 	private final String schemaRootElementName;
 	private final String schemaRootElementNamespace;
@@ -44,6 +46,8 @@ public class ModelConfigImpl implements ModelConfig {
 		this.schemaConfig = builder.schemaConfig;
 		this.addr = builder.addr;
 		this.modelConfigRoot = builder.modelConfigRoot;
+		this.modelName = builder.modelName;
+		this.modelDescription = builder.modelDescription;
 		this.schemaRootFile = builder.schemaRootFile;
 		this.schemaRootElementName = builder.schemaRootElementName;
 		this.schemaRootElementNamespace = builder.schemaRootElementNamespace;
@@ -69,6 +73,16 @@ public class ModelConfigImpl implements ModelConfig {
 	@Override
 	public Path getModelConfigRoot() {
 		return modelConfigRoot;
+	}
+
+	@Override
+	public String getModelName() {
+		return modelName;
+	}
+
+	@Override
+	public String getModelDescription() {
+		return modelDescription;
 	}
 
 	@Override
@@ -139,6 +153,8 @@ public class ModelConfigImpl implements ModelConfig {
 		private final SchemaExtractorFactory schemaExtractorFactory;
 		private final GeneralEvaluatorFactory evaluatorFactory;
 
+		private String modelName;
+		private String modelDescription;
 		private String schemaRootFile;
 		private String schemaRootElementName;
 		private String schemaRootElementNamespace;
@@ -166,6 +182,8 @@ public class ModelConfigImpl implements ModelConfig {
 		}
 
 		public ModelConfig build() {
+			modelName = config.getString("ModelName", null, true);
+			modelDescription = config.getString("ModelDescription", "", false);
 			schemaRootFile = config.getString("SchemaRootFile", null, true);
 			schemaRootElementName = config.getString("SchemaRootElementName", null, true);
 			schemaRootElementNamespace = config.getString("SchemaRootElementNamespace", null, true);
@@ -174,7 +192,7 @@ public class ModelConfigImpl implements ModelConfig {
 			defaultOccursCount = config.getInt("DefaultOccursCount", 5, false);
 			schemaExtractors = schemaExtractorFactory.createSchemaExtractors(config, "SchemaExtractors");
 			modelCustomizerConfig = new ModelCustomizerConfigImpl.Builder(
-					config, modelConfigRoot, defaultOccursCount, evaluatorFactory).build();
+					config, modelConfigRoot, defaultOccursCount, modelName, evaluatorFactory).build();
 			testLoadMaxMessages = config.getInt("TestLoadMaxMessages", Util.NO_LIMIT, false);
 			schemaValidateMaxMessages = config.getInt("SchemaValidateMaxMessages", Util.NO_LIMIT, false);
 			return new ModelConfigImpl(this);

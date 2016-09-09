@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Config>
+	<ModelName>OldTest_Cust</ModelName>
+	<ModelDescription>Old Test Model -- customized</ModelDescription>
 	<SchemaRootFile>OldTest.xsd</SchemaRootFile>
 	<SchemaRootElementName>TestRoot</SchemaRootElementName>
 	<SchemaRootElementNamespace>http://com.gurtz.tdc/test</SchemaRootElementNamespace>
@@ -8,7 +10,7 @@
 	<DefaultOccursCount>5</DefaultOccursCount>
 
 	<Customizer>
-		<FileName>Customizer.xlsx</FileName>
+		<FileNamePrefix>Customizer_</FileNamePrefix>
 		<DefaultStyle>
 			<FontName>Calibri</FontName>
 			<FontHeight>11</FontHeight>

@@ -58,7 +58,7 @@ public class ModelConfigTest {
 		assertThat(modelConfig.getDefaultOccursCount()).isEqualTo(5);
 		assertThat(modelConfig.hasModelCustomizerConfig()).isEqualTo(true);
 		ModelCustomizerConfig cust = modelConfig.getModelCustomizerConfig();
-		assertThat(cust.getFilePath()).isEqualTo(modelConfig.getModelConfigRoot().resolve("Customizer.xlsx"));
+		assertThat(cust.getFilePath()).isEqualTo(modelConfig.getModelConfigRoot().resolve("Customizer_ConfigTest.xlsx"));
 		assertThat(cust.getDefaultNodeStyle().getFontName()).isEqualTo("Calibri");
 		assertThat(cust.getDefaultNodeStyle().getFontHeight()).isEqualTo(11);
 		assertThat(cust.getParentNodeStyle().getFontName()).isEqualTo("Arial");

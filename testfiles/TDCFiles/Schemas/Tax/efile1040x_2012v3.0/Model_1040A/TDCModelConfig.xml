@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Config>
+	<ModelName>2012v3.0_1040A</ModelName>
+	<ModelDescription>TY2012 v3.0 1040A</ModelDescription>
 	<SchemaRootFile>2012v3.0/IndividualIncomeTax/Ind1040A/Return1040A.xsd</SchemaRootFile>
 	<SchemaRootElementName>Return</SchemaRootElementName>
 	<SchemaRootElementNamespace>http://www.irs.gov/efile</SchemaRootElementNamespace>
@@ -36,7 +38,7 @@
 	</SchemaExtractors>
 
 	<Customizer>
-		<FileName>Customizer.xlsx</FileName>
+		<FileNamePrefix>Customizer_</FileNamePrefix>
 		<DefaultStyle>
 			<FontName>Calibri</FontName>
 			<FontHeight>11</FontHeight>

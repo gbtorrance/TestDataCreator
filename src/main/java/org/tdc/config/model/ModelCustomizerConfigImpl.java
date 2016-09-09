@@ -7,6 +7,7 @@ import java.util.List;
 import org.tdc.config.XMLConfigWrapper;
 import org.tdc.evaluator.factory.GeneralEvaluatorFactory;
 import org.tdc.spreadsheet.CellStyle;
+import org.tdc.util.Util;
 
 /**
  * A {@link ModelCustomizerConfig} implementation.
@@ -170,6 +171,7 @@ public class ModelCustomizerConfigImpl implements ModelCustomizerConfig {
 		private final XMLConfigWrapper config;
 		private final Path modelConfigRoot;
 		private final int defaultOccursCount;
+		private final String modelName;
 		private final GeneralEvaluatorFactory evaluatorFactory;
 		private final int headerRowStart;
 		private final int nodeColStart;
@@ -194,11 +196,12 @@ public class ModelCustomizerConfigImpl implements ModelCustomizerConfig {
 		private int nodeRowStart;
 		
 		public Builder(
-				XMLConfigWrapper config, Path modelConfigRoot, int defaultOccursCount, 
-				GeneralEvaluatorFactory evaluatorFactory) {
+				XMLConfigWrapper config, Path modelConfigRoot, int defaultOccursCount,
+				String modelName, GeneralEvaluatorFactory evaluatorFactory) {
 			this.config = config;
 			this.modelConfigRoot = modelConfigRoot;
 			this.defaultOccursCount = defaultOccursCount;
+			this.modelName = modelName;
 			this.evaluatorFactory = evaluatorFactory;
 			this.headerRowStart = 1;
 			this.nodeColStart = 1;
@@ -207,7 +210,8 @@ public class ModelCustomizerConfigImpl implements ModelCustomizerConfig {
 		public ModelCustomizerConfig build() {
 			ModelCustomizerConfig custConfig = null;
 			if (config.hasNode(CONFIG_PREFIX)) {
-				String fileName = config.getString(CONFIG_PREFIX + ".FileName", null, true);
+				String fileNamePrefix = config.getString(CONFIG_PREFIX + ".FileNamePrefix", "Customizer_", false);
+				String fileName = Util.legalizeName(fileNamePrefix + modelName) + ".xlsx";
 				filePath = modelConfigRoot.resolve(fileName);
 				defaultStyle = config.getCellStyle(CONFIG_PREFIX + ".DefaultStyle", null, true);
 				defaultHeaderStyle = config.getCellStyle(CONFIG_PREFIX + ".DefaultHeaderStyle", defaultStyle, false);
