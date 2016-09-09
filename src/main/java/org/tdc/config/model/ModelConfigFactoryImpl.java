@@ -2,6 +2,7 @@ package org.tdc.config.model;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,8 +14,8 @@ import org.tdc.schemaparse.extractor.SchemaExtractorFactory;
 import org.tdc.schemaparse.extractor.SchemaExtractorFactoryImpl;
 import org.tdc.util.Addr;
 import org.tdc.util.Cache;
-import org.tdc.util.SimpleCache;
 import org.tdc.util.ConfigFinder;
+import org.tdc.util.SimpleCache;
 
 /**
  * A {@link ModelConfigFactory} implementation.
@@ -53,14 +54,33 @@ public class ModelConfigFactoryImpl implements ModelConfigFactory {
 
 	@Override
 	public List<ModelConfig> getAllModelConfigs() {
+		return getAllModelConfigs(null);
+	}
+	
+	@Override
+	public List<ModelConfig> getAllModelConfigs(Map<Addr, Exception> errors) {
 		List<Addr> allConfigAddrs = ConfigFinder.findAllConfigsContainingConfigFile(
 				schemaConfigFactory.getSchemasConfigRoot(), 
 				ModelConfigImpl.CONFIG_FILE);
 		List<ModelConfig> modelConfigs = new ArrayList<>();
 		for (Addr addr : allConfigAddrs) {
+			processConfig(addr, modelConfigs, errors);
+		}
+		return modelConfigs;
+	}
+	
+	private void processConfig(Addr addr, List<ModelConfig> modelConfigs, Map<Addr, Exception> errors) {
+		try {
 			ModelConfig modelConfig = getModelConfig(addr);
 			modelConfigs.add(modelConfig);
 		}
-		return modelConfigs;
+		catch (RuntimeException e) {
+			if (errors == null) {
+				throw e;
+			}
+			else {
+				errors.put(addr, e);
+			}
+		}
 	}
 }

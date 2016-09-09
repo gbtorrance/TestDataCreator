@@ -3,13 +3,14 @@ package org.tdc.config.schema;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.tdc.util.Addr;
 import org.tdc.util.Cache;
-import org.tdc.util.SimpleCache;
 import org.tdc.util.ConfigFinder;
+import org.tdc.util.SimpleCache;
 
 /**
  * A {@link SchemaConfigFactory} implementation.
@@ -46,14 +47,33 @@ public class SchemaConfigFactoryImpl implements SchemaConfigFactory {
 
 	@Override
 	public List<SchemaConfig> getAllSchemaConfigs() {
+		return getAllSchemaConfigs(null);
+	}
+	
+	@Override
+	public List<SchemaConfig> getAllSchemaConfigs(Map<Addr, Exception> errors) {
 		List<Addr> allConfigAddrs = ConfigFinder.findAllConfigsContainingConfigFile(
 				schemasConfigRoot, 
 				SchemaConfigImpl.CONFIG_FILE);
 		List<SchemaConfig> schemaConfigs = new ArrayList<>();
 		for (Addr addr : allConfigAddrs) {
+			processConfig(addr, schemaConfigs, errors);
+		}
+		return schemaConfigs;
+	}
+	
+	private void processConfig(Addr addr, List<SchemaConfig> schemaConfigs, Map<Addr, Exception> errors) {
+		try {
 			SchemaConfig schemaConfig = getSchemaConfig(addr);
 			schemaConfigs.add(schemaConfig);
 		}
-		return schemaConfigs;
+		catch (RuntimeException e) {
+			if (errors == null) {
+				throw e;
+			}
+			else {
+				errors.put(addr, e);
+			}
+		}
 	}
 }

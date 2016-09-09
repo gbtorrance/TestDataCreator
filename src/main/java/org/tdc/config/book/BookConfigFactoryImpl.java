@@ -3,14 +3,15 @@ package org.tdc.config.book;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.tdc.config.model.ModelConfigFactory;
 import org.tdc.util.Addr;
 import org.tdc.util.Cache;
-import org.tdc.util.SimpleCache;
 import org.tdc.util.ConfigFinder;
+import org.tdc.util.SimpleCache;
 
 /**
  * A {@link BookConfigFactory} implementation.
@@ -51,14 +52,32 @@ public class BookConfigFactoryImpl implements BookConfigFactory {
 
 	@Override
 	public List<BookConfig> getAllBookConfigs() {
+		return getAllBookConfigs(null);
+	}
+
+	@Override
+	public List<BookConfig> getAllBookConfigs(Map<Addr, Exception> errors) {
 		List<Addr> allConfigAddrs = ConfigFinder.findAllConfigsContainingConfigFile(
-				booksConfigRoot, 
-				BookConfigImpl.CONFIG_FILE);
+				booksConfigRoot, BookConfigImpl.CONFIG_FILE);
 		List<BookConfig> bookConfigs = new ArrayList<>();
 		for (Addr addr : allConfigAddrs) {
+			processConfig(addr, bookConfigs, errors);
+		}
+		return bookConfigs;
+	}
+
+	private void processConfig(Addr addr, List<BookConfig> bookConfigs, Map<Addr, Exception> errors) {
+		try {
 			BookConfig bookConfig = getBookConfig(addr);
 			bookConfigs.add(bookConfig);
 		}
-		return bookConfigs;
+		catch (RuntimeException e) {
+			if (errors == null) {
+				throw e;
+			}
+			else {
+				errors.put(addr, e);
+			}
+		}
 	}
 }
