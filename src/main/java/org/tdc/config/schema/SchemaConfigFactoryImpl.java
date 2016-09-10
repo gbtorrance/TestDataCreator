@@ -57,12 +57,12 @@ public class SchemaConfigFactoryImpl implements SchemaConfigFactory {
 				SchemaConfigImpl.CONFIG_FILE);
 		List<SchemaConfig> schemaConfigs = new ArrayList<>();
 		for (Addr addr : allConfigAddrs) {
-			processConfig(addr, schemaConfigs, errors);
+			processConfigWithErrorTracking(addr, schemaConfigs, errors);
 		}
 		return schemaConfigs;
 	}
 	
-	private void processConfig(Addr addr, List<SchemaConfig> schemaConfigs, Map<Addr, Exception> errors) {
+	private void processConfigWithErrorTracking(Addr addr, List<SchemaConfig> schemaConfigs, Map<Addr, Exception> errors) {
 		try {
 			SchemaConfig schemaConfig = getSchemaConfig(addr);
 			schemaConfigs.add(schemaConfig);
@@ -73,6 +73,7 @@ public class SchemaConfigFactoryImpl implements SchemaConfigFactory {
 			}
 			else {
 				errors.put(addr, e);
+				log.debug("Exception encountered while getting config for " + addr, e);
 			}
 		}
 	}

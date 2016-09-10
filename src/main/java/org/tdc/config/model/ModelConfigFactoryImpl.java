@@ -64,12 +64,12 @@ public class ModelConfigFactoryImpl implements ModelConfigFactory {
 				ModelConfigImpl.CONFIG_FILE);
 		List<ModelConfig> modelConfigs = new ArrayList<>();
 		for (Addr addr : allConfigAddrs) {
-			processConfig(addr, modelConfigs, errors);
+			processConfigWithErrorTracking(addr, modelConfigs, errors);
 		}
 		return modelConfigs;
 	}
 	
-	private void processConfig(Addr addr, List<ModelConfig> modelConfigs, Map<Addr, Exception> errors) {
+	private void processConfigWithErrorTracking(Addr addr, List<ModelConfig> modelConfigs, Map<Addr, Exception> errors) {
 		try {
 			ModelConfig modelConfig = getModelConfig(addr);
 			modelConfigs.add(modelConfig);
@@ -80,6 +80,7 @@ public class ModelConfigFactoryImpl implements ModelConfigFactory {
 			}
 			else {
 				errors.put(addr, e);
+				log.debug("Exception encountered while getting config for " + addr, e);
 			}
 		}
 	}

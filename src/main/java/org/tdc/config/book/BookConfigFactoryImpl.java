@@ -61,12 +61,12 @@ public class BookConfigFactoryImpl implements BookConfigFactory {
 				booksConfigRoot, BookConfigImpl.CONFIG_FILE);
 		List<BookConfig> bookConfigs = new ArrayList<>();
 		for (Addr addr : allConfigAddrs) {
-			processConfig(addr, bookConfigs, errors);
+			processConfigWithErrorTracking(addr, bookConfigs, errors);
 		}
 		return bookConfigs;
 	}
 
-	private void processConfig(Addr addr, List<BookConfig> bookConfigs, Map<Addr, Exception> errors) {
+	private void processConfigWithErrorTracking(Addr addr, List<BookConfig> bookConfigs, Map<Addr, Exception> errors) {
 		try {
 			BookConfig bookConfig = getBookConfig(addr);
 			bookConfigs.add(bookConfig);
@@ -77,6 +77,7 @@ public class BookConfigFactoryImpl implements BookConfigFactory {
 			}
 			else {
 				errors.put(addr, e);
+				log.debug("Exception encountered while getting config for " + addr, e);
 			}
 		}
 	}
