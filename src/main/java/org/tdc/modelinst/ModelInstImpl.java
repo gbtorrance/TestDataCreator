@@ -47,4 +47,9 @@ public class ModelInstImpl implements ModelInst {
 	public ElementNodeInst getRootElement() {
 		return rootElement;
 	}
+
+	@Override
+	public MPathIndex<NodeInst> getMPathIndex() {
+		return mpathIndex;
+	}
 }

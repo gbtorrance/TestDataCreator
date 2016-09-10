@@ -60,7 +60,6 @@ public class ModelInstBuilderImpl implements ModelInstBuilder {
 		if (list.size() != 1) {
 			throw new IllegalStateException("There should only be one 'root' element, not " + list.size());
 		}
-		mpathIndex = null;
 		mpathBuilder = null;
 		return (ElementNodeInst)list.get(0);
 	}

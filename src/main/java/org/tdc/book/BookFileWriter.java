@@ -5,8 +5,9 @@ import java.util.List;
 
 import org.tdc.config.book.BookConfig;
 import org.tdc.config.book.DocIDRowConfig;
-import org.tdc.config.book.PageNodeDetailColumnConfig;
 import org.tdc.config.book.PageConfig;
+import org.tdc.config.book.PageNodeDetailColumnConfig;
+import org.tdc.dom.TestDocCopier;
 import org.tdc.model.AttribNode;
 import org.tdc.model.CompositorNode;
 import org.tdc.model.ElementNode;
@@ -33,6 +34,7 @@ public class BookFileWriter {
 	
 	private int maxColumns;
 	private PageConfig currentPageConfig;
+	private ModelInst currentModelInst;
 	private Spreadsheet currentSheet;
 	
 	public BookFileWriter(BookConfig config, SpreadsheetFile spreadsheetFile, ModelInstFactory modelInstFactory) {
@@ -42,30 +44,34 @@ public class BookFileWriter {
 	}
 
 	public void write() {
-		writePages();
+		writePages(null);
 		writeConfigSheet();
 	}
 	
-	private void writePages() {
+	public void writeWithTestDataFromExistingBook(Book basedOnBook) {
+		writePages(basedOnBook);
+		writeConfigSheet();
+	}
+	
+	private void writePages(Book basedOnBook) {
 		Collection<PageConfig> pageConfigs = config.getPageConfigs().values();
 		for (PageConfig pageConfig : pageConfigs) {
-			writePage(pageConfig);
+			writePage(pageConfig, basedOnBook);
 		}
 	}
 	
-	private void writePage(PageConfig pageConfig) {
+	private void writePage(PageConfig pageConfig, Book basedOnBook) {
 		maxColumns = 0;
 		currentPageConfig = pageConfig;
+		currentModelInst = modelInstFactory.getModelInst(currentPageConfig.getModelConfig());
 		currentSheet = spreadsheetFile.createSpreadsheet(currentPageConfig.getPageName());
-		ModelInst modelInst = modelInstFactory.getModelInst(currentPageConfig.getModelConfig());
-		ElementNodeInst rootElement = modelInst.getRootElement();
-		ModelWriterVisitor writerVisitor = new ModelWriterVisitor();
-		rootElement.accept(writerVisitor);
+		writeModelStructure();
 		formatColumns();
 		writeDocIDRowLabels();
 		writeHeaderLabels();
+		writeTestsFromExistingBook(basedOnBook);
 	}
-	
+
 	private void writeConfigSheet() {
 		Spreadsheet configSheet = spreadsheetFile.createSpreadsheet(
 				BookUtil.CONFIG_SHEET_NAME);
@@ -73,6 +79,12 @@ public class BookFileWriter {
 				config.getAddr().toString(), 
 				BookUtil.CONFIG_SHEET_BOOK_ADDR_ROW, BookUtil.CONFIG_SHEET_BOOK_ADDR_COL);
 		spreadsheetFile.setSpreadsheetHidden(BookUtil.CONFIG_SHEET_NAME, true);
+	}
+	
+	private void writeModelStructure() {
+		ElementNodeInst rootElement = currentModelInst.getRootElement();
+		ModelWriterVisitor writerVisitor = new ModelWriterVisitor();
+		rootElement.accept(writerVisitor);
 	}
 	
 	private void formatColumns() {
@@ -119,43 +131,29 @@ public class BookFileWriter {
 		}
 	}
 
-	private void processAttribNode(AttribNode node) {
-		trackMaxColumns(node);
-
-		outputNodeName(node, config.getAttribNodeStyle());
-		outputOccurrenceMarkers(node); 
-		outputCustomColumns(node);
+	private void writeTestsFromExistingBook(Book basedOnBook) {
+		if (basedOnBook != null) {
+			String pageName = currentPageConfig.getPageName();
+			Page basedOnPage = basedOnBook.getPages().get(pageName);
+			if (basedOnPage != null) {
+				List<TestDoc> basedOnTestDocs = basedOnPage.getTestDocs();
+				writeTestsFromExistingTestDocs(basedOnTestDocs);
+			}
+		}
 	}
 	
-	private void processCompositorNode(CompositorNode node) {
-		trackMaxColumns(node);
-
-		if (node.isChildOfChoice()) {
-			outputChoiceMarker(node, config.getChoiceMarkerStyle());
+	private void writeTestsFromExistingTestDocs(List<TestDoc> basedOnTestDocs) {
+		int colNumOnCurrentPage = currentPageConfig.getTestDocColStart();
+		for (TestDoc basedOnTestDoc : basedOnTestDocs) {
+			writeTestFromExistingTestDoc(basedOnTestDoc, colNumOnCurrentPage++);
 		}
-		
-		outputNodeName(node, config.getCompositorNodeStyle());
-		outputOccurrenceMarkers(node);
-		outputCustomColumns(node);
 	}
-	
-	private void processElementNode(ElementNode node) {
-		trackMaxColumns(node);
 
-		if (node.isChildOfChoice()) {
-			outputChoiceMarker(node, config.getChoiceMarkerStyle());
-		}
-		
-		CellStyle cellStyle = config.getDefaultNodeStyle();
-		if (node.hasChild()) {
-			cellStyle = config.getParentNodeStyle();
-		}
-
-		outputNodeName(node, cellStyle);
-		outputOccurrenceMarkers(node);
-		outputCustomColumns(node);
+	private void writeTestFromExistingTestDoc(TestDoc basedOnTestDoc, int colNumOnCurrentPage) {
+		TestDocCopier copier = new TestDocCopier(currentModelInst, currentPageConfig, currentSheet);
+		copier.copyTestDoc(basedOnTestDoc, colNumOnCurrentPage);
 	}
-	
+
 	private void trackMaxColumns(TDCNode node) {
 		maxColumns = Integer.max(maxColumns, node.getColOffset()+1);
 	}
@@ -220,21 +218,40 @@ public class BookFileWriter {
 			currentSheet.setCellValue(value, getNodeRow(node), column.getColNum(), style);
 		}
 	}
-
+	
 	class ModelWriterVisitor implements ModelVisitor {
 		@Override
-		public void visit(AttribNode attribNode) {
-			processAttribNode(attribNode);
+		public void visit(AttribNode node) {
+			trackMaxColumns(node);
+			outputNodeName(node, config.getAttribNodeStyle());
+			outputOccurrenceMarkers(node); 
+			outputCustomColumns(node);
 		}
 
 		@Override
-		public void visit(CompositorNode compositorNode) {
-			processCompositorNode(compositorNode);
+		public void visit(CompositorNode node) {
+			trackMaxColumns(node);
+			if (node.isChildOfChoice()) {
+				outputChoiceMarker(node, config.getChoiceMarkerStyle());
+			}
+			outputNodeName(node, config.getCompositorNodeStyle());
+			outputOccurrenceMarkers(node);
+			outputCustomColumns(node);
 		}
 
 		@Override
-		public void visit(ElementNode elementNode) {
-			processElementNode(elementNode);
+		public void visit(ElementNode node) {
+			trackMaxColumns(node);
+			if (node.isChildOfChoice()) {
+				outputChoiceMarker(node, config.getChoiceMarkerStyle());
+			}
+			CellStyle cellStyle = config.getDefaultNodeStyle();
+			if (node.hasChild()) {
+				cellStyle = config.getParentNodeStyle();
+			}
+			outputNodeName(node, cellStyle);
+			outputOccurrenceMarkers(node);
+			outputCustomColumns(node);
 		}
 	}
 }

@@ -45,6 +45,7 @@ public class BookFileWriterTest {
 	private static SchemaFactory schemaFactory;
 	private static ModelDefFactory modelDefFactory;
 	private static ModelInstFactory modelInstFactory;
+	private static BookFactory bookFactory;
 
 	@BeforeClass
 	public static void setup() {
@@ -62,6 +63,7 @@ public class BookFileWriterTest {
 		schemaFactory = new SchemaFactoryImpl();
 		modelDefFactory = new ModelDefFactoryImpl(schemaFactory, spreadsheetFileFactory);
 		modelInstFactory = new ModelInstFactoryImpl(modelDefFactory);
+		bookFactory = new BookFactoryImpl(bookConfigFactory, modelInstFactory);
 	}
 	
 	@Test
@@ -74,6 +76,26 @@ public class BookFileWriterTest {
 		bookFileWriter.write();
 		
 		Path bookFilePath = Paths.get("testfiles/Temp/TestBook.xlsx");
+		bookFile.save(bookFilePath);
+	}
+	
+	@Test
+	public void testWriteBookBasedOnExistingBook() {
+		Addr bookAddr = new Addr("/Tax/IndividualIncome2012v1");
+		BookConfig bookConfig = bookConfigFactory.getBookConfig(bookAddr);
+		SpreadsheetFile bookFile = spreadsheetFileFactory.createNewSpreadsheetFile();
+		
+		Path basedOnBookPath = Paths.get("testfiles/SampleFiles/TestBook.xlsx");
+		SpreadsheetFile basedOnBookSpreadsheetFile = 
+				spreadsheetFileFactory.createReadOnlySpreadsheetFileFromPath(basedOnBookPath);
+		Book basedOnBook = bookFactory.getBook(basedOnBookSpreadsheetFile);
+		BookTestDataLoader loader = new BookTestDataLoader(basedOnBook, basedOnBookSpreadsheetFile);
+		loader.loadTestData();
+		
+		BookFileWriter bookFileWriter =  new BookFileWriter(bookConfig, bookFile, modelInstFactory);
+		bookFileWriter.writeWithTestDataFromExistingBook(basedOnBook);
+		
+		Path bookFilePath = Paths.get("testfiles/Temp/TestBookWithExistingData.xlsx");
 		bookFile.save(bookFilePath);
 	}
 	

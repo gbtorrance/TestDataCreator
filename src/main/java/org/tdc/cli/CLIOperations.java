@@ -10,7 +10,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.tdc.book.Book;
+import org.tdc.book.BookFactory;
+import org.tdc.book.BookFactoryImpl;
 import org.tdc.book.BookFileWriter;
+import org.tdc.book.BookTestDataLoader;
 import org.tdc.config.book.BookConfig;
 import org.tdc.config.book.BookConfigFactory;
 import org.tdc.config.book.BookConfigFactoryImpl;
@@ -42,6 +46,21 @@ import joptsimple.OptionSet;
  * Handles processing of command-line operations. 
  */
 public class CLIOperations {
+	private static final String OP_H = "h";
+	private static final String OP_HELP = "help";
+	private static final String OP_QUESTION = "?";
+	private static final String OP_S = "s";
+	private static final String OP_SCHEMAS_CONFIG_ROOT = "schemas-config-root";
+	private static final String OP_B = "b";
+	private static final String OP_BOOKS_CONFIG_ROOT = "books-config-root";
+	private static final String OP_L = "l";
+	private static final String OP_LIST = "list";
+	private static final String OP_C = "c";
+	private static final String OP_CREATE_BOOK = "create-book";
+	private static final String OP_TARGET = "target";
+	private static final String OP_BASED_ON_BOOK = "based-on-book";
+	private static final int INDENT_SPACES = 3;
+	
 	private final OptionParser parser = new OptionParser();
 	private final boolean admin;
 	
@@ -55,6 +74,7 @@ public class CLIOperations {
 	private SchemaFactory schemaFactory;
 	private ModelDefFactory modelDefFactory;
 	private ModelInstFactory modelInstFactory;
+	private BookFactory bookFactory;
 	
 	
 	public CLIOperations(boolean admin) {
@@ -64,27 +84,31 @@ public class CLIOperations {
 	
 	private void initParser() {
 		parser.acceptsAll(Arrays.asList(
-				"h", "help", "?"), "help")
+				OP_H, OP_HELP, OP_QUESTION), "help")
 				.forHelp();
 		parser.acceptsAll(Arrays.asList(
-				"s", "schemas-config-root"), "schemas config root dir")
+				OP_S, OP_SCHEMAS_CONFIG_ROOT), "schemas config root dir")
 				.withRequiredArg();
 		parser.acceptsAll(Arrays.asList(
-				"b", "books-config-root"), "books config root dir")
+				OP_B, OP_BOOKS_CONFIG_ROOT), "books config root dir")
 				.withRequiredArg();
 		parser.acceptsAll(Arrays.asList(
-				"l", "list"), "list config schema|model|book")
+				OP_L, OP_LIST), "list config schema|model|book")
 				.withRequiredArg()
 				.ofType(CLIArgsConfigType.class);
 		parser.acceptsAll(Arrays.asList(
-				"c", "create-book"), "create book")
+				OP_C, OP_CREATE_BOOK), "create book")
 				.withRequiredArg()
 				.ofType(Addr.class)
 				.describedAs("Book address");
-		parser.accepts("target", "target file for book creation")
-				.availableIf("c")
+		parser.accepts(OP_TARGET, "target file for book creation")
+				.availableIf(OP_CREATE_BOOK)
 				.withRequiredArg()
 				.ofType(String.class);
+		parser.accepts(OP_BASED_ON_BOOK, "book file with test data for book creation")
+		.availableIf(OP_CREATE_BOOK)
+		.withRequiredArg()
+		.ofType(String.class);
 	}
 
 	public void execute(String[] args) {
@@ -98,25 +122,30 @@ public class CLIOperations {
 	}
 	
 	private void executeOptions(OptionSet options) {
-		if (!options.hasOptions() || options.has("h")) {
+		if (!options.hasOptions() || options.has(OP_HELP)) {
 			executeHelp();
 			System.exit(0);
 		}
 
 		initConfigDirs(options);
 		
-		if (options.has("l")) {
-			CLIArgsConfigType configType = (CLIArgsConfigType)options.valueOf("l");
+		if (options.has(OP_LIST)) {
+			CLIArgsConfigType configType = (CLIArgsConfigType)options.valueOf(OP_LIST);
 			executeListConfig(configType);
 		}
-		else if (options.has("c")) {
-			Addr bookAddr = (Addr)options.valueOf("c");
-			Path target = null;
-			if (options.has("target")) {
-				String fileStr = (String)options.valueOf("target");
-				target = Paths.get(fileStr);
+		else if (options.has(OP_CREATE_BOOK)) {
+			Addr bookAddr = (Addr)options.valueOf(OP_CREATE_BOOK);
+			Path targetFile = null;
+			Path basedOnBookPath = null;
+			if (options.has(OP_TARGET)) {
+				String fileStr = (String)options.valueOf(OP_TARGET);
+				targetFile = Paths.get(fileStr);
 			}
-			executeCreateBook(bookAddr, target);
+			if (options.has(OP_BASED_ON_BOOK)) {
+				String fileStr = (String)options.valueOf(OP_BASED_ON_BOOK);
+				basedOnBookPath = Paths.get(fileStr);
+			}
+			executeCreateBook(bookAddr, targetFile, basedOnBookPath);
 		}
 		else {
 			outputAndEnd("No commands specified");
@@ -124,13 +153,17 @@ public class CLIOperations {
 	}
 
 	private void initConfigDirs(OptionSet options) {
-		schemasConfigRoot = options.has("s") ?  Paths.get("" + options.valueOf("s")) : null;
+		schemasConfigRoot = options.has(OP_SCHEMAS_CONFIG_ROOT) ?  
+				Paths.get("" + options.valueOf(OP_SCHEMAS_CONFIG_ROOT)) : null;
 		if (schemasConfigRoot == null || !Files.isDirectory(schemasConfigRoot)) {
-			outputAndEnd("A valid Schemas Config Root dir must be specified with option -s or --schemas-config-root");
+			outputAndEnd("A valid Schemas Config Root dir must be specified with option -" + 
+					OP_S + " or --" + OP_SCHEMAS_CONFIG_ROOT);
 		}
-		booksConfigRoot = options.has("b") ? Paths.get("" + options.valueOf("b")) : null;
+		booksConfigRoot = options.has(OP_BOOKS_CONFIG_ROOT) ? 
+				Paths.get("" + options.valueOf(OP_BOOKS_CONFIG_ROOT)) : null;
 		if (booksConfigRoot == null || !Files.isDirectory(booksConfigRoot)) {
-			outputAndEnd("A valid Books Config Root dir must be specified with option -b or --books-config-root");
+			outputAndEnd("A valid Books Config Root dir must be specified with option -" +
+					OP_B + " or --" + OP_BOOKS_CONFIG_ROOT);
 		}
 	}
 
@@ -156,14 +189,14 @@ public class CLIOperations {
 		}
 	}
 
-	private void executeCreateBook(Addr bookAddr, Path target) {
+	private void executeCreateBook(Addr bookAddr, Path targetFile, Path basedOnBookPath) {
 		verifyBookAddr(bookAddr);
 		BookConfig bookConfig = getBookConfigFactory().getBookConfig(bookAddr);
-		target = verifyTargetOrProvideDefault(target, bookConfig);
-		SpreadsheetFile bookFile = getSpreadsheetFileFactory().createNewSpreadsheetFile();
-		BookFileWriter bookFileWriter =  new BookFileWriter(bookConfig, bookFile, getModelInstFactory());
-		bookFileWriter.write();
-		bookFile.saveAsNew(target);
+		targetFile = verifyTargetOrProvideDefault(targetFile, bookConfig);
+		Book basedOnBook = loadBasedOnBookIfExists(basedOnBookPath); 
+		SpreadsheetFile newBookFile = getSpreadsheetFileFactory().createNewSpreadsheetFile();
+		writeToSpreadsheetBookFile(bookConfig, newBookFile, basedOnBook);
+		newBookFile.saveAsNew(targetFile);
 	}
 
 	private void verifyBookAddr(Addr bookAddr) {
@@ -184,10 +217,33 @@ public class CLIOperations {
 			outputAndEnd("Target file " + target + 
 					" already exists; delete first or specify an alternative file name with --target option");
 		}
+		target = target.toAbsolutePath();
 		if (!Files.isDirectory(target.getParent())) {
 			outputAndEnd("Target directory " + target.getParent() + " does not exist");
 		}
 		return target;
+	}
+
+	private Book loadBasedOnBookIfExists(Path basedOnBookPath) {
+		if (Files.notExists(basedOnBookPath)) {
+			outputAndEnd("Based-on book " + basedOnBookPath + " does not exists");
+		}
+		SpreadsheetFile spreadsheetFile = 
+				getSpreadsheetFileFactory().createReadOnlySpreadsheetFileFromPath(basedOnBookPath);
+		Book basedOnBook = getBookFactory().getBook(spreadsheetFile);
+		BookTestDataLoader loader = new BookTestDataLoader(basedOnBook, spreadsheetFile);
+		loader.loadTestData();
+		return basedOnBook;
+	}
+
+	private void writeToSpreadsheetBookFile(BookConfig bookConfig, SpreadsheetFile bookFile, Book basedOnBook) {
+		BookFileWriter bookFileWriter =  new BookFileWriter(bookConfig, bookFile, getModelInstFactory());
+		if (basedOnBook == null) {
+			bookFileWriter.write();
+		} 
+		else {
+			bookFileWriter.writeWithTestDataFromExistingBook(basedOnBook);
+		}
 	}
 
 	private void outputSchemaConfigsList() {
@@ -289,6 +345,13 @@ public class CLIOperations {
 		return modelInstFactory;
 	}
 
+	private BookFactory getBookFactory() {
+		if (bookFactory == null) {
+			bookFactory = new BookFactoryImpl(getBookConfigFactory(), getModelInstFactory());
+		}
+		return bookFactory;
+	}
+
 	private SpreadsheetFileFactory getSpreadsheetFileFactory() {
 		if (spreadsheetFileFactory == null) {
 			spreadsheetFileFactory = new ExcelSpreadsheetFileFactory();
@@ -301,7 +364,7 @@ public class CLIOperations {
 	}
 
 	private void output(int indent, String message) {
-		System.out.println(Util.spaces(indent * 3) + message);
+		System.out.println(Util.spaces(indent * INDENT_SPACES) + message);
 	}
 
 	private void outputAndEnd(String message) {
