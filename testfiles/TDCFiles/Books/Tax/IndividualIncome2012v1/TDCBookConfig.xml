@@ -134,7 +134,7 @@
 	
 	<Tasks>
 		<Task id="export" type="default-export">
-			<ExportRoot>testfiles/Temp/ExportRoot</ExportRoot>
+			<ExportRoot>../../../../Temp/ExportRoot</ExportRoot>
 			<BatchDirPrefix>TestBatch</BatchDirPrefix>
 		</Task>
 	</Tasks>

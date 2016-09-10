@@ -2,12 +2,12 @@ package org.tdc.extension.mef.export;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.tdc.config.XMLConfigWrapper;
 import org.tdc.config.book.TaskConfig;
+import org.tdc.util.Addr;
 
 /**
  * Configuration for {@link MeFExportTask}.
@@ -64,10 +64,13 @@ public class MeFExportTaskConfig implements TaskConfig {
 		return federalDocTypeName;
 	}
 	
-	public static TaskConfig build(XMLConfigWrapper config, String key) {
+	public static TaskConfig build(
+			XMLConfigWrapper config, String key,
+			Path bookConfigRoot, Addr bookAddr, String bookName) {
+		
 		String taskID = config.getString(key + "[@id]", "export", false);
 		String exportRootStr = config.getString(key + ".ExportRoot", null, true);
-		Path exportRoot = getExportRootPath(exportRootStr);
+		Path exportRoot = getExportRootPath(bookConfigRoot, exportRootStr);
 		String submissionIDVariable = config.getString(key + ".SubmissionIDVariable", "SUBMISSION_ID", false);
 		String stateDocTypeName = config.getString(key + ".StateDocTypeName", null, true);
 		String manifestDocTypeName = config.getString(key + ".ManifestDocTypeName", null, true);
@@ -77,11 +80,11 @@ public class MeFExportTaskConfig implements TaskConfig {
 				stateDocTypeName, manifestDocTypeName, federalDocTypeName);
 	}
 	
-	private static Path getExportRootPath(String exportRootStr) {
-		Path exportRoot = Paths.get(exportRootStr);
+	private static Path getExportRootPath(Path bookConfigRoot, String exportRootStr) {
+		Path exportRoot = bookConfigRoot.resolve(exportRootStr).normalize();
 		if (!Files.exists(exportRoot)) {
 			throw new IllegalStateException(
-					"Exporter root dir does not exist: " + exportRoot.toString());
+					"Exporter root dir does not exist: " + exportRoot.toAbsolutePath());
 		}
 		return exportRoot;
 	}

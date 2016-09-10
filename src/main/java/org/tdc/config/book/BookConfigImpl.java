@@ -239,7 +239,8 @@ public class BookConfigImpl implements BookConfig {
 					"NodeHeaderLabels", headerRowCount);
 			pageConfigs = new PageConfigImpl.Builder(config, docTypeConfigs, modelConfigFactory, 
 					nodeColumnCount, headerRowCount, defaultNodeDetailColumnStyle).buildAll();
-			taskConfigs = taskConfigFactory.createTaskConfigs(config, "Tasks");
+			taskConfigs = taskConfigFactory.createTaskConfigs(
+					config, "Tasks", bookConfigRoot, addr, bookName);
 			return new BookConfigImpl(this);
 		}
 	}
