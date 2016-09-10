@@ -51,14 +51,26 @@ public class BookConfigFactoryImpl implements BookConfigFactory {
 	}
 
 	@Override
+	public boolean isBookConfig(Addr addr) {
+		return getAllBookConfigAddrs()
+				.stream()
+				.anyMatch(a -> a.equals(addr));
+	}
+
+	@Override
+	public List<Addr> getAllBookConfigAddrs() {
+		return ConfigFinder.findAllConfigsContainingConfigFile(
+				booksConfigRoot, BookConfigImpl.CONFIG_FILE);
+	}
+
+	@Override
 	public List<BookConfig> getAllBookConfigs() {
 		return getAllBookConfigs(null);
 	}
 
 	@Override
 	public List<BookConfig> getAllBookConfigs(Map<Addr, Exception> errors) {
-		List<Addr> allConfigAddrs = ConfigFinder.findAllConfigsContainingConfigFile(
-				booksConfigRoot, BookConfigImpl.CONFIG_FILE);
+		List<Addr> allConfigAddrs = getAllBookConfigAddrs();
 		List<BookConfig> bookConfigs = new ArrayList<>();
 		for (Addr addr : allConfigAddrs) {
 			processConfigWithErrorTracking(addr, bookConfigs, errors);
