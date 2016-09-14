@@ -67,6 +67,11 @@ public abstract class NonAttribNodeDef extends NodeDef implements NonAttribNode 
 		children.add(child);
 	}
 	
+	public void removeChild(NonAttribNodeDef child) {
+		getSharedState().throwExceptionIfImmutable("removeChild");
+		children.remove(child);
+	}
+	
 	@Override
 	public boolean isChildOfChoice() {
 		boolean result = false;

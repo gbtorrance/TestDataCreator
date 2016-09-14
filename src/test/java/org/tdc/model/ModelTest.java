@@ -176,6 +176,16 @@ public class ModelTest {
 		compareModelInstMPath("Test/TestSchemaV1.0/Model_OldTest_Customized", "ModelInstMPath_Customized.txt");
 	}
 
+	@Test
+	public void oldTestModelDefFilteredStructureCreatedCorrectly() {
+		compareModelDefSummary("Test/TestSchemaV1.0/Model_OldTest_Filtered", "ModelDefSummary_Filtered.txt");
+	}
+	
+	@Test
+	public void oldTestModelDefFilteredMpathCreatedCorrectly() {
+		compareModelDefMPath("Test/TestSchemaV1.0/Model_OldTest_Filtered", "ModelDefMPath_Filtered.txt");
+	}
+	
 	// ------------------------------
 	
 	private void compareModelDefSummary(String addrStr, String resourceName) {

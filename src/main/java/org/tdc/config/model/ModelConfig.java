@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.tdc.config.schema.SchemaConfig;
 import org.tdc.schemaparse.extractor.SchemaExtractor;
+import org.tdc.schemaparse.filter.SchemaFilter;
 import org.tdc.util.Addr;
 
 /**
@@ -24,6 +25,7 @@ public interface ModelConfig {
 	boolean getFailOnParserWarning();
 	boolean getFailOnParserNonFatalError();
 	int getDefaultOccursCount();
+	SchemaFilter getSchemaFilter();
 	List<SchemaExtractor> getSchemaExtractors();
 	ModelCustomizerConfig getModelCustomizerConfig();
 	boolean hasModelCustomizerConfig();

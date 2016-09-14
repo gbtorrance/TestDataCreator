@@ -32,6 +32,7 @@ import org.tdc.modeldef.NonAttribNodeDef;
 import org.tdc.schemaparse.extractor.SchemaAnnotationExtractor;
 import org.tdc.schemaparse.extractor.SchemaDataTypeExtractor;
 import org.tdc.schemaparse.extractor.SchemaExtractor;
+import org.tdc.schemaparse.filter.SchemaFilter;
 
 /**
  * Takes an Apache Xerces {@link XSModel} representation of a Schema 
@@ -46,6 +47,8 @@ public class ModelDefSchemaParser {
 	private final MPathIndex<NodeDef> mpathIndex; 
 	private final MPathBuilder mpathBuilder = new MPathBuilder();
 	private final ModelDefSharedState sharedState;
+	private final StringBuilder currentElementPath = new StringBuilder();
+	private final SchemaFilter schemaFilter;
 	private final List<SchemaExtractor> schemaExtractors;
 	
 	private int rowOffset;
@@ -54,6 +57,7 @@ public class ModelDefSchemaParser {
 		this.xsModel = builder.xsModel;
 		this.mpathIndex = builder.mpathIndex;
 		this.sharedState = builder.sharedState;
+		this.schemaFilter = builder.schemaFilter;
 		this.schemaExtractors = builder.schemaExtractors;
 	}
 	
@@ -79,6 +83,7 @@ public class ModelDefSchemaParser {
 		elementNodeDef.setColOffset(colOffset);
 		elementNodeDef.setRowOffset(rowOffset++);
 		mpathBuilder.zoomIn();
+		addElementToElementPath(elementNodeDef.getName());
 		colOffset++;
 
 		// elements can be of a simple type or complex type
@@ -100,6 +105,7 @@ public class ModelDefSchemaParser {
 		processElementAnnotation(xsElementDecl, elementNodeDef);
 
 		colOffset--;
+		removeElementFromElementPath();
 		mpathBuilder.zoomOut();
 	}
 	
@@ -162,21 +168,26 @@ public class ModelDefSchemaParser {
 		
 		// process based on type of term
 		if (xsTerm instanceof XSElementDeclaration) {
-			
 			// element declaration
+			XSElementDeclaration xsElement = (XSElementDeclaration)xsTerm;
+
 			// I believe this can only occur if the particle is part of a model group (nested particle), 
 			// but not when it's part of a complex type model (typedef particle)
 			
-			// create new element (with current element as parent)
-			ElementNodeDef newElementNodeDef = new ElementNodeDef(nonAttribNodeDef, sharedState);
-			newElementNodeDef.setMinOccurs(xsParticle.getMinOccurs());
-			newElementNodeDef.setMaxOccurs(xsParticle.getMaxOccursUnbounded() ? NonAttribNodeDef.MAX_UNBOUNDED : xsParticle.getMaxOccurs());
-			
-			// add new element as child of current element
-			nonAttribNodeDef.addChild(newElementNodeDef);
-			
-			// process element declaration (for new element node)
-			processElementDeclaration((XSElementDeclaration)xsTerm, newElementNodeDef, colOffset);
+			// only proceed down this path if filtering does not exclude element
+			if (schemaFilter.includeElementInModel(currentElementPath.toString(), xsElement)) {
+				
+				// create new element (with current element as parent)
+				ElementNodeDef newElementNodeDef = new ElementNodeDef(nonAttribNodeDef, sharedState);
+				newElementNodeDef.setMinOccurs(xsParticle.getMinOccurs());
+				newElementNodeDef.setMaxOccurs(xsParticle.getMaxOccursUnbounded() ? NonAttribNodeDef.MAX_UNBOUNDED : xsParticle.getMaxOccurs());
+				
+				// add new element as child of current element
+				nonAttribNodeDef.addChild(newElementNodeDef);
+				
+				// process element declaration (for new element node)
+				processElementDeclaration(xsElement, newElementNodeDef, colOffset);
+			}
 		}
 		else if (xsTerm instanceof XSModelGroup) {
 			
@@ -196,6 +207,11 @@ public class ModelDefSchemaParser {
 			
 			// process model group (for new compositor node)
 			processModelGroup(xsModelGroup, compositorNodeDef, colOffset);
+			
+			// filtering may have resulted in an empty compositor; if so, remove
+			if (!compositorNodeDef.hasChild()) {
+				nonAttribNodeDef.removeChild(compositorNodeDef);
+			}
 		} 
 		else if (xsTerm instanceof XSWildcard) {
 			
@@ -292,10 +308,19 @@ public class ModelDefSchemaParser {
 		return mpath;
 	}
 	
+	private void addElementToElementPath(String name) {
+		currentElementPath.append("/" + name);
+	}
+
+	private void removeElementFromElementPath() {
+		currentElementPath.setLength(currentElementPath.lastIndexOf("/"));
+	}
+
 	public static class Builder {
 		private final Path rootSchemaFile;
 		private final MPathIndex<NodeDef> mpathIndex; 
 		private final ModelDefSharedState sharedState;
+		private final SchemaFilter schemaFilter;
 		private final List<SchemaExtractor> schemaExtractors;
 
 		private boolean failOnParserWarning;
@@ -305,11 +330,12 @@ public class ModelDefSchemaParser {
 
 		public Builder(
 				Path rootSchemaFile, MPathIndex<NodeDef> mpathIndex, ModelDefSharedState sharedState, 
-				List<SchemaExtractor> schemaExtractors) {
+				SchemaFilter schemaFilter, List<SchemaExtractor> schemaExtractors) {
 			
 			this.rootSchemaFile = rootSchemaFile;
 			this.mpathIndex = mpathIndex;
 			this.sharedState = sharedState;
+			this.schemaFilter = schemaFilter;
 			this.schemaExtractors = schemaExtractors;
 		}
 		

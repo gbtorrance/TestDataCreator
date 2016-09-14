@@ -69,7 +69,9 @@ public class ModelDefBuilderImpl implements ModelDefBuilder {
 		
 		ModelDefSchemaParser modelDefSchemaParser =
 				new ModelDefSchemaParser
-						.Builder(rootSchemaFile, mpathIndex, sharedState, config.getSchemaExtractors())
+						.Builder(rootSchemaFile, mpathIndex, sharedState, 
+								config.getSchemaFilter(), 
+								config.getSchemaExtractors())
 						.setFailOnParserWarning(config.getFailOnParserWarning())
 						.setFailOnParserNonFatalError(config.getFailOnParserNonFatalError())
 						.build();

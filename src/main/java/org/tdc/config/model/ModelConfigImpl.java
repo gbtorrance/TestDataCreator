@@ -12,6 +12,8 @@ import org.tdc.config.schema.SchemaConfig;
 import org.tdc.evaluator.factory.GeneralEvaluatorFactory;
 import org.tdc.schemaparse.extractor.SchemaExtractor;
 import org.tdc.schemaparse.extractor.SchemaExtractorFactory;
+import org.tdc.schemaparse.filter.SchemaFilter;
+import org.tdc.schemaparse.filter.SchemaFilterImpl;
 import org.tdc.util.Addr;
 import org.tdc.util.Util;
 
@@ -37,6 +39,7 @@ public class ModelConfigImpl implements ModelConfig {
 	private final boolean schemaFailOnParserWarning;
 	private final boolean schemaFailOnParserNonFatalError;
 	private final int defaultOccursCount;
+	private final SchemaFilter schemaFilter;
 	private final List<SchemaExtractor> schemaExtractors;
 	private final ModelCustomizerConfig modelCustomizerConfig;
 	private final int testLoadMaxMessages;
@@ -54,6 +57,7 @@ public class ModelConfigImpl implements ModelConfig {
 		this.schemaFailOnParserWarning = builder.schemaFailOnParserWarning;
 		this.schemaFailOnParserNonFatalError = builder.schemaFailOnParserNonFatalError;
 		this.defaultOccursCount = builder.defaultOccursCount;
+		this.schemaFilter = builder.schemaFilter;
 		this.schemaExtractors = Collections.unmodifiableList(builder.schemaExtractors); // unmodifiable
 		this.modelCustomizerConfig = builder.modelCustomizerConfig;
 		this.testLoadMaxMessages = builder.testLoadMaxMessages;
@@ -119,6 +123,11 @@ public class ModelConfigImpl implements ModelConfig {
 	public int getDefaultOccursCount() {
 		return defaultOccursCount;
 	}
+
+	@Override
+	public SchemaFilter getSchemaFilter() {
+		return schemaFilter;
+	}
 	
 	@Override
 	public List<SchemaExtractor> getSchemaExtractors() {
@@ -161,6 +170,7 @@ public class ModelConfigImpl implements ModelConfig {
 		private boolean schemaFailOnParserWarning;
 		private boolean schemaFailOnParserNonFatalError;
 		private int defaultOccursCount;
+		private SchemaFilter schemaFilter;
 		private List<SchemaExtractor> schemaExtractors;
 		private ModelCustomizerConfig modelCustomizerConfig;
 		private int testLoadMaxMessages;
@@ -190,6 +200,7 @@ public class ModelConfigImpl implements ModelConfig {
 			schemaFailOnParserWarning = config.getBoolean("SchemaFailOnParserWarning", false , false);
 			schemaFailOnParserNonFatalError = config.getBoolean("SchemaFailOnParserNonFatalError", true, false);
 			defaultOccursCount = config.getInt("DefaultOccursCount", 5, false);
+			schemaFilter = new SchemaFilterImpl.Builder().buildFromConfig(config, "SchemaFilter");
 			schemaExtractors = schemaExtractorFactory.createSchemaExtractors(config, "SchemaExtractors");
 			modelCustomizerConfig = new ModelCustomizerConfigImpl.Builder(
 					config, modelConfigRoot, defaultOccursCount, modelName, evaluatorFactory).build();
