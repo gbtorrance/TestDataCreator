@@ -74,9 +74,9 @@ public class ConfigsProcessorImpl implements ConfigsProcessor {
 		}
 		
 		public ConfigsProcessor build() {
-			schemaConfigs = schemaConfigFactory.getAllSchemaConfigs();
-			modelConfigs = modelConfigFactory.getAllModelConfigs();
-			bookConfigs = bookConfigFactory.getAllBookConfigs();
+			schemaConfigs = schemaConfigFactory.getAllSchemaConfigs(null); // TODO handle error list
+			modelConfigs = modelConfigFactory.getAllModelConfigs(null); // TODO handle error list
+			bookConfigs = bookConfigFactory.getAllBookConfigs(null); // TODO handle error list
 			schemaConfigDTOs = SchemaConfigMapper.INSTANCE.schemaConfigsToSchemaConfigDTOs(schemaConfigs);
 			modelConfigDTOs = ModelConfigMapper.INSTANCE.modelConfigsToModelConfigDTOs(modelConfigs);
 			bookConfigDTOs = BookConfigMapper.INSTANCE.bookConfigsToBookConfigDTOs(bookConfigs);

@@ -12,6 +12,7 @@ import org.tdc.util.Addr;
 public interface SchemaConfigFactory {
 	Path getSchemasConfigRoot();
 	SchemaConfig getSchemaConfig(Addr addr);
-	List<SchemaConfig> getAllSchemaConfigs();
+	boolean isSchemaConfig(Addr addr);
+	List<Addr> getAllSchemaConfigAddrs();
 	List<SchemaConfig> getAllSchemaConfigs(Map<Addr, Exception> errors);
 }

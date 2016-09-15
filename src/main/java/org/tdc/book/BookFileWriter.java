@@ -53,6 +53,15 @@ public class BookFileWriter {
 		writeConfigSheet();
 	}
 	
+	public void deleteDefaultSheet() {
+		// when using a template file, a default sheet will always exist 
+		// (because Excel won't save a file without at least one sheet);
+		String defaultSheetName = "Sheet1";
+		if (spreadsheetFile.getSpreadsheet(defaultSheetName) != null) {
+			spreadsheetFile.deleteSpreadsheet(defaultSheetName);
+		}
+	}
+	
 	private void writePages(Book basedOnBook) {
 		Collection<PageConfig> pageConfigs = config.getPageConfigs().values();
 		for (PageConfig pageConfig : pageConfigs) {

@@ -46,15 +46,22 @@ public class SchemaConfigFactoryImpl implements SchemaConfigFactory {
 	}
 
 	@Override
-	public List<SchemaConfig> getAllSchemaConfigs() {
-		return getAllSchemaConfigs(null);
+	public boolean isSchemaConfig(Addr addr) {
+		return getAllSchemaConfigAddrs()
+				.stream()
+				.anyMatch(a -> a.equals(addr));
 	}
-	
+
 	@Override
-	public List<SchemaConfig> getAllSchemaConfigs(Map<Addr, Exception> errors) {
-		List<Addr> allConfigAddrs = ConfigFinder.findAllConfigsContainingConfigFile(
+	public List<Addr> getAllSchemaConfigAddrs() {
+		return ConfigFinder.findAllConfigsContainingConfigFile(
 				schemasConfigRoot, 
 				SchemaConfigImpl.CONFIG_FILE);
+	}
+
+	@Override
+	public List<SchemaConfig> getAllSchemaConfigs(Map<Addr, Exception> errors) {
+		List<Addr> allConfigAddrs = getAllSchemaConfigAddrs();
 		List<SchemaConfig> schemaConfigs = new ArrayList<>();
 		for (Addr addr : allConfigAddrs) {
 			processConfigWithErrorTracking(addr, schemaConfigs, errors);

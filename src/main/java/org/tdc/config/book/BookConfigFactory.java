@@ -12,6 +12,5 @@ public interface BookConfigFactory {
 	BookConfig getBookConfig(Addr addr);
 	boolean isBookConfig(Addr addr);
 	List<Addr> getAllBookConfigAddrs();
-	List<BookConfig> getAllBookConfigs();
 	List<BookConfig> getAllBookConfigs(Map<Addr, Exception> errors);
 }

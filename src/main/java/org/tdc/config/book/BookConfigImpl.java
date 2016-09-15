@@ -29,6 +29,7 @@ public class BookConfigImpl implements BookConfig {
 	private final Path bookConfigRoot;
 	private final String bookName;
 	private final String bookDescription;
+	private final Path bookTemplateFile;
 	private final Map<String, DocTypeConfig> docTypeConfigs;
 	private final Map<String, PageConfig> pageConfigs;
 	private final List<TaskConfig> taskConfigs;
@@ -52,6 +53,7 @@ public class BookConfigImpl implements BookConfig {
 		this.bookConfigRoot = builder.bookConfigRoot;
 		this.bookName = builder.bookName;
 		this.bookDescription = builder.bookDescription;
+		this.bookTemplateFile = builder.bookTemplateFile;
 		this.docTypeConfigs = Collections.unmodifiableMap(builder.docTypeConfigs); // unmodifiable
 		this.pageConfigs = Collections.unmodifiableMap(builder.pageConfigs); // unmodifiable
 		this.taskConfigs = Collections.unmodifiableList(builder.taskConfigs); // unmodifiable
@@ -93,6 +95,20 @@ public class BookConfigImpl implements BookConfig {
 	@Override
 	public String getBookDescription() {
 		return bookDescription;
+	}
+
+	@Override
+	public Path getBookTemplateFile() {
+		return bookTemplateFile;
+	}
+
+	@Override
+	public String getBookTemplateFileExtension() {
+		if (bookTemplateFile == null) {
+			return null;
+		}
+		String filename = bookTemplateFile.toString();
+		return filename.substring(filename.lastIndexOf(".") + 1);
 	}
 
 	@Override
@@ -185,6 +201,7 @@ public class BookConfigImpl implements BookConfig {
 		
 		public String bookName;
 		public String bookDescription;
+		public Path bookTemplateFile;
 		private Map<String, DocTypeConfig> docTypeConfigs;
 		private Map<String, PageConfig> pageConfigs;
 		private List<TaskConfig> taskConfigs;
@@ -222,6 +239,11 @@ public class BookConfigImpl implements BookConfig {
 		public BookConfig build() {
 			bookName = config.getString("BookName", null, true);
 			bookDescription = config.getString("BookDescription", "", false);
+			String templateFileStr = config.getString("BookTemplateFile", null, false);
+			bookTemplateFile = templateFileStr == null ? null : bookConfigRoot.resolve(templateFileStr);
+			if (bookTemplateFile != null && Files.notExists(bookTemplateFile)) {
+				throw new IllegalStateException("BookTemplateFile does not exist: " + bookTemplateFile.toString());
+			}
 			docTypeConfigs = new DocTypeConfigImpl.Builder(config).buildAll();
 			defaultStyle = config.getCellStyle("DefaultStyle", null, true);
 			defaultHeaderStyle = config.getCellStyle("DefaultHeaderStyle", defaultStyle, false);

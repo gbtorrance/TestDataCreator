@@ -10,31 +10,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.tdc.book.Book;
-import org.tdc.book.BookFactory;
-import org.tdc.book.BookFactoryImpl;
-import org.tdc.book.BookFileWriter;
-import org.tdc.book.BookTestDataLoader;
 import org.tdc.config.book.BookConfig;
-import org.tdc.config.book.BookConfigFactory;
-import org.tdc.config.book.BookConfigFactoryImpl;
-import org.tdc.config.book.TaskConfigFactory;
-import org.tdc.config.book.TaskConfigFactoryImpl;
 import org.tdc.config.model.ModelConfig;
-import org.tdc.config.model.ModelConfigFactory;
-import org.tdc.config.model.ModelConfigFactoryImpl;
 import org.tdc.config.schema.SchemaConfig;
-import org.tdc.config.schema.SchemaConfigFactory;
-import org.tdc.config.schema.SchemaConfigFactoryImpl;
-import org.tdc.modeldef.ModelDefFactory;
-import org.tdc.modeldef.ModelDefFactoryImpl;
-import org.tdc.modelinst.ModelInstFactory;
-import org.tdc.modelinst.ModelInstFactoryImpl;
-import org.tdc.schema.SchemaFactory;
-import org.tdc.schema.SchemaFactoryImpl;
-import org.tdc.spreadsheet.SpreadsheetFile;
-import org.tdc.spreadsheet.SpreadsheetFileFactory;
-import org.tdc.spreadsheet.excel.ExcelSpreadsheetFileFactory;
+import org.tdc.process.Processor;
+import org.tdc.process.ProcessorImpl;
 import org.tdc.util.Addr;
 import org.tdc.util.Util;
 
@@ -63,20 +43,11 @@ public class CLIOperations {
 	
 	private final OptionParser parser = new OptionParser();
 	private final boolean admin;
-	
+
 	private Path schemasConfigRoot;
 	private Path booksConfigRoot;
-	private SchemaConfigFactory schemaConfigFactory;
-	private ModelConfigFactory modelConfigFactory;
-	private TaskConfigFactory taskConfigFactory;
-	private BookConfigFactory bookConfigFactory;
-	private SpreadsheetFileFactory spreadsheetFileFactory;
-	private SchemaFactory schemaFactory;
-	private ModelDefFactory modelDefFactory;
-	private ModelInstFactory modelInstFactory;
-	private BookFactory bookFactory;
-	
-	
+	private Processor processor;
+
 	public CLIOperations(boolean admin) {
 		this.admin = admin;
 		initParser();
@@ -128,6 +99,8 @@ public class CLIOperations {
 		}
 
 		initConfigDirs(options);
+		initProcessor();
+		
 		
 		if (options.has(OP_LIST)) {
 			CLIArgsConfigType configType = (CLIArgsConfigType)options.valueOf(OP_LIST);
@@ -150,6 +123,13 @@ public class CLIOperations {
 		else {
 			outputAndEnd("No commands specified");
 		}
+	}
+
+	private void initProcessor() {
+		processor = new ProcessorImpl
+				.Builder(schemasConfigRoot, booksConfigRoot)
+				.defaultFactories()
+				.build();
 	}
 
 	private void initConfigDirs(OptionSet options) {
@@ -191,23 +171,21 @@ public class CLIOperations {
 
 	private void executeCreateBook(Addr bookAddr, Path targetFile, Path basedOnBookPath) {
 		verifyBookAddr(bookAddr);
-		BookConfig bookConfig = getBookConfigFactory().getBookConfig(bookAddr);
-		targetFile = verifyTargetOrProvideDefault(targetFile, bookConfig);
-		Book basedOnBook = loadBasedOnBookIfExists(basedOnBookPath); 
-		SpreadsheetFile newBookFile = getSpreadsheetFileFactory().createNewSpreadsheetFile();
-		writeToSpreadsheetBookFile(bookConfig, newBookFile, basedOnBook);
-		newBookFile.saveAsNew(targetFile);
+		String bookName = processor.getBookConfig(bookAddr).getBookName();
+		verifyTargetOrProvideDefault(targetFile, bookName);
+		verifyBasedOnBookIfExists(basedOnBookPath);
+		processor.createBook(bookAddr, targetFile, basedOnBookPath, false);
 	}
 
 	private void verifyBookAddr(Addr bookAddr) {
-		if (!getBookConfigFactory().isBookConfig(bookAddr)) {
+		if (!processor.isBookConfig(bookAddr)) {
 			outputAndEnd(bookAddr + " does not represent a Book Config address");
 		}
 	}
 
-	private Path verifyTargetOrProvideDefault(Path target, BookConfig bookConfig) {
+	private Path verifyTargetOrProvideDefault(Path target, String bookName) {
 		if (target == null) {
-			String defaultName = Util.legalizeName(bookConfig.getBookName()) + ".xlsx";
+			String defaultName = Util.legalizeName(bookName) + ".xlsx";
 			target = Paths.get(defaultName);
 		}
 		if (!target.toString().endsWith(".xlsx")) {
@@ -224,31 +202,15 @@ public class CLIOperations {
 		return target;
 	}
 
-	private Book loadBasedOnBookIfExists(Path basedOnBookPath) {
+	private void verifyBasedOnBookIfExists(Path basedOnBookPath) {
 		if (Files.notExists(basedOnBookPath)) {
 			outputAndEnd("Based-on book " + basedOnBookPath + " does not exists");
-		}
-		SpreadsheetFile spreadsheetFile = 
-				getSpreadsheetFileFactory().createReadOnlySpreadsheetFileFromPath(basedOnBookPath);
-		Book basedOnBook = getBookFactory().getBook(spreadsheetFile);
-		BookTestDataLoader loader = new BookTestDataLoader(basedOnBook, spreadsheetFile);
-		loader.loadTestData();
-		return basedOnBook;
-	}
-
-	private void writeToSpreadsheetBookFile(BookConfig bookConfig, SpreadsheetFile bookFile, Book basedOnBook) {
-		BookFileWriter bookFileWriter =  new BookFileWriter(bookConfig, bookFile, getModelInstFactory());
-		if (basedOnBook == null) {
-			bookFileWriter.write();
-		} 
-		else {
-			bookFileWriter.writeWithTestDataFromExistingBook(basedOnBook);
 		}
 	}
 
 	private void outputSchemaConfigsList() {
 		Map<Addr, Exception> errors = new HashMap<>();
-		List<SchemaConfig> schemaConfigs = getSchemaConfigFactory().getAllSchemaConfigs(errors);
+		List<SchemaConfig> schemaConfigs = processor.getAllSchemaConfigs(errors);
 		output("Schema Config addresses:");
 		for (SchemaConfig schemaConfig : schemaConfigs) {
 			String addr = schemaConfig.getAddr().toString();
@@ -259,7 +221,7 @@ public class CLIOperations {
 
 	private void outputModelConfigsList() {
 		Map<Addr, Exception> errors = new HashMap<>();
-		List<ModelConfig> modelConfigs = getModelConfigFactory().getAllModelConfigs(errors);
+		List<ModelConfig> modelConfigs = processor.getAllModelConfigs(errors);
 		output("Model Config addresses:");
 		for (ModelConfig modelConfig : modelConfigs) {
 			String addr = modelConfig.getAddr().toString();
@@ -273,7 +235,7 @@ public class CLIOperations {
 
 	private void outputBookConfigsList() {
 		Map<Addr, Exception> errors = new HashMap<>();
-		List<BookConfig> bookConfigs = getBookConfigFactory().getAllBookConfigs(errors);
+		List<BookConfig> bookConfigs = processor.getAllBookConfigs(errors);
 		output("Book Config addresses:");
 		for (BookConfig bookConfig : bookConfigs) {
 			String addr = bookConfig.getAddr().toString();
@@ -292,71 +254,6 @@ public class CLIOperations {
 				output(1, e.getKey() + " (" + e.getValue().getMessage() + ")");
 			}
 		}
-	}
-
-	private SchemaConfigFactory getSchemaConfigFactory() {
-		if (schemaConfigFactory == null) {
-			schemaConfigFactory = new SchemaConfigFactoryImpl(schemasConfigRoot); 
-		}
-		return schemaConfigFactory;
-	}
-
-	private ModelConfigFactory getModelConfigFactory() {
-		if (modelConfigFactory == null) {
-			modelConfigFactory = new ModelConfigFactoryImpl(getSchemaConfigFactory());
-		}
-		return modelConfigFactory;
-	}
-	
-	private BookConfigFactory getBookConfigFactory() {
-		if (bookConfigFactory == null) {
-			bookConfigFactory = new BookConfigFactoryImpl(
-					booksConfigRoot, getModelConfigFactory(), getTaskConfigFactory());
-		}
-		return bookConfigFactory;
-	}
-
-	private TaskConfigFactory getTaskConfigFactory() {
-		if (taskConfigFactory == null) {
-			taskConfigFactory = new TaskConfigFactoryImpl();
-		}
-		return taskConfigFactory;
-	}
-
-	private SchemaFactory getSchemaFactory() {
-		if (schemaFactory == null) {
-			schemaFactory = new SchemaFactoryImpl();
-		}
-		return schemaFactory;
-	}
-
-	private ModelDefFactory getModelDefFactory() {
-		if (modelDefFactory == null) {
-			modelDefFactory = new ModelDefFactoryImpl(
-					getSchemaFactory(), getSpreadsheetFileFactory());
-		}
-		return modelDefFactory;
-	}
-
-	private ModelInstFactory getModelInstFactory() {
-		if (modelInstFactory == null) {
-			modelInstFactory = new ModelInstFactoryImpl(getModelDefFactory());
-		}
-		return modelInstFactory;
-	}
-
-	private BookFactory getBookFactory() {
-		if (bookFactory == null) {
-			bookFactory = new BookFactoryImpl(getBookConfigFactory(), getModelInstFactory());
-		}
-		return bookFactory;
-	}
-
-	private SpreadsheetFileFactory getSpreadsheetFileFactory() {
-		if (spreadsheetFileFactory == null) {
-			spreadsheetFileFactory = new ExcelSpreadsheetFileFactory();
-		}
-		return spreadsheetFileFactory;
 	}
 
 	private void output(String message) {

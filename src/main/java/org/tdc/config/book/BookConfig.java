@@ -16,6 +16,8 @@ public interface BookConfig {
 	Path getBookConfigRoot();
 	String getBookName();
 	String getBookDescription();
+	Path getBookTemplateFile();
+	String getBookTemplateFileExtension();
 	Map<String, DocTypeConfig> getDocTypeConfigs();
 	Map<String, PageConfig> getPageConfigs();
 	List<TaskConfig> getTaskConfigs();

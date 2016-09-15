@@ -64,11 +64,6 @@ public class BookConfigFactoryImpl implements BookConfigFactory {
 	}
 
 	@Override
-	public List<BookConfig> getAllBookConfigs() {
-		return getAllBookConfigs(null);
-	}
-
-	@Override
 	public List<BookConfig> getAllBookConfigs(Map<Addr, Exception> errors) {
 		List<Addr> allConfigAddrs = getAllBookConfigAddrs();
 		List<BookConfig> bookConfigs = new ArrayList<>();

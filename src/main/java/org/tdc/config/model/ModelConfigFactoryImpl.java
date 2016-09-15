@@ -53,15 +53,22 @@ public class ModelConfigFactoryImpl implements ModelConfigFactory {
 	}
 
 	@Override
-	public List<ModelConfig> getAllModelConfigs() {
-		return getAllModelConfigs(null);
+	public boolean isModelConfig(Addr addr) {
+		return getAllModelConfigAddrs()
+				.stream()
+				.anyMatch(a -> a.equals(addr));
 	}
-	
+
 	@Override
-	public List<ModelConfig> getAllModelConfigs(Map<Addr, Exception> errors) {
-		List<Addr> allConfigAddrs = ConfigFinder.findAllConfigsContainingConfigFile(
+	public List<Addr> getAllModelConfigAddrs() {
+		return ConfigFinder.findAllConfigsContainingConfigFile(
 				schemaConfigFactory.getSchemasConfigRoot(), 
 				ModelConfigImpl.CONFIG_FILE);
+	}
+
+	@Override
+	public List<ModelConfig> getAllModelConfigs(Map<Addr, Exception> errors) {
+		List<Addr> allConfigAddrs = getAllModelConfigAddrs();
 		List<ModelConfig> modelConfigs = new ArrayList<>();
 		for (Addr addr : allConfigAddrs) {
 			processConfigWithErrorTracking(addr, modelConfigs, errors);

@@ -3,6 +3,7 @@
 
 	<BookName>2012_Individual_Income_01</BookName>
 	<BookDescription>TY2012 Individual Income Tax -- version 1</BookDescription>
+	<BookTemplateFile>../../BookTemplateWithMacros.xlsm</BookTemplateFile>
 
 	<DocTypes>
 		<DocType>
