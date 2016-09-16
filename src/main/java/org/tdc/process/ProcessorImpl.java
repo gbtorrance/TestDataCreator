@@ -7,10 +7,6 @@ import java.util.Map;
 import org.tdc.book.Book;
 import org.tdc.book.BookFactory;
 import org.tdc.book.BookFactoryImpl;
-import org.tdc.book.BookFileWriter;
-import org.tdc.book.BookSchemaValidator;
-import org.tdc.book.BookSpreadsheetLogWriter;
-import org.tdc.book.BookTestDataLoader;
 import org.tdc.config.book.BookConfig;
 import org.tdc.config.book.BookConfigFactory;
 import org.tdc.config.book.BookConfigFactoryImpl;
@@ -30,12 +26,10 @@ import org.tdc.schema.SchemaFactory;
 import org.tdc.schema.SchemaFactoryImpl;
 import org.tdc.schemavalidate.SchemaValidatorFactory;
 import org.tdc.schemavalidate.SchemaValidatorFactoryImpl;
-import org.tdc.spreadsheet.SpreadsheetFile;
 import org.tdc.spreadsheet.SpreadsheetFileFactory;
 import org.tdc.spreadsheet.excel.ExcelSpreadsheetFileFactory;
 import org.tdc.task.TaskFactory;
 import org.tdc.task.TaskFactoryImpl;
-import org.tdc.task.TaskProcessor;
 import org.tdc.util.Addr;
 
 /**
@@ -55,6 +49,8 @@ public class ProcessorImpl implements Processor {
 	private final BookFactory bookFactory;
 	private final SchemaValidatorFactory schemaValidatorFactory; 
 	private final TaskFactory taskFactory;
+	private final ModelProcessor modelProcessor;
+	private final BookProcessor bookProcessor;
 	
 	private ProcessorImpl(Builder builder) {
 		this.schemasConfigRoot = builder.schemasConfigRoot;
@@ -70,6 +66,8 @@ public class ProcessorImpl implements Processor {
 		this.bookFactory = builder.bookFactory;
 		this.schemaValidatorFactory = builder.schemaValidatorFactory;
 		this.taskFactory = builder.taskFactory;
+		this.modelProcessor = builder.modelProcessor;
+		this.bookProcessor = builder.bookProcessor;
 	}
 	
 	@Override
@@ -183,119 +181,38 @@ public class ProcessorImpl implements Processor {
 	}
 
 	@Override
-	public String getTargetBookFileExtension(Addr bookAddr) {
-		BookConfig bookConfig = bookConfigFactory.getBookConfig(bookAddr);
-		return getTargetBookFileExtension(bookConfig);
+	public void createCustomizer(Addr modelAddr, Path targetPath, 
+			Addr basedOnModelAddr, boolean overwriteExisting) {
+
+		modelProcessor.createCustomizer(modelAddr, targetPath, basedOnModelAddr, overwriteExisting);
 	}
 	
-	private String getTargetBookFileExtension(BookConfig bookConfig) {
-		String extension = bookConfig.getBookTemplateFileExtension();
-		return extension == null ? "xlsx" : extension;
+	@Override
+	public String getTargetBookFileExtension(Addr bookAddr) {
+		return bookProcessor.getTargetBookFileExtension(bookAddr);
 	}
-
+	
 	@Override
 	public void createBook(Addr bookAddr, Path targetPath, 
 			Path basedOnBookPath, boolean overwriteExisting) {
 
-		Book basedOnBook = loadBasedOnBookIfExists(basedOnBookPath); 
-		BookConfig bookConfig = bookConfigFactory.getBookConfig(bookAddr);
-		verifyTargetPathExtension(bookConfig, targetPath);
-		SpreadsheetFile newBookFile = createNewSpreadsheetFile(bookConfig);
-		writeToSpreadsheetBookFile(bookConfig, newBookFile, basedOnBook);
-		if (overwriteExisting) {
-			newBookFile.save(targetPath);
-		}
-		else {
-			newBookFile.saveAsNew(targetPath);
-		}
-	}
-	
-	private Book loadBasedOnBookIfExists(Path basedOnBookPath) {
-		if (basedOnBookPath == null) {
-			return null;
-		}
-		SpreadsheetFile spreadsheetFile = 
-				spreadsheetFileFactory.createReadOnlySpreadsheetFileFromPath(basedOnBookPath);
-		Book basedOnBook = bookFactory.getBook(spreadsheetFile);
-		BookTestDataLoader loader = new BookTestDataLoader(basedOnBook, spreadsheetFile);
-		loader.loadTestData();
-		return basedOnBook;
+		bookProcessor.createBook(bookAddr, targetPath, basedOnBookPath, overwriteExisting);
 	}
 
-	private void verifyTargetPathExtension(BookConfig bookConfig, Path targetPath) {
-		String expectedExtension = getTargetBookFileExtension(bookConfig);
-		String targetFilename = targetPath.toString();
-		String targetExtension = targetFilename.substring(targetFilename.lastIndexOf(".") + 1);
-		if (!expectedExtension.equals(targetExtension)) {
-			throw new IllegalStateException("Extension of target Book file " + 
-					targetFilename + " does not match expected extension '." + 
-					expectedExtension + "'");
-		}
-	}
-
-	private SpreadsheetFile createNewSpreadsheetFile(BookConfig bookConfig) {
-		Path templateFile = bookConfig.getBookTemplateFile();
-		SpreadsheetFile newSpreadsheetFile = 
-				templateFile == null ?
-				spreadsheetFileFactory.createNewSpreadsheetFile() :
-				spreadsheetFileFactory.createEditableSpreadsheetFileFromPath(templateFile);
-		return newSpreadsheetFile;
-	}
-
-	private void writeToSpreadsheetBookFile(
-			BookConfig bookConfig, SpreadsheetFile bookFile, Book basedOnBook) {
+	@Override
+	public Book loadAndProcessBook(
+			Path bookPath, boolean schemaValidate, boolean processTasks) {
 		
-		BookFileWriter bookFileWriter =  new BookFileWriter(bookConfig, bookFile, modelInstFactory);
-		if (basedOnBook == null) {
-			bookFileWriter.write();
-		} 
-		else {
-			bookFileWriter.writeWithTestDataFromExistingBook(basedOnBook);
-		}
-		bookFileWriter.deleteDefaultSheet();
+		return bookProcessor.loadAndProcessBook(bookPath, schemaValidate, processTasks);
 	}
 
 	@Override
-	public Book loadAndProcessBook(Path bookPath, boolean schemaValidate, boolean processTasks) {
-		return loadAndProcessBookWithLogOutput(bookPath, schemaValidate, processTasks, null, false);
-	}
-
-	@Override
-	public Book loadAndProcessBookWithLogOutput(Path bookPath, boolean schemaValidate, boolean processTasks,
+	public Book loadAndProcessBookWithLogOutput(
+			Path bookPath, boolean schemaValidate, boolean processTasks,
 			Path targetPath, boolean overwriteExisting) {
 
-		SpreadsheetFile spreadsheetFile = 
-				targetPath == null ? 
-				spreadsheetFileFactory.createReadOnlySpreadsheetFileFromPath(bookPath) : 
-				spreadsheetFileFactory.createEditableSpreadsheetFileFromPath(bookPath); 
-
-		Book book = bookFactory.getBook(spreadsheetFile);
-		
-		BookTestDataLoader loader = new BookTestDataLoader(book, spreadsheetFile);
-		loader.loadTestData();
-		
-		if (schemaValidate) {
-			BookSchemaValidator schemaValidator = new BookSchemaValidator(book, schemaValidatorFactory);
-			schemaValidator.validate();
-		}
-		
-		if (processTasks) {
-			TaskProcessor taskProcessor = new TaskProcessor.Builder(taskFactory, book).build();
-			taskProcessor.processTasks();
-		}
-		
-		if (targetPath != null) {
-			BookSpreadsheetLogWriter logWriter = new BookSpreadsheetLogWriter(book, spreadsheetFile);
-			logWriter.writeLog();
-			if (overwriteExisting) {
-				spreadsheetFile.save(targetPath);
-			}
-			else {
-				spreadsheetFile.saveAsNew(targetPath);
-			}
-		}
-		
-		return book;
+		return bookProcessor.loadAndProcessBookWithLogOutput(
+				bookPath, schemaValidate, processTasks, targetPath, overwriteExisting);
 	}
 
 	public static class Builder {
@@ -313,6 +230,9 @@ public class ProcessorImpl implements Processor {
 		private BookFactory bookFactory;
 		private SchemaValidatorFactory schemaValidatorFactory; 
 		private TaskFactory taskFactory;
+		
+		private ModelProcessor modelProcessor;
+		private BookProcessor bookProcessor;
 		
 		public Builder(Path schemasConfigRoot, Path booksConfigRoot) {
 			this.schemasConfigRoot = schemasConfigRoot;
@@ -391,7 +311,12 @@ public class ProcessorImpl implements Processor {
 		}
 
 		public Processor build() {
-			return new ProcessorImpl(this);
+			modelProcessor = new ModelProcessor();
+			bookProcessor = new BookProcessor();
+			Processor processor = new ProcessorImpl(this);
+			modelProcessor.setProcessor(processor);
+			bookProcessor.setProcessor(processor);
+			return processor;
 		}
 	}
 }

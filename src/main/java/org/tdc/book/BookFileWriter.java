@@ -53,7 +53,7 @@ public class BookFileWriter {
 		writeConfigSheet();
 	}
 	
-	public void deleteDefaultSheet() {
+	public void deleteDefaultSheetIfExists() {
 		// when using a template file, a default sheet will always exist 
 		// (because Excel won't save a file without at least one sheet);
 		String defaultSheetName = "Sheet1";

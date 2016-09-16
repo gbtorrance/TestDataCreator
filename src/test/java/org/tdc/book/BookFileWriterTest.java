@@ -5,13 +5,8 @@ import java.nio.file.Paths;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.tdc.config.model.ModelConfig;
-import org.tdc.modelcustomizer.ModelCustomizerWriter;
-import org.tdc.modeldef.ModelDef;
 import org.tdc.process.Processor;
 import org.tdc.process.ProcessorImpl;
-import org.tdc.spreadsheet.SpreadsheetFile;
-import org.tdc.spreadsheet.SpreadsheetFileFactory;
 import org.tdc.util.Addr;
 
 /**
@@ -53,55 +48,15 @@ public class BookFileWriterTest {
 	@Test
 	public void initCustomizer() {
 		Addr modelAddr = new Addr("Tax/efile1040x_2012v3.0/Model_1040A");
-		ModelConfig config = processor.getModelConfig(modelAddr);
-		ModelDef modelDef = processor.getModelDefFactory().getModelDef(config);
-		
-		SpreadsheetFileFactory factory = processor.getSpreadsheetFileFactory();
-		SpreadsheetFile spreadsheetFile = factory.createNewSpreadsheetFile();
-		
-		ModelCustomizerWriter writer = new ModelCustomizerWriter(
-				modelDef.getRootElement(), config.getModelCustomizerConfig(), spreadsheetFile, null);
-		writer.writeCustomizer();
-		
-		Path path = Paths.get("testfiles/Temp/Customizer2.xlsx");
-		spreadsheetFile.save(path);
+		Path targetPath = Paths.get("testfiles/Temp/Customizer2.xlsx");
+		processor.createCustomizer(modelAddr, targetPath, null, true);
 	}
 
 	@Test
 	public void initCustomizerFromPrevious() {
 		Addr modelAddr = new Addr("Tax/efile1040x_2012v3.0/Model_1040A");
-		ModelConfig config = processor.getModelConfig(modelAddr);
-		ModelDef modelDef = processor.getModelDefFactory().getModelDef(config);
-
-		Addr prevModelAddr = new Addr("Tax/efile1040x_2011v3.0/Model_1040A");
-		ModelConfig prevConfig = processor.getModelConfig(prevModelAddr);
-		ModelDef prevModelDef = processor.getModelDefFactory().getModelDef(prevConfig);
-
-		SpreadsheetFileFactory factory = processor.getSpreadsheetFileFactory();
-		SpreadsheetFile spreadsheetFile = factory.createNewSpreadsheetFile();
-		
-		ModelCustomizerWriter writer = new ModelCustomizerWriter(
-				modelDef.getRootElement(), config.getModelCustomizerConfig(), spreadsheetFile, prevModelDef.getMPathIndex());
-		writer.writeCustomizer();
-		
-		Path path = Paths.get("testfiles/Temp/Customizer3.xlsx");
-		spreadsheetFile.save(path);
+		Path targetPath = Paths.get("testfiles/Temp/Customizer3.xlsx");
+		Addr basedOnModelAddr = new Addr("Tax/efile1040x_2011v3.0/Model_1040A");
+		processor.createCustomizer(modelAddr, targetPath, basedOnModelAddr, true);
 	}
-
-//	@Test
-//	public void initCustomizer2011() {
-//		Addr modelAddr = new Addr("Tax/efile1040x_2011v3.0/Model_1040A");
-//		ModelConfig config = processor.getModelConfig(modelAddr);
-//		ModelDef modelDef = processor.getModelDefFactory().getModelDefSkipCustomization(config);
-//		
-//		SpreadsheetFileFactory factory = processor.getSpreadsheetFileFactory();
-//		SpreadsheetFile spreadsheetFile =  factory.createNewSpreadsheetFile();
-//		
-//		ModelCustomizerWriter writer = new ModelCustomizerWriter(
-//				modelDef.getRootElement(), config.getModelCustomizerConfig(), spreadsheetFile, null);
-//		writer.writeCustomizer();
-//		
-//		Path path = Paths.get("testfiles/TDCFiles/Schemas/Tax/efile1040x_2011v3.0/Model_1040A/Customizer.xlsx");
-//		spreadsheetFile.save(path);
-//	}
 }

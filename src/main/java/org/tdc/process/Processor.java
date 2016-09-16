@@ -55,6 +55,10 @@ public interface Processor {
 	boolean isBookConfig(Addr addr);
 	List<BookConfig> getAllBookConfigs(Map<Addr, Exception> errors);
 	
+	void createCustomizer(
+			Addr modelAddr, Path targetPath,
+			Addr basedOnModelAddr, boolean overwriteExisting);
+	
 	String getTargetBookFileExtension(Addr bookAddr);
 	
 	void createBook(
