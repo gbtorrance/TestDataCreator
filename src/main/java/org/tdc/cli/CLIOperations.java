@@ -294,7 +294,7 @@ public class CLIOperations {
 	}
 
 	private void verifyBasedOnBookIfExists(Path basedOnBookPath) {
-		if (Files.notExists(basedOnBookPath)) {
+		if (basedOnBookPath != null && Files.notExists(basedOnBookPath)) {
 			outputAndEnd("Based-on book " + basedOnBookPath + " does not exists");
 		}
 	}
@@ -329,10 +329,8 @@ public class CLIOperations {
 	}
 
 	private void verifyBasedOnModelIfExists(Addr basedOnModelAddr) {
-		if (basedOnModelAddr != null) {
-			if (!processor.isModelConfig(basedOnModelAddr)) {
-				outputAndEnd(basedOnModelAddr + " does not represent a Model Config address");
-			}
+		if (basedOnModelAddr != null && !processor.isModelConfig(basedOnModelAddr)) {
+			outputAndEnd(basedOnModelAddr + " does not represent a Model Config address");
 		}
 	}
 	
