@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Config>
+
+	<BookName>Test Various</BookName>
+	<BookDescription>Test Various</BookDescription>
+
+	<DocTypes>
+		<DocType>
+			<DocTypeName>Various</DocTypeName>
+			<MinPerTestCase>1</MinPerTestCase>
+			<MaxPerTestCase>1</MaxPerTestCase>
+		</DocType>
+	</DocTypes>
+	
+	<Pages>
+		<Page>
+			<PageName>Various</PageName>
+			<ModelAddress>/Test/TestSchemaV1.0/Model_TestVarious</ModelAddress>
+			<DocTypeName>Various</DocTypeName>
+			<DocIDRows>
+				<Row type="case-num">
+					<Label>Test Case Number</Label>
+				</Row>
+			</DocIDRows>
+			<NodeDetailColumns>
+				<Column>
+					<HeaderLabels><Label>Data</Label><Label>Type</Label></HeaderLabels>
+					<Width>3000</Width>
+					<Style><Italic>true</Italic></Style>
+					<ReadFromVariable>DATA_TYPE_FROM_SCHEMA</ReadFromVariable>
+				</Column>
+				<Column>
+					<HeaderLabels><Label>Data</Label><Label>Type (Verbose)</Label></HeaderLabels>
+					<Width>3000</Width>
+					<Style><Italic>true</Italic></Style>
+					<ReadFromVariable>DATA_TYPE_FROM_SCHEMA_VERBOSE</ReadFromVariable>
+				</Column>
+				<Column>
+					<HeaderLabels><Label>Occurs</Label></HeaderLabels>
+					<Width>2000</Width>
+					<ReadFromProperty>DispOccurs</ReadFromProperty>
+				</Column>
+			</NodeDetailColumns>
+		</Page>	
+	</Pages>
+	
+	<DefaultStyle>
+		<FontName>Calibri</FontName>
+		<FontHeight>11</FontHeight>
+	</DefaultStyle>
+	<DefaultHeaderStyle>
+		<Bold>true</Bold>
+	</DefaultHeaderStyle>
+	<DefaultNodeDetailColumnStyle>
+		<ShrinkToFit>true</ShrinkToFit>
+	</DefaultNodeDetailColumnStyle>
+	<DefaultNodeStyle/>
+	<ParentNodeStyle>
+		<ColorRGB>0 0 255</ColorRGB> <!-- blue -->
+	</ParentNodeStyle>
+	<AttribNodeStyle>
+		<ColorRGB>34 97 13</ColorRGB> <!-- green -->
+	</AttribNodeStyle>
+	<CompositorNodeStyle>
+		<ColorRGB>64 64 64</ColorRGB> <!-- dark gray -->
+		<Italic>true</Italic>
+	</CompositorNodeStyle>
+	<ChoiceMarkerStyle>
+		<ColorRGB>255 0 0</ColorRGB> <!-- red -->
+	</ChoiceMarkerStyle>
+	<OccurMarkerStyle>
+		<FontHeight>10</FontHeight>
+		<ColorRGB>107 36 12</ColorRGB> <!-- brown -->
+	</OccurMarkerStyle>
+	<NodeColumnCount>25</NodeColumnCount>
+	<NodeColumnWidth>500</NodeColumnWidth>
+	<HeaderRowCount>2</HeaderRowCount>
+	<NodeHeaderLabels>
+		<Label>Document Structure</Label>
+	</NodeHeaderLabels>
+	
+	<Tasks>
+		<Task id="export" type="default-export">
+			<ExportRoot>../../../../Temp/ExportRoot</ExportRoot>
+			<BatchDirPrefix>TestBatch</BatchDirPrefix>
+		</Task>
+	</Tasks>
+	
+</Config>

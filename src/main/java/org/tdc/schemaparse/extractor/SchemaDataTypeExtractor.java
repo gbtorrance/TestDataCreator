@@ -1,6 +1,6 @@
 package org.tdc.schemaparse.extractor;
 
-import org.apache.xerces.xs.XSTypeDefinition;
+import org.apache.xerces.xs.XSObject;
 import org.tdc.modeldef.NodeDef;
 
 /**
@@ -10,5 +10,5 @@ import org.tdc.modeldef.NodeDef;
  * @see DefaultDataTypeExtractor
  */
 public interface SchemaDataTypeExtractor extends SchemaExtractor {
-	void extractDataType(XSTypeDefinition xsTypeDef, NodeDef nodeDef);
+	void extractDataType(XSObject xsElementDeclOrAttribUse, NodeDef elementOrAttribDef);
 }

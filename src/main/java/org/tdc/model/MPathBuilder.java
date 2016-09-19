@@ -40,6 +40,10 @@ public class MPathBuilder {
 		return state.peekLast().getMPath();
 	}
 	
+	public String getLastValidMPath() {
+		return state.peekLast().getLastValidMPath();
+	}
+	
 	public void zoomIn() {
 		MPathState currentAddrState = state.peekLast();
 		if (!currentAddrState.hasMPath()) {
@@ -138,6 +142,10 @@ public class MPathBuilder {
 		
 		public boolean hasMPath() {
 			return mpath != null;
+		}
+		
+		public String getLastValidMPath() {
+			return mpath != null ? mpath : (parent != null ? parent.getMPath() : "");
 		}
 	}
 }

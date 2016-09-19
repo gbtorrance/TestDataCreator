@@ -4,11 +4,15 @@ import java.util.Collection;
 import java.util.LinkedHashMap;
 
 import org.apache.xerces.xs.StringList;
+import org.apache.xerces.xs.XSAttributeUse;
 import org.apache.xerces.xs.XSComplexTypeDefinition;
 import org.apache.xerces.xs.XSConstants;
+import org.apache.xerces.xs.XSElementDeclaration;
 import org.apache.xerces.xs.XSFacet;
+import org.apache.xerces.xs.XSObject;
 import org.apache.xerces.xs.XSSimpleTypeDefinition;
 import org.apache.xerces.xs.XSTypeDefinition;
+import org.apache.xerces.xs.XSValue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.tdc.config.XMLConfigWrapper;
@@ -22,7 +26,6 @@ import org.tdc.modeldef.NodeDef;
  * corresponding {@link NodeDef}s.
  */
 public class DefaultSchemaDataTypeExtractor implements SchemaDataTypeExtractor {
-	
 	private static final Logger log = LoggerFactory.getLogger(DefaultSchemaDataTypeExtractor.class);
 	
 	private final String variableName;
@@ -32,16 +35,28 @@ public class DefaultSchemaDataTypeExtractor implements SchemaDataTypeExtractor {
 		this.variableName = variableName;
 		this.verbose = verbose;
 	}
-	
+
 	@Override
-	public void extractDataType(XSTypeDefinition type, NodeDef nodeDef) {
-		String dataType = verbose ?
-				extractDataTypeVerbose(type) :
-				extractDataTypeSimple(type);
-		nodeDef.setVariable(variableName, dataType);
+	public void extractDataType(XSObject xsElementDeclOrAttribUse, NodeDef elementOrAttribDef) {
+		String typeInfo = getDataType(xsElementDeclOrAttribUse);
+		elementOrAttribDef.setVariable(variableName, typeInfo);
 	}
 	
-	public String extractDataTypeVerbose(XSTypeDefinition type) {
+	private String getDataType(XSObject xsElementDeclOrAttribUse) {
+		String result;
+		XSTypeDefinition type = getType(xsElementDeclOrAttribUse);
+		if (verbose) {
+			String typeInfo = getDataTypeVerbose(type);
+			String valueConstraint = getValueConstraint(xsElementDeclOrAttribUse);
+			result = formatResult(typeInfo, valueConstraint);
+		}
+		else {
+			result = getDataTypeSimple(type); 
+		}
+		return result;
+	}
+
+	private String getDataTypeVerbose(XSTypeDefinition type) {
 		String result = "";
 		String typeName = getTypeNamesCascadeBases(type, 2);
 		if (type instanceof XSSimpleTypeDefinition) {
@@ -77,8 +92,8 @@ public class DefaultSchemaDataTypeExtractor implements SchemaDataTypeExtractor {
 		}
 		return result;
 	}
-	
-	public String extractDataTypeSimple(XSTypeDefinition type) {
+
+	private String getDataTypeSimple(XSTypeDefinition type) {
 		String result = "";
 		String typeName = getTypeNamesCascadeBases(type, 1);
 		if (type instanceof XSSimpleTypeDefinition) {
@@ -105,6 +120,26 @@ public class DefaultSchemaDataTypeExtractor implements SchemaDataTypeExtractor {
 		return result;
 	}
 	
+	private XSTypeDefinition getType(XSObject xsElementDeclOrAttribUse) {
+		XSTypeDefinition type;
+		if (xsElementDeclOrAttribUse instanceof XSElementDeclaration) {
+			XSElementDeclaration xsElementDecl = 
+					(XSElementDeclaration)xsElementDeclOrAttribUse;
+			type = xsElementDecl.getTypeDefinition();
+		}
+		else if (xsElementDeclOrAttribUse instanceof XSAttributeUse) {
+			XSAttributeUse xsAttributeUse = 
+					(XSAttributeUse)xsElementDeclOrAttribUse;
+			type = xsAttributeUse.getAttrDeclaration().getTypeDefinition();
+		}
+		else {
+			throw new IllegalStateException("XSObjects of type " + 
+					xsElementDeclOrAttribUse.getClass().getName() + 
+					" not supported; must be XSElementDeclaration or XSAttributeUse");
+		}
+		return type;
+	}
+
 	private String getTypeNamesCascadeBases(XSTypeDefinition type, int maxNames) {
 		String result = "";
 		int count = 0;
@@ -179,6 +214,54 @@ public class DefaultSchemaDataTypeExtractor implements SchemaDataTypeExtractor {
 		return ignore;
 	}
 
+	private String getValueConstraint(XSObject xsElementDeclOrAttribUse) {
+		String result;
+		if (xsElementDeclOrAttribUse instanceof XSElementDeclaration) {
+			XSElementDeclaration xsElementDecl = 
+					(XSElementDeclaration)xsElementDeclOrAttribUse;
+			result = getValueConstraint(
+					xsElementDecl.getConstraintType(),
+					xsElementDecl.getValueConstraintValue());
+		}
+		else if (xsElementDeclOrAttribUse instanceof XSAttributeUse) {
+			XSAttributeUse xsAttribUse = 
+					(XSAttributeUse)xsElementDeclOrAttribUse;
+			result = getValueConstraint(
+					xsAttribUse.getConstraintType(), 
+					xsAttribUse.getValueConstraintValue());
+			if (result.length() == 0) {
+				result = getValueConstraint(
+						xsAttribUse.getAttrDeclaration().getConstraintType(), 
+						xsAttribUse.getAttrDeclaration().getValueConstraintValue());
+			}
+		}
+		else {
+			throw new IllegalStateException("XSObjects of type " + 
+					xsElementDeclOrAttribUse.getClass().getName() + 
+					" not supported; must be XSElementDeclaration or XSAttributeUse");
+		}
+		return result;
+	}
+	
+	private String getValueConstraint(short vcType, XSValue vcValue) {
+		String result = "";
+		if (vcType != XSConstants.VC_NONE) {
+			String vcTypeStr = valueConstraintToString(vcType);
+			String value = vcValue.getNormalizedValue();
+			result = vcTypeStr + ": '" + value + "'";
+		}
+		return result;
+	}
+
+	private String valueConstraintToString(short vcType) {
+		switch (vcType) {
+		case XSConstants.VC_NONE: return "none";
+		case XSConstants.VC_FIXED: return "fixed";
+		case XSConstants.VC_DEFAULT: return "default";
+		default: throw new RuntimeException("Value Constraint " + vcType + " not supported");
+		}
+	}
+	
 	private String getUnionCascade(XSSimpleTypeDefinition simpleType) {
 		String result = "";
 		XSSimpleTypeDefinition currentSimpleType = simpleType;
@@ -187,7 +270,7 @@ public class DefaultSchemaDataTypeExtractor implements SchemaDataTypeExtractor {
 				result = "union: ";
 				for (int i = 0; i < currentSimpleType.getMemberTypes().getLength(); i++) {
 					XSSimpleTypeDefinition member = (XSSimpleTypeDefinition)currentSimpleType.getMemberTypes().get(i);
-					result += (i == 0 ? "{" : " + {") + extractDataTypeVerbose(member) + "}";
+					result += (i == 0 ? "{" : " + {") + getDataTypeVerbose(member) + "}";
 				}
 				break;
 			}
@@ -202,7 +285,7 @@ public class DefaultSchemaDataTypeExtractor implements SchemaDataTypeExtractor {
 		while (currentSimpleType != null) {
 			if (currentSimpleType.getVariety() == XSSimpleTypeDefinition.VARIETY_LIST) {
 				XSSimpleTypeDefinition item = (XSSimpleTypeDefinition)currentSimpleType.getItemType();
-				result = "list: {" + extractDataTypeVerbose(item) + "}";
+				result = "list: {" + getDataTypeVerbose(item) + "}";
 				break;
 			}
 			currentSimpleType = (XSSimpleTypeDefinition)currentSimpleType.getBaseType(); 

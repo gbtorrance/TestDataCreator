@@ -11,6 +11,7 @@ import org.apache.xerces.xs.XSComplexTypeDefinition;
 import org.apache.xerces.xs.XSElementDeclaration;
 import org.apache.xerces.xs.XSModel;
 import org.apache.xerces.xs.XSModelGroup;
+import org.apache.xerces.xs.XSObject;
 import org.apache.xerces.xs.XSObjectList;
 import org.apache.xerces.xs.XSParticle;
 import org.apache.xerces.xs.XSSimpleTypeDefinition;
@@ -61,7 +62,10 @@ public class ModelDefSchemaParser {
 		this.schemaExtractors = builder.schemaExtractors;
 	}
 	
-	public ElementNodeDef buildModelDefTreeFromSchema(String rootElementName, String rootElementNamespace) {
+	public ElementNodeDef buildModelDefTreeFromSchema(
+			String rootElementName, 
+			String rootElementNamespace) {
+
 		rowOffset = 0;
 		XSElementDeclaration ed = xsModel.getElementDeclaration(rootElementName, rootElementNamespace);
 
@@ -76,7 +80,11 @@ public class ModelDefSchemaParser {
 		return rootElementNodeDef;
 	}
 	
-	private void processElementDeclaration(XSElementDeclaration xsElementDecl, ElementNodeDef elementNodeDef, int colOffset) {
+	private void processElementDeclaration(
+			XSElementDeclaration xsElementDecl, 
+			ElementNodeDef elementNodeDef, 
+			int colOffset) {
+		
 		// set the name
 		elementNodeDef.setName(xsElementDecl.getName());
 		elementNodeDef.setMPath(buildMPath(elementNodeDef));
@@ -85,6 +93,9 @@ public class ModelDefSchemaParser {
 		mpathBuilder.zoomIn();
 		addElementToElementPath(elementNodeDef.getName());
 		colOffset++;
+		
+		// process data type
+		processDataType(xsElementDecl, elementNodeDef);
 
 		// elements can be of a simple type or complex type
 		XSTypeDefinition xsTypeDef = xsElementDecl.getTypeDefinition();
@@ -109,12 +120,18 @@ public class ModelDefSchemaParser {
 		mpathBuilder.zoomOut();
 	}
 	
-	private void processSimpleTypeDefinition(XSSimpleTypeDefinition xsSimpleTypeDef, ElementNodeDef elementNodeDef) {
-		processDataType(xsSimpleTypeDef, elementNodeDef);
+	private void processSimpleTypeDefinition(
+			XSSimpleTypeDefinition xsSimpleTypeDef, 
+			ElementNodeDef elementNodeDef) {
+		
 		// TODO Anything to do for restriction/list/union ... or restriction/extension? 
 	}
 	
-	private void processComplexTypeDefinition(XSComplexTypeDefinition xsComplexTypeDef, ElementNodeDef elementNodeDef, int colOffset) {
+	private void processComplexTypeDefinition(
+			XSComplexTypeDefinition xsComplexTypeDef, 
+			ElementNodeDef elementNodeDef, 
+			int colOffset) {
+		
 		// process attributes
 		processAttributes(xsComplexTypeDef, elementNodeDef, colOffset);
 		
@@ -138,7 +155,7 @@ public class ModelDefSchemaParser {
 			// set with the "mixed" attribute!
 			// refers to a "letter" type of content (with mixed text and embedded elements (order defined by sequence, choice, etc.) 
 			// [confirmed that getParticle() only applies to ELEMENT and MIXED content types]
-			// Note: we're allowing MIXED types, but there is no is no practical way in MDC to represent the 
+			// Note: we're allowing MIXED types, but there is no is no practical way in TDC to represent the 
 			//       "letter" part, so that will be ignored
 
 			// CONTENTTYPE_EMPTY
@@ -146,13 +163,13 @@ public class ModelDefSchemaParser {
 
 			// set type
 			// applicable to ELEMENT, MIXED, and EMPTY
-			processDataType(xsComplexTypeDef, elementNodeDef);
 
 			// process particle 
-			// applicable to ELEMENT and MIXED only
-			if (xsComplexTypeDef.getContentType() == XSComplexTypeDefinition.CONTENTTYPE_ELEMENT ||
-				xsComplexTypeDef.getContentType() == XSComplexTypeDefinition.CONTENTTYPE_MIXED) {
-				
+			// applicable to ELEMENT and MIXED only;
+			// however, since this tool has no true way to represent MIXED content in the model tree,
+			// other than simply embedding it in a test value, we will *not* go the particle
+			// route for MIXED content; ELEMENT content only
+			if (xsComplexTypeDef.getContentType() == XSComplexTypeDefinition.CONTENTTYPE_ELEMENT) {
 				processParticle(xsComplexTypeDef.getParticle(), elementNodeDef, colOffset);
 			}
 		}
@@ -162,7 +179,11 @@ public class ModelDefSchemaParser {
 		}
 	}
 	
-	private void processParticle(XSParticle xsParticle, NonAttribNodeDef nonAttribNodeDef, int colOffset) {
+	private void processParticle(
+			XSParticle xsParticle, 
+			NonAttribNodeDef nonAttribNodeDef, 
+			int colOffset) {
+		
 		// get term
 		XSTerm xsTerm = (XSTerm)xsParticle.getTerm();
 		
@@ -180,7 +201,8 @@ public class ModelDefSchemaParser {
 				// create new element (with current element as parent)
 				ElementNodeDef newElementNodeDef = new ElementNodeDef(nonAttribNodeDef, sharedState);
 				newElementNodeDef.setMinOccurs(xsParticle.getMinOccurs());
-				newElementNodeDef.setMaxOccurs(xsParticle.getMaxOccursUnbounded() ? NonAttribNodeDef.MAX_UNBOUNDED : xsParticle.getMaxOccurs());
+				newElementNodeDef.setMaxOccurs(xsParticle.getMaxOccursUnbounded() ? 
+						NonAttribNodeDef.MAX_UNBOUNDED : xsParticle.getMaxOccurs());
 				
 				// add new element as child of current element
 				nonAttribNodeDef.addChild(newElementNodeDef);
@@ -190,7 +212,6 @@ public class ModelDefSchemaParser {
 			}
 		}
 		else if (xsTerm instanceof XSModelGroup) {
-			
 			// model groups types are "sequence", "choice", "all"
 			XSModelGroup xsModelGroup = (XSModelGroup)xsTerm;
 
@@ -200,7 +221,8 @@ public class ModelDefSchemaParser {
 			compositorNodeDef.setColOffset(colOffset);
 			compositorNodeDef.setRowOffset(rowOffset++);
 			compositorNodeDef.setMinOccurs(xsParticle.getMinOccurs());
-			compositorNodeDef.setMaxOccurs(xsParticle.getMaxOccursUnbounded() ? NonAttribNodeDef.MAX_UNBOUNDED : xsParticle.getMaxOccurs());
+			compositorNodeDef.setMaxOccurs(xsParticle.getMaxOccursUnbounded() ? 
+					NonAttribNodeDef.MAX_UNBOUNDED : xsParticle.getMaxOccurs());
 			
 			// add new compositor node as child of current element
 			nonAttribNodeDef.addChild(compositorNodeDef);
@@ -214,19 +236,27 @@ public class ModelDefSchemaParser {
 			}
 		} 
 		else if (xsTerm instanceof XSWildcard) {
-			
 			// "any"
 			
 			// TODO How to handle Wildcards??
-			throw new UnsupportedOperationException("Does not support 'wildcards'");
+			// this may never be called, since we no longer call processParticle()
+			// from processComplexTypeDefinition() when ContentType == CONTENT_TYPE_MIXED;
+			throw new UnsupportedOperationException(
+					"Does not support 'wildcards'; mpath: " + getLastValidMPath());
 		}
 		else {
-			// should *never* occur; throw unchecked exception to indicate failure to properly understand XSD model 
-			throw new UnsupportedOperationException("Unknown term: " + xsTerm.getName());
+			// should *never* occur; throw unchecked exception to 
+			// indicate failure to properly understand XSD model 
+			throw new UnsupportedOperationException(
+					"Unknown term: " + xsTerm.getName() + "; mpath: " + getLastValidMPath());
 		}
 	}
 	
-	private void processModelGroup(XSModelGroup xsModelGroup, CompositorNodeDef compositorNodeDef, int colOffset) {
+	private void processModelGroup(
+			XSModelGroup xsModelGroup, 
+			CompositorNodeDef compositorNodeDef, 
+			int colOffset) {
+		
 		// note: model groups do not have names; leave as null
 		
 		// iterate through particle children of model group
@@ -244,7 +274,11 @@ public class ModelDefSchemaParser {
 		mpathBuilder.zoomOut();
 	}
 	
-	private void processAttributes(XSComplexTypeDefinition xsComplexTypeDef, ElementNodeDef elementNodeDef, int colOffset) {
+	private void processAttributes(
+			XSComplexTypeDefinition xsComplexTypeDef, 
+			ElementNodeDef elementNodeDef, 
+			int colOffset) {
+		
 		XSObjectList xsObjectList = xsComplexTypeDef.getAttributeUses();
 		if (xsObjectList != null) {
 			for (int i = 0; i < xsObjectList.getLength(); i++) {
@@ -258,23 +292,31 @@ public class ModelDefSchemaParser {
 				attribNodeDef.setColOffset(colOffset);
 				attribNodeDef.setRowOffset(rowOffset++);
 				attribNodeDef.setRequired(attribUse.getRequired());
-				XSSimpleTypeDefinition attribType = attribDecl.getTypeDefinition();
-				processDataType(attribType, attribNodeDef);
+				processDataType(attribUse, attribNodeDef);
 				processAttribAnnotation(attribDecl, attribNodeDef);
 				elementNodeDef.addAttribute(attribNodeDef);
 			}
 		}
 	}
 	
-	private void processElementAnnotation(XSElementDeclaration xsElementDecl, ElementNodeDef elementNodeDef) {
+	private void processElementAnnotation(
+			XSElementDeclaration xsElementDecl, 
+			ElementNodeDef elementNodeDef) {
+		
 		processAnnotation(xsElementDecl.getAnnotation(), elementNodeDef);
 	}
 
-	private void processAttribAnnotation(XSAttributeDeclaration xsAttribDecl, AttribNodeDef attribNodeDef) {
+	private void processAttribAnnotation(
+			XSAttributeDeclaration xsAttribDecl, 
+			AttribNodeDef attribNodeDef) {
+		
 		processAnnotation(xsAttribDecl.getAnnotation(), attribNodeDef);
 	}
 
-	private void processAnnotation(XSAnnotation xsAnnotation, NodeDef nodeDef) {
+	private void processAnnotation(
+			XSAnnotation xsAnnotation, 
+			NodeDef nodeDef) {
+		
 		for (SchemaExtractor extractor : schemaExtractors) {
 			if (extractor instanceof SchemaAnnotationExtractor) {
 				SchemaAnnotationExtractor e = (SchemaAnnotationExtractor)extractor;
@@ -283,22 +325,33 @@ public class ModelDefSchemaParser {
 		}
 	}
 	
-	private void processDataType(XSTypeDefinition xsTypeDef, NodeDef nodeDef) {
+	private void processDataType(
+			XSObject xsElementDeclOrAttribUse, 
+			NodeDef elementOrAttribDef) {
+		
 		for (SchemaExtractor extractor : schemaExtractors) {
 			if (extractor instanceof SchemaDataTypeExtractor) {
 				SchemaDataTypeExtractor e = (SchemaDataTypeExtractor)extractor;
-				e.extractDataType(xsTypeDef, nodeDef);
+				e.extractDataType(xsElementDeclOrAttribUse, elementOrAttribDef);
 			}
 		}
 	}
 	
-	private CompositorNodeDef createCompositorNode(NonAttribNodeDef parent, XSModelGroup mg) {
+	private CompositorNodeDef createCompositorNode(
+			NonAttribNodeDef parent, 
+			XSModelGroup mg) {
+		
 		switch(mg.getCompositor()) {
-			case XSModelGroup.COMPOSITOR_SEQUENCE: return new CompositorNodeDef(parent, sharedState, CompositorType.SEQUENCE);
-			case XSModelGroup.COMPOSITOR_CHOICE: return new CompositorNodeDef(parent, sharedState, CompositorType.CHOICE);
-			case XSModelGroup.COMPOSITOR_ALL: return new CompositorNodeDef(parent, sharedState, CompositorType.ALL);
-			// should *never* occur; throw unchecked exception to indicate failure to properly understand XSD model 
-			default: throw new UnsupportedOperationException("Invalid compositor: " + mg.getCompositor());
+			case XSModelGroup.COMPOSITOR_SEQUENCE: 
+				return new CompositorNodeDef(parent, sharedState, CompositorType.SEQUENCE);
+			case XSModelGroup.COMPOSITOR_CHOICE: 
+				return new CompositorNodeDef(parent, sharedState, CompositorType.CHOICE);
+			case XSModelGroup.COMPOSITOR_ALL: 
+				return new CompositorNodeDef(parent, sharedState, CompositorType.ALL);
+			// should *never* occur; throw unchecked exception to indicate 
+			// failure to properly understand XSD model 
+			default: throw new UnsupportedOperationException(
+					"Invalid compositor: " + mg.getCompositor());
 		}
 	}
 	
@@ -306,6 +359,10 @@ public class ModelDefSchemaParser {
 		String mpath = mpathBuilder.buildMPath(nodeDef);
 		mpathIndex.addMPath(mpath, nodeDef);
 		return mpath;
+	}
+	
+	private String getLastValidMPath() {
+		return mpathBuilder.getLastValidMPath();
 	}
 	
 	private void addElementToElementPath(String name) {
@@ -358,4 +415,3 @@ public class ModelDefSchemaParser {
 		}
 	}
 }
-

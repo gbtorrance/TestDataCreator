@@ -123,18 +123,28 @@ public class ModelTest {
 //	public void test1() {
 //		String modelAddr = "Test/TestSchemaV1.0/Model_OldTest";
 //		System.out.println("--------------------------------------------------");
-//		outputModelDefSummary(mdAddr);
+//		outputModelDefSummary(modelAddr);
 //		System.out.println("--------------------------------------------------");
-//		outputModelDefMPath(mdAddr);
+//		outputModelDefMPath(modelAddr);
 //		System.out.println("--------------------------------------------------");
-//		outputModelInstSummary(miAddr);
+//		outputModelInstSummary(modelAddr);
 //		System.out.println("--------------------------------------------------");
-//		outputModelInstMPath(miAddr);
+//		outputModelInstMPath(modelAddr);
 //		compareModelDefSummary(modelAddr, "ModelDefSummary.txt");
 //		compareModelDefMPath(modelAddr, "ModelDefMPath.txt");
 //		compareModelInstSummary(modelAddr, "ModelInstSummary.txt");
 //		compareModelInstMPath(modelAddr, "ModelInstMPath.txt");
 //	}
+	
+	@Test
+	public void testVariousModelDefMpathCreatedCorrectly() {
+		compareModelDefMPath("Test/TestSchemaV1.0/Model_TestVarious", "ModelDefMPath_Various.txt");
+	}
+	
+	@Test
+	public void testVariousModelDefStructureCreatedCorrectly() {
+		compareModelDefSummary("Test/TestSchemaV1.0/Model_TestVarious", "ModelDefSummary_Various.txt");
+	}
 	
 	@Test
 	public void oldTestModelDefStructureCreatedCorrectly() {
