@@ -57,40 +57,51 @@ public class DefaultSchemaDataTypeExtractor implements SchemaDataTypeExtractor {
 	}
 
 	private String getDataTypeVerbose(XSTypeDefinition type) {
-		String result = "";
-		String typeName = getTypeNamesCascadeBases(type, 2);
+		String content;
 		if (type instanceof XSSimpleTypeDefinition) {
-			XSSimpleTypeDefinition simpleType = (XSSimpleTypeDefinition)type;
-			String union = getUnionCascade(simpleType);
-			String list = getListCascade(simpleType);
-			String length = getFacetPlusLabelCascade(simpleType, XSSimpleTypeDefinition.FACET_LENGTH);
-			String minLength = getFacetPlusLabelCascade(simpleType, XSSimpleTypeDefinition.FACET_MINLENGTH);
-			String maxLength = getFacetPlusLabelCascade(simpleType, XSSimpleTypeDefinition.FACET_MAXLENGTH);
-			String totalDigits = getFacetPlusLabelCascade(simpleType, XSSimpleTypeDefinition.FACET_TOTALDIGITS);
-			String fractionDigits = getFacetPlusLabelCascade(simpleType, XSSimpleTypeDefinition.FACET_FRACTIONDIGITS);
-			String minInclusive = getFacetPlusLabelCascade(simpleType, XSSimpleTypeDefinition.FACET_MININCLUSIVE);
-			String minExclusive = getFacetPlusLabelCascade(simpleType, XSSimpleTypeDefinition.FACET_MINEXCLUSIVE);
-			String maxInclusive = getFacetPlusLabelCascade(simpleType, XSSimpleTypeDefinition.FACET_MAXINCLUSIVE);
-			String maxExclusive = getFacetPlusLabelCascade(simpleType, XSSimpleTypeDefinition.FACET_MAXEXCLUSIVE);
-			String whitespace = getFacetPlusLabelCascade(simpleType, XSSimpleTypeDefinition.FACET_WHITESPACE);
-			String pattern = getPatternPlusLabelCascade(simpleType);
-			String enumeration = getEnumerationPlusLabelCascade(simpleType);
-			result = formatResult(
-					typeName, union, list, 
-					length, minLength, maxLength, 
-					totalDigits, fractionDigits, 
-					minInclusive, minExclusive, maxInclusive, maxExclusive, 
-					whitespace, 
-					pattern, 
-					enumeration);
+			XSSimpleTypeDefinition simpleType = (XSSimpleTypeDefinition)type;			
+			content = getSimpleContentVerbose(simpleType);
 		}
 		else {
 			XSComplexTypeDefinition complexType = (XSComplexTypeDefinition)type;
-			String extension = complexType.getDerivationMethod() == 
-					XSConstants.DERIVATION_EXTENSION ? "extension" : "";
-			result = formatResult(typeName, extension);
+			content = getComplexContentVerbose(complexType);
 		}
-		return result;
+		String typeName = getTypeNamesCascadeBases(type, 2);
+		return formatResult(typeName, content);
+	}
+	
+	private String getComplexContentVerbose(XSComplexTypeDefinition complexType) {
+		String extension = complexType.getDerivationMethod() == 
+				XSConstants.DERIVATION_EXTENSION ? "extension" : "";
+		String content = complexType.getSimpleType() == null ? 
+				"complexContent" :
+				getSimpleContentVerbose((XSSimpleTypeDefinition)complexType.getSimpleType());
+		return formatResult(extension, content);
+	}
+	
+	private String getSimpleContentVerbose(XSSimpleTypeDefinition simpleType) {
+		String union = getUnionCascade(simpleType);
+		String list = getListCascade(simpleType);
+		String length = getFacetPlusLabelCascade(simpleType, XSSimpleTypeDefinition.FACET_LENGTH);
+		String minLength = getFacetPlusLabelCascade(simpleType, XSSimpleTypeDefinition.FACET_MINLENGTH);
+		String maxLength = getFacetPlusLabelCascade(simpleType, XSSimpleTypeDefinition.FACET_MAXLENGTH);
+		String totalDigits = getFacetPlusLabelCascade(simpleType, XSSimpleTypeDefinition.FACET_TOTALDIGITS);
+		String fractionDigits = getFacetPlusLabelCascade(simpleType, XSSimpleTypeDefinition.FACET_FRACTIONDIGITS);
+		String minInclusive = getFacetPlusLabelCascade(simpleType, XSSimpleTypeDefinition.FACET_MININCLUSIVE);
+		String minExclusive = getFacetPlusLabelCascade(simpleType, XSSimpleTypeDefinition.FACET_MINEXCLUSIVE);
+		String maxInclusive = getFacetPlusLabelCascade(simpleType, XSSimpleTypeDefinition.FACET_MAXINCLUSIVE);
+		String maxExclusive = getFacetPlusLabelCascade(simpleType, XSSimpleTypeDefinition.FACET_MAXEXCLUSIVE);
+		String whitespace = getFacetPlusLabelCascade(simpleType, XSSimpleTypeDefinition.FACET_WHITESPACE);
+		String pattern = getPatternPlusLabelCascade(simpleType);
+		String enumeration = getEnumerationPlusLabelCascade(simpleType);
+		return formatResult(
+				union, list, 
+				length, minLength, maxLength, 
+				totalDigits, fractionDigits, 
+				minInclusive, minExclusive, maxInclusive, maxExclusive, 
+				whitespace, 
+				pattern, 
+				enumeration);
 	}
 
 	private String getDataTypeSimple(XSTypeDefinition type) {

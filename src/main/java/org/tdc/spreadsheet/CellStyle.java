@@ -7,7 +7,7 @@ import java.awt.Color;
  */
 public interface CellStyle {
 	String getFontName();
-	double getFontHeight();
+	Double getFontHeight();
 	Color getColor();
 	String getColorRGB();
 	int getColorRed();
@@ -18,7 +18,9 @@ public interface CellStyle {
 	int getFillColorRed();
 	int getFillColorGreen();
 	int getFillColorBlue();
-	boolean getItalic();
-	boolean getBold();
-	boolean getShrinkToFit();
+	Boolean getItalic();
+	Boolean getBold();
+	Boolean getShrinkToFit();
+	CellAlignment getAlignment();
+	String getFormat();
 }

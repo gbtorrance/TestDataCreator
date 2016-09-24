@@ -27,7 +27,7 @@ public enum DocIDType {
 	
 	public static DocIDType getDocIDTypeByConfigType(String configType) {
 		for (DocIDType docIDType : DocIDType.values()) {
-			if (docIDType.getConfigType().equals(configType)) {
+			if (docIDType.getConfigType().equalsIgnoreCase(configType)) {
 				return docIDType;
 			}
 		}

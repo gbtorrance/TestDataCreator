@@ -38,7 +38,6 @@ public class ModelCustomizerWriter extends AbstractModelCustomizer {
 	
 	public void writeCustomizer() {
 		getSpreadsheetFile().createSpreadsheet(CUSTOMIZER_SHEET_NAME);
-		getCustomizerSheet().setDefaultCellStyle(getConfig().getDefaultNodeStyle());
 		maxColumns = 0;
 		processTree();
 		formatColumns();

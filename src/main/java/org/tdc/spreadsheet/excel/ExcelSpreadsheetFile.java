@@ -7,6 +7,7 @@ import java.nio.file.Path;
 import java.util.Map;
 
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.tdc.spreadsheet.CellStyle;
 import org.tdc.spreadsheet.Spreadsheet;
 import org.tdc.spreadsheet.SpreadsheetFile;
 import org.tdc.util.Util;
@@ -17,10 +18,12 @@ import org.tdc.util.Util;
 public class ExcelSpreadsheetFile implements SpreadsheetFile {
 
 	private final XSSFWorkbook workbook;
+	private final ExcelStyleManager styleManager;
 	private final Map<String, Spreadsheet> spreadsheets;
 
 	private ExcelSpreadsheetFile(Builder builder) {
 		this.workbook = builder.workbook;
+		this.styleManager = builder.styleManager;
 		this.spreadsheets = builder.spreadsheets;
 	}
 
@@ -31,7 +34,7 @@ public class ExcelSpreadsheetFile implements SpreadsheetFile {
 
 	@Override
 	public Spreadsheet createSpreadsheet(String name) {
-		Spreadsheet spreadsheet = new ExcelSpreadsheet.Builder(workbook).build(name);
+		Spreadsheet spreadsheet = new ExcelSpreadsheet.Builder(workbook, styleManager).build(name);
 		spreadsheets.put(spreadsheet.getName(), spreadsheet);
 		return spreadsheet;
 	}
@@ -45,6 +48,11 @@ public class ExcelSpreadsheetFile implements SpreadsheetFile {
 		spreadsheets.remove(name);
 		int index = workbook.getSheetIndex(name);
 		workbook.removeSheetAt(index);
+	}
+
+	@Override
+	public void setDefaultCellStyle(CellStyle style) {
+		styleManager.setDefaultStyle(style);
 	}
 
 	@Override
@@ -74,7 +82,6 @@ public class ExcelSpreadsheetFile implements SpreadsheetFile {
 		catch (IOException e) {
 			throw new RuntimeException("Unable to close ExcelSpreadsheetFile", e);
 		}
-
 	}
 
 	@Override
@@ -89,6 +96,7 @@ public class ExcelSpreadsheetFile implements SpreadsheetFile {
 	public static class Builder {
 		private final XSSFWorkbook workbook;
 
+		private ExcelStyleManager styleManager;
 		private Map<String, Spreadsheet> spreadsheets;
 
 		public Builder(XSSFWorkbook workbook) {
@@ -96,7 +104,8 @@ public class ExcelSpreadsheetFile implements SpreadsheetFile {
 		}
 
 		public SpreadsheetFile build() {
-			spreadsheets = new ExcelSpreadsheet.Builder(workbook).buildAll();
+			styleManager = new ExcelStyleManager(workbook); 
+			spreadsheets = new ExcelSpreadsheet.Builder(workbook, styleManager).buildAll();
 			return new ExcelSpreadsheetFile(this);
 		}
 	}

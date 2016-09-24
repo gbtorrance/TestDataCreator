@@ -1,6 +1,5 @@
 package org.tdc.config;
 
-import java.awt.Color;
 import java.io.File;
 import java.nio.file.Path;
 import java.util.NoSuchElementException;
@@ -9,6 +8,7 @@ import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.XMLConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.tdc.spreadsheet.CellAlignment;
 import org.tdc.spreadsheet.CellStyle;
 import org.tdc.spreadsheet.CellStyleImpl;
 
@@ -29,6 +29,8 @@ public class XMLConfigWrapper {
 	private static final String ITEM_STYLE_ITALIC = "Italic";
 	private static final String ITEM_STYLE_BOLD = "Bold";
 	private static final String ITEM_STYLE_SHRINK_TO_FIT = "ShrinkToFit";
+	private static final String ITEM_STYLE_ALIGNMENT = "Alignment";
+	private static final String ITEM_STYLE_FORMAT = "Format";
 	
 	private final XMLConfiguration config;
 	
@@ -41,7 +43,9 @@ public class XMLConfigWrapper {
 			throw new IllegalStateException("Configuration file does not exist: " + file); 
 		}
 		try {
-			this.config = new XMLConfiguration(file);
+			this.config = new XMLConfiguration();
+			config.setDelimiterParsingDisabled(true);
+			config.load(file);
 		} 
 		catch (ConfigurationException e) {
 			throw new IllegalStateException("Unable to read configuration file: " + file, e);
@@ -66,6 +70,13 @@ public class XMLConfigWrapper {
 		return result;
 	}
 	
+	public Integer getInt(String key, Integer defaultValue, boolean required) {
+		boolean found = validateRequired(key, required);
+		Integer result = config.getInt(key, defaultValue);
+		logKeyValue(key, "" + result, !found);
+		return result;
+	}
+	
 	public double getDouble(String key, double defaultValue, boolean required) {
 		boolean found = validateRequired(key, required);
 		double result = config.getDouble(key, defaultValue);
@@ -73,10 +84,24 @@ public class XMLConfigWrapper {
 		return result;
 	}
 
+	public Double getDouble(String key, Double defaultValue, boolean required) {
+		boolean found = validateRequired(key, required);
+		Double result = config.getDouble(key, defaultValue);
+		logKeyValue(key, "" + result, !found);
+		return result;
+	}
+
 	public boolean getBoolean(String key, boolean defaultValue, boolean required) {
 		boolean found = validateRequired(key, required);
 		boolean result = config.getBoolean(key, defaultValue);
 		logKeyValue(key, Boolean.toString(result), !found);
+		return result;
+	}
+	
+	public Boolean getBoolean(String key, Boolean defaultValue, boolean required) {
+		boolean found = validateRequired(key, required);
+		Boolean result = config.getBoolean(key, defaultValue);
+		logKeyValue(key, "" + result, !found);
 		return result;
 	}
 	
@@ -109,85 +134,28 @@ public class XMLConfigWrapper {
 		}
 		return labels;
 	}
-
+	
 	public CellStyle getCellStyle(String key, CellStyle defaultValue, boolean required) {
-		CellStyle result = null;
-		if (hasNode(key)) {
-			// style element exists;
-			// extract info from style
-			String defaultFontName = defaultValue == null ? null : defaultValue.getFontName();
-			String fontName = getString(key + "." + ITEM_STYLE_FONT_NAME, defaultFontName, false);
-			
-			double defaultFontHeight = defaultValue == null ? 0 : defaultValue.getFontHeight();
-			double fontHeight = getDouble(key + "." + ITEM_STYLE_FONT_HEIGHT, defaultFontHeight, false);
-			
-			String colorRGBDefault = defaultValue == null ? null : defaultValue.getColorRGB();
-			String colorRGB = getString(key + "." + ITEM_STYLE_COLOR_RGB, colorRGBDefault, false);
-			Color color = colorRGB == null ? null : createColorFromRGB(colorRGB);
-			
-			String fillColorRGBDefault = defaultValue == null ? null : defaultValue.getFillColorRGB();
-			String fillColorRGB = getString(key + "." + ITEM_STYLE_FILL_COLOR_RGB, fillColorRGBDefault, false);
-			Color fillColor = fillColorRGB == null ? null : createColorFromRGB(fillColorRGB);
-			
-			boolean italicDefault = defaultValue == null ? false : defaultValue.getItalic();
-			boolean italic = getBoolean(key + "." + ITEM_STYLE_ITALIC, italicDefault, false);
-			
-			boolean boldDefault = defaultValue == null ? false : defaultValue.getBold();
-			boolean bold = getBoolean(key + "." + ITEM_STYLE_BOLD, boldDefault, false);
-			
-			boolean shrinkToFitDefault = defaultValue == null ? false : defaultValue.getShrinkToFit();
-			boolean shrinkToFit = getBoolean(key + "." + ITEM_STYLE_SHRINK_TO_FIT, shrinkToFitDefault, false);
-			
-			// ensure we have the bare minimum needed to create a style
-			if (fontName == null || fontHeight == 0) {
-				String msg = "Style '" + key + "' (or associated default style) must have at least a " +
-						ITEM_STYLE_FONT_NAME + " and a " + ITEM_STYLE_FONT_HEIGHT + " element";
-				throw new NoSuchElementException(msg);
-			}
-			
-			// create style
-			result = new CellStyleImpl(fontName, fontHeight, color, fillColor, italic, bold, shrinkToFit);
+		if (required && !hasNode(key)) {
+			throwConfigItemNotFoundException(key);
 		}
-		else {
-			// style parent element does NOT exist
-			if (required) {
-				// at least some style information is required;
-				// even if it's just an empty style element; error
-				throwConfigItemNotFoundException(key);
-			}
-			else {
-				// return default value, whether it's null or not; 
-				// don't care; style info is not required
-				result = defaultValue;
-			}
-		}
-		logKeyValue(key, result.toString(), result == defaultValue);
-		return result;
-	}
-	
-	private Color createColorFromRGB(String colorRGB) {
-		Color color = null;
-		String[] colorSplit = colorRGB.split("[ ]+");
-		boolean validFormat = colorSplit.length == 3;
-		if (validFormat) { 
-			try {
-				int red = Integer.parseUnsignedInt(colorSplit[0]);
-				int green = Integer.parseUnsignedInt(colorSplit[1]);
-				int blue = Integer.parseUnsignedInt(colorSplit[2]);
-				color = new Color(red, green, blue);
-			}
-			catch (NumberFormatException ex) {
-				validFormat = false;
-			}
-		}
-	
-		if (!validFormat) {
-			throw new RuntimeException(ITEM_STYLE_COLOR_RGB + 
-					" must contain 3 non-negative integer values separated by spaces; '" + 
-					colorRGB + "' is not valid");
-		}
-		
-		return color;
+		String alignmentStr = getString(key + "." + ITEM_STYLE_ALIGNMENT, null, false);
+		CellAlignment alignment = alignmentStr == null ? 
+				null : CellAlignment.getCellAlignmentByConfigType(alignmentStr);
+		CellStyle style = new CellStyleImpl.Builder()
+				.setFrom(defaultValue)
+				.setFontNameIfProvided(getString(key + "." + ITEM_STYLE_FONT_NAME, null, false))
+				.setFontHeightIfProvided(getDouble(key + "." + ITEM_STYLE_FONT_HEIGHT, null, false))
+				.setColorIfProvided(getString(key + "." + ITEM_STYLE_COLOR_RGB, null, false))
+				.setFillColorIfProvided(getString(key + "." + ITEM_STYLE_FILL_COLOR_RGB, null, false))
+				.setItalicIfProvided(getBoolean(key + "." + ITEM_STYLE_ITALIC, null, false))
+				.setBoldIfProvided(getBoolean(key + "." + ITEM_STYLE_BOLD, null, false))
+				.setShrinkToFitIfProvided(getBoolean(key + "." + ITEM_STYLE_SHRINK_TO_FIT, null, false))
+				.setAlignmentIfProvided(alignment)
+				.setFormatIfProvided(getString(key + "." + ITEM_STYLE_FORMAT, null, false))
+				.build();
+		logKeyValue(key, style.toString(), style.equals(defaultValue));
+		return style;
 	}
 
 	/**

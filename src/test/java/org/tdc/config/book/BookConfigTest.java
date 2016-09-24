@@ -63,26 +63,26 @@ public class BookConfigTest {
 		style = bookConfig.getDefaultStyle();
 		assertThat(style.getFontName()).isEqualTo("Calibri");
 		assertThat(style.getFontHeight()).isEqualTo(11);
-		assertThat(style.getBold()).isEqualTo(false);
-		assertThat(style.getItalic()).isEqualTo(false);
+		assertThat(style.getBold()).isNull();
+		assertThat(style.getItalic()).isNull();
 		assertThat(style.getColor()).isEqualTo(null);
 		assertThat(style.getFillColor()).isEqualTo(null);
-		assertThat(style.getShrinkToFit()).isEqualTo(false);
+		assertThat(style.getShrinkToFit()).isNull();
 
 		style = bookConfig.getDefaultHeaderStyle();
 		assertThat(style.getFontName()).isEqualTo("Calibri");
 		assertThat(style.getFontHeight()).isEqualTo(11);
 		assertThat(style.getBold()).isEqualTo(true);
-		assertThat(style.getItalic()).isEqualTo(false);
+		assertThat(style.getItalic()).isNull();
 		assertThat(style.getColor()).isEqualTo(null);
 		assertThat(style.getFillColor()).isEqualTo(null);
-		assertThat(style.getShrinkToFit()).isEqualTo(false);
+		assertThat(style.getShrinkToFit()).isNull();
 		
 		style = bookConfig.getDefaultNodeDetailColumnStyle();
 		assertThat(style.getFontName()).isEqualTo("Calibri");
 		assertThat(style.getFontHeight()).isEqualTo(11);
-		assertThat(style.getBold()).isEqualTo(false);
-		assertThat(style.getItalic()).isEqualTo(false);
+		assertThat(style.getBold()).isNull();
+		assertThat(style.getItalic()).isNull();
 		assertThat(style.getColor()).isEqualTo(null);
 		assertThat(style.getFillColor()).isEqualTo(null);
 		assertThat(style.getShrinkToFit()).isEqualTo(true);
@@ -90,47 +90,47 @@ public class BookConfigTest {
 		style = bookConfig.getDefaultNodeStyle();
 		assertThat(style.getFontName()).isEqualTo("Calibri");
 		assertThat(style.getFontHeight()).isEqualTo(10);
-		assertThat(style.getBold()).isEqualTo(false);
-		assertThat(style.getItalic()).isEqualTo(false);
+		assertThat(style.getBold()).isNull();
+		assertThat(style.getItalic()).isNull();
 		assertThat(style.getColor()).isEqualTo(null);
 		assertThat(style.getFillColor()).isEqualTo(null);
-		assertThat(style.getShrinkToFit()).isEqualTo(false);
+		assertThat(style.getShrinkToFit()).isNull();
 
 		style = bookConfig.getParentNodeStyle();
 		assertThat(style.getFontName()).isEqualTo("Arial");
 		assertThat(style.getFontHeight()).isEqualTo(12);
-		assertThat(style.getBold()).isEqualTo(false);
+		assertThat(style.getBold()).isNull();
 		assertThat(style.getItalic()).isEqualTo(false);
 		assertThat(style.getColor()).isEqualTo(new Color(0, 0, 255));
 		assertThat(style.getFillColor()).isEqualTo(null);
-		assertThat(style.getShrinkToFit()).isEqualTo(false);
+		assertThat(style.getShrinkToFit()).isNull();
 
 		style = bookConfig.getAttribNodeStyle();
 		assertThat(style.getFontName()).isEqualTo("Calibri");
 		assertThat(style.getFontHeight()).isEqualTo(13);
-		assertThat(style.getBold()).isEqualTo(false);
-		assertThat(style.getItalic()).isEqualTo(false);
+		assertThat(style.getBold()).isNull();
+		assertThat(style.getItalic()).isNull();
 		assertThat(style.getColor()).isEqualTo(null);
 		assertThat(style.getFillColor()).isEqualTo(new Color(34, 97, 13));
-		assertThat(style.getShrinkToFit()).isEqualTo(false);
+		assertThat(style.getShrinkToFit()).isNull();
 
 		style = bookConfig.getCompositorNodeStyle();
 		assertThat(style.getFontName()).isEqualTo("Times New Roman");
 		assertThat(style.getFontHeight()).isEqualTo(10);
-		assertThat(style.getBold()).isEqualTo(false);
+		assertThat(style.getBold()).isNull();
 		assertThat(style.getItalic()).isEqualTo(true);
 		assertThat(style.getColor()).isEqualTo(new Color(64, 64, 64));
 		assertThat(style.getFillColor()).isEqualTo(null);
-		assertThat(style.getShrinkToFit()).isEqualTo(false);
+		assertThat(style.getShrinkToFit()).isNull();
 
 		style = bookConfig.getChoiceMarkerStyle();
 		assertThat(style.getFontName()).isEqualTo("Calibri");
 		assertThat(style.getFontHeight()).isEqualTo(10);
-		assertThat(style.getBold()).isEqualTo(false);
-		assertThat(style.getItalic()).isEqualTo(false);
+		assertThat(style.getBold()).isNull();
+		assertThat(style.getItalic()).isNull();
 		assertThat(style.getColor()).isEqualTo(new Color(255, 0, 0));
 		assertThat(style.getFillColor()).isEqualTo(null);
-		assertThat(style.getShrinkToFit()).isEqualTo(false);
+		assertThat(style.getShrinkToFit()).isNull();
 
 		assertThat(bookConfig.getNodeColumnCount()).isEqualTo(12);
 		assertThat(bookConfig.getNodeColumnWidth()).isEqualTo(500);

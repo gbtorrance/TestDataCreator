@@ -43,17 +43,46 @@ public interface Spreadsheet {
 	 * @param value String value for cell
 	 * @param rowNum Row number for cell value to retrieve (1-based index)
 	 * @param colNum Column number for cell value to retrieve (1-based index)
-	 * @param cellStyle Desired formatting for cell; null = use default (if specified)
+	 * @param style Desired formatting for cell; null = use default (if specified)
 	 */
-	void setCellValue(String value, int rowNum, int colNum, CellStyle cellStyle);
+	void setCellValue(String value, int rowNum, int colNum, CellStyle style);
 	
 	/**
-	 * Set default cell style to use when not is specified
+	 * Returns a CellStyle containing the various style attributes for the cell.
 	 * 
-	 * @param cellStyle Default CellStyle or null
+	 * @param rowNum Row number for CellStyle to retrieve (1-based index)
+	 * @param colNum Column number for CellStyle to retrieve (1-based index); 
+	 * @return CellStyle value
 	 */
-	void setDefaultCellStyle(CellStyle cellStyle);
+	CellStyle getCellStyle(int rowNum, int colNum);
 	
+	/**
+	 * Sets the CellStyle for a particular cell.
+	 * 
+	 * @param rowNum Row number for cell to set (1-based index)
+	 * @param colNum Column number for cell to set (1-based index)
+	 * @param style CellStyle to use
+	 */
+	void setCellStyle(int rowNum, int colNum, CellStyle style);
+	
+	/**
+	 * Set default cell style to use for a particular column.
+	 * 
+	 * @param colNum Column number for which to set style (1-based index)
+	 * @param style Default CellStyle or null
+	 */
+	void setDefaultColumnCellStyle(int colNum, CellStyle style);
+
+	/**
+	 * Get column width in units of 1/256 the width of a character (see Apache POI docs for further details).
+	 * 
+	 * @see <a href="https://poi.apache.org/apidocs/org/apache/poi/xssf/usermodel/XSSFSheet.html#setColumnWidth%28int,%20int%29">Apache POI XSSFSheet.setColumnWidth()</a>
+	 *
+	 * @param colNum Column number for which to set width (1-based index)
+	 * @return Column width in units of 1/256 the width of a character
+	 */
+	int getColumnWidth(int colNum);
+
 	/**
 	 * Set column width in units of 1/256 the width of a character (see Apache POI docs for further details).
 	 * 

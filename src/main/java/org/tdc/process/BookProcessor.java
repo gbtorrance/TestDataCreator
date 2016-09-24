@@ -32,33 +32,38 @@ class BookProcessor {
 		String extension = bookConfig.getBookTemplateFileExtension();
 		return extension == null ? "xlsx" : extension;
 	}
-
+	
 	public void createBook(Addr bookAddr, Path targetPath, 
 			Path basedOnBookPath, boolean overwriteExisting) {
-
-		Book basedOnBook = loadBasedOnBookIfExists(basedOnBookPath); 
-		BookConfig bookConfig = processor.getBookConfigFactory().getBookConfig(bookAddr);
+		
+		SpreadsheetFile basedOnBookSF = getBasedOnSpreadsheetFile(basedOnBookPath);
+		Book basedOnBook = getBasedOnBook(basedOnBookSF);
+		BookConfig bookConfig = getBookConfig(bookAddr);
 		verifyTargetPathExtension(bookConfig, targetPath);
-		SpreadsheetFile newBookFile = createNewSpreadsheetFile(bookConfig);
-		writeToSpreadsheetFile(bookConfig, newBookFile, basedOnBook);
-		if (overwriteExisting) {
-			newBookFile.save(targetPath);
-		}
-		else {
-			newBookFile.saveAsNew(targetPath);
-		}
+		SpreadsheetFile newBookSF = createNewSpreadsheetFile(bookConfig);
+		writeToSpreadsheetFile(bookConfig, newBookSF, basedOnBook, basedOnBookSF);
+		saveNewBook(newBookSF, targetPath, overwriteExisting);
 	}
-	
-	private Book loadBasedOnBookIfExists(Path basedOnBookPath) {
-		if (basedOnBookPath == null) {
-			return null;
+
+	private SpreadsheetFile getBasedOnSpreadsheetFile(Path basedOnBookPath) {
+		SpreadsheetFile spreadsheetFile = null;
+		if (basedOnBookPath != null) {
+			spreadsheetFile = processor.getSpreadsheetFileFactory()
+					.createReadOnlySpreadsheetFileFromPath(basedOnBookPath); 
 		}
-		SpreadsheetFile spreadsheetFile = processor.getSpreadsheetFileFactory()
-				.createReadOnlySpreadsheetFileFromPath(basedOnBookPath);
-		Book basedOnBook = processor.getBookFactory().getBook(spreadsheetFile);
-		BookTestDataLoader loader = new BookTestDataLoader(basedOnBook, spreadsheetFile);
-		loader.loadTestData();
-		return basedOnBook;
+		return spreadsheetFile;
+	}
+
+	private Book getBasedOnBook(SpreadsheetFile basedOnBookSF) {
+		Book book = null;
+		if (basedOnBookSF != null) {
+			book = processor.getBookFactory().getBook(basedOnBookSF); 
+		}
+		return book;
+	}
+
+	private BookConfig getBookConfig(Addr bookAddr) {
+		return processor.getBookConfigFactory().getBookConfig(bookAddr);
 	}
 
 	private void verifyTargetPathExtension(BookConfig bookConfig, Path targetPath) {
@@ -83,17 +88,29 @@ class BookProcessor {
 	}
 
 	private void writeToSpreadsheetFile(
-			BookConfig bookConfig, SpreadsheetFile bookFile, Book basedOnBook) {
+			BookConfig bookConfig, SpreadsheetFile newBookSF, 
+			Book basedOnBook, SpreadsheetFile basedOnBookSF) {
 		
 		BookFileWriter bookFileWriter =  new BookFileWriter(
-				bookConfig, bookFile, processor.getModelInstFactory());
+				bookConfig, newBookSF, processor.getModelInstFactory());
 		if (basedOnBook == null) {
 			bookFileWriter.write();
 		} 
 		else {
-			bookFileWriter.writeWithTestDataFromExistingBook(basedOnBook);
+			bookFileWriter.writeWithTestDataFromExistingBook(basedOnBook, basedOnBookSF);
 		}
 		bookFileWriter.deleteDefaultSheetIfExists();
+	}
+
+	private void saveNewBook(SpreadsheetFile newBookSF, 
+			Path targetPath, boolean overwriteExisting) {
+		
+		if (overwriteExisting) {
+			newBookSF.save(targetPath);
+		}
+		else {
+			newBookSF.saveAsNew(targetPath);
+		}
 	}
 
 	public Book loadAndProcessBook(Path bookPath, boolean schemaValidate, boolean processTasks) {
@@ -108,24 +125,19 @@ class BookProcessor {
 				targetPath == null ? 
 				spreadsheetFileFactory.createReadOnlySpreadsheetFileFromPath(bookPath) : 
 				spreadsheetFileFactory.createEditableSpreadsheetFileFromPath(bookPath); 
-
 		Book book = processor.getBookFactory().getBook(spreadsheetFile);
-		
 		BookTestDataLoader loader = new BookTestDataLoader(book, spreadsheetFile);
 		loader.loadTestData();
-		
 		if (schemaValidate) {
 			BookSchemaValidator schemaValidator = 
 					new BookSchemaValidator(book, processor.getSchemaValidatorFactory());
 			schemaValidator.validate();
 		}
-		
 		if (processTasks) {
 			TaskProcessor taskProcessor = new TaskProcessor
 					.Builder(processor.getTaskFactory(), book).build();
 			taskProcessor.processTasks();
 		}
-		
 		if (targetPath != null) {
 			BookSpreadsheetLogWriter logWriter = new BookSpreadsheetLogWriter(book, spreadsheetFile);
 			logWriter.writeLog();
@@ -136,7 +148,6 @@ class BookProcessor {
 				spreadsheetFile.saveAsNew(targetPath);
 			}
 		}
-		
 		return book;
 	}
 }

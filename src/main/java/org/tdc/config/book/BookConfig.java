@@ -30,6 +30,7 @@ public interface BookConfig {
 	CellStyle getCompositorNodeStyle();
 	CellStyle getChoiceMarkerStyle();
 	CellStyle getOccurMarkerStyle();
+	CellStyle getConversionNewNodeStyle();
 	int getNodeColumnCount();
 	int getNodeColumnWidth();
 	int getHeaderRowCount();

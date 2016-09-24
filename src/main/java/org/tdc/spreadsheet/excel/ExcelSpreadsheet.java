@@ -1,14 +1,10 @@
 package org.tdc.spreadsheet.excel;
 
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.apache.poi.ss.util.CellReference;
 import org.apache.poi.xssf.usermodel.XSSFCell;
-import org.apache.poi.xssf.usermodel.XSSFCellStyle;
-import org.apache.poi.xssf.usermodel.XSSFColor;
-import org.apache.poi.xssf.usermodel.XSSFFont;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -30,10 +26,11 @@ public class ExcelSpreadsheet implements Spreadsheet {
 	private static final Logger log = LoggerFactory.getLogger(ExcelSpreadsheet.class);
 
 	private final XSSFSheet xssfSheet;
-	private final POICellStyleLookup poiCellStyleLookup = new POICellStyleLookup();
+	private final ExcelStyleManager styleManager;
 	
 	private ExcelSpreadsheet(Builder builder) {
 		this.xssfSheet = builder.xssfSheet;
+		this.styleManager = builder.styleManager;
 	}
 	
 	@Override
@@ -53,20 +50,38 @@ public class ExcelSpreadsheet implements Spreadsheet {
 	}
 	
 	@Override
-	public void setCellValue(String value, int rowNum, int colNum, CellStyle cellStyle) {
+	public void setCellValue(String value, int rowNum, int colNum, CellStyle style) {
 		XSSFCell cell = getCellCreateIfNotExist(rowNum, colNum);
-		cell.setCellValue(value);
-		if (cellStyle != null) {
-			cell.setCellStyle(poiCellStyleLookup.getPOICellStyle(cellStyle));
-		}
-		else if (poiCellStyleLookup.hasDefaultPOICellStyle()) {
-			cell.setCellStyle(poiCellStyleLookup.getDefaultPOICellStyle());
+		cell.setCellValue(value.length() == 0 ? null : value);
+		styleManager.setCellStyle(cell, style);
+	}
+	
+	@Override
+	public CellStyle getCellStyle(int rowNum, int colNum) {
+		XSSFCell cell = getCell(rowNum, colNum);
+		return styleManager.getCellStyle(cell);
+	}
+
+	@Override
+	public void setCellStyle(int rowNum, int colNum, CellStyle style) {
+		XSSFCell cell = getCellCreateIfNotExist(rowNum, colNum);
+		styleManager.setCellStyle(cell, style);
+	}
+	
+	@Override
+	public void setDefaultColumnCellStyle(int colNum, CellStyle style) {
+		if (style != null) {
+			styleManager.setDefaultColumnStyle(xssfSheet, colNum, style);
 		}
 	}
 	
 	@Override
-	public void setDefaultCellStyle(CellStyle cellStyle) {
-		this.poiCellStyleLookup.setDefaultCellStyle(cellStyle);
+	public int getColumnWidth(int colNum) {
+		// Whereas the public methods in this class use 1-based index values, 
+		// Apache POI libraries use 0-based indexes;
+		// this method accepts 1-based indexes and converts to 0-based indexes for POI (as necessary)
+		
+		return xssfSheet.getColumnWidth(colNum-1);
 	}
 
 	@Override
@@ -119,6 +134,10 @@ public class ExcelSpreadsheet implements Spreadsheet {
 	}
 	
 	private XSSFCell getCell(int rowNum, int colNum) {
+		// Whereas the public methods in this class use 1-based index values, 
+		// Apache POI libraries use 0-based indexes;
+		// this method accepts 1-based indexes and converts to 0-based indexes for POI (as necessary)
+
 		XSSFRow row = xssfSheet.getRow(rowNum-1);
 		return row == null ? null : row.getCell(colNum-1);
 	}
@@ -180,66 +199,15 @@ public class ExcelSpreadsheet implements Spreadsheet {
 		return value;
 	}
 	
-	/**
-	 * A cache/factory for creating and looking up POI-based CellStyle objects (i.e. specific to Excel files) using
-	 * TDC-based CellStyle objects (i.e. generic).  
-	 */
-	private class POICellStyleLookup {
-		private Map<CellStyle, org.apache.poi.ss.usermodel.CellStyle> map = new HashMap<>();
-		private CellStyle defaultCellStyle;
-		private org.apache.poi.ss.usermodel.CellStyle defaultPOICellStyle;
-		
-		public org.apache.poi.ss.usermodel.CellStyle getPOICellStyle(CellStyle cellStyle) {
-			org.apache.poi.ss.usermodel.CellStyle poiStyle;
-			poiStyle = map.get(cellStyle);
-			if (poiStyle == null) {
-				poiStyle = createPOICellStyleFromCellStyle(cellStyle);
-				map.put(cellStyle, poiStyle);
-			}
-			return poiStyle;
-		}
-		
-		public org.apache.poi.ss.usermodel.CellStyle getDefaultPOICellStyle() {
-			return defaultPOICellStyle;
-		}
-		
-		public boolean hasDefaultPOICellStyle() {
-			return defaultPOICellStyle != null;
-		}
-		
-		public void setDefaultCellStyle(CellStyle cellStyle) {
-			this.defaultCellStyle = cellStyle;
-			this.defaultPOICellStyle = (cellStyle == null ? null : getPOICellStyle(defaultCellStyle));
-		}
-
-		private org.apache.poi.ss.usermodel.CellStyle createPOICellStyleFromCellStyle(CellStyle cellStyle) {
-			XSSFWorkbook workbook = ExcelSpreadsheet.this.xssfSheet.getWorkbook();
-			XSSFFont font = workbook.createFont();
-			font.setFontName(cellStyle.getFontName());
-			font.setFontHeight(cellStyle.getFontHeight());
-			if (cellStyle.getColor() != null) {
-				font.setColor(new XSSFColor(cellStyle.getColor()));
-			}
-			font.setItalic(cellStyle.getItalic());
-			font.setBold(cellStyle.getBold());
-			org.apache.poi.xssf.usermodel.XSSFCellStyle poiCellStyle = workbook.createCellStyle();
-			poiCellStyle.setFont(font);
-			poiCellStyle.setShrinkToFit(cellStyle.getShrinkToFit());
-			if (cellStyle.getFillColor() != null) {
-				poiCellStyle.setFillForegroundColor(new XSSFColor(cellStyle.getFillColor()));
-				poiCellStyle.setFillPattern(XSSFCellStyle.SOLID_FOREGROUND);
-			}
-			return poiCellStyle;
-		}
-	}
-	
 	public static class Builder {
 		private final XSSFWorkbook workbook;
+		private final ExcelStyleManager styleManager;
 		
 		private XSSFSheet xssfSheet;
 		
-		public Builder(XSSFWorkbook workbook) {
+		public Builder(XSSFWorkbook workbook, ExcelStyleManager styleManager) {
 			this.workbook = workbook;
+			this.styleManager = styleManager;
 		}
 		
 		public Spreadsheet build(String name) {

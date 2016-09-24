@@ -2,6 +2,7 @@ package org.tdc.config.book;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import org.tdc.config.XMLConfigWrapper;
 
@@ -46,6 +47,15 @@ public class DocIDRowConfigImpl implements DocIDRowConfig {
 	@Override
 	public int getRowNum() {
 		return rowNum;
+	}
+	
+	@Override
+	public boolean isIdentityEqual(DocIDRowConfig compareTo) {
+		if (this == compareTo) {
+			return true;
+		}
+		return Objects.equals(docIDType, compareTo.getType()) &&
+				Objects.equals(variableName, compareTo.getVariableName());
 	}
 	
 	public static class Builder {

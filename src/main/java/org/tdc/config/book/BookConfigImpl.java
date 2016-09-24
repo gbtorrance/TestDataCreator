@@ -42,6 +42,7 @@ public class BookConfigImpl implements BookConfig {
 	private final CellStyle compositorNodeStyle;
 	private final CellStyle choiceMarkerStyle;
 	private final CellStyle occurMarkerStyle;
+	private final CellStyle conversionNewNodeStyle;
 	private final int nodeColumnCount;
 	private final int nodeColumnWidth;
 	private final int headerRowCount;
@@ -66,6 +67,7 @@ public class BookConfigImpl implements BookConfig {
 		this.compositorNodeStyle = builder.compositorNodeStyle;
 		this.choiceMarkerStyle = builder.choiceMarkerStyle;
 		this.occurMarkerStyle = builder.occurMarkerStyle;
+		this.conversionNewNodeStyle = builder.conversionNewNodeStyle;
 		this.nodeColumnCount = builder.nodeColumnCount;
 		this.nodeColumnWidth = builder.nodeColumnWidth;
 		this.headerRowCount = builder.headerRowCount;
@@ -172,6 +174,11 @@ public class BookConfigImpl implements BookConfig {
 	}
 
 	@Override
+	public CellStyle getConversionNewNodeStyle() {
+		return conversionNewNodeStyle;
+	}
+
+	@Override
 	public int getNodeColumnCount() {
 		return nodeColumnCount;
 	}
@@ -214,6 +221,7 @@ public class BookConfigImpl implements BookConfig {
 		private CellStyle compositorNodeStyle;
 		private CellStyle choiceMarkerStyle;
 		private CellStyle occurMarkerStyle;
+		private CellStyle conversionNewNodeStyle;
 		private int nodeColumnCount;
 		private int nodeColumnWidth;
 		private int headerRowCount;
@@ -254,6 +262,7 @@ public class BookConfigImpl implements BookConfig {
 			compositorNodeStyle = config.getCellStyle("CompositorNodeStyle", defaultNodeStyle, false);
 			choiceMarkerStyle = config.getCellStyle("ChoiceMarkerStyle", defaultNodeStyle, false);
 			occurMarkerStyle = config.getCellStyle("OccurMarkerStyle", defaultNodeStyle, false);
+			conversionNewNodeStyle = config.getCellStyle("ConversionNewNodeStyle", defaultNodeStyle, false); 
 			nodeColumnCount = config.getInt("NodeColumnCount", 0, true);
 			nodeColumnWidth = config.getInt("NodeColumnWidth", 0, true);
 			headerRowCount = config.getInt("HeaderRowCount", 1, false);

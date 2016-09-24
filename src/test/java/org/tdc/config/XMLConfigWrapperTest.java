@@ -10,6 +10,7 @@ import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import org.tdc.spreadsheet.CellAlignment;
 import org.tdc.spreadsheet.CellStyle;
 import org.tdc.spreadsheet.CellStyleImpl;
 import org.tdc.util.Util;
@@ -180,8 +181,17 @@ public class XMLConfigWrapperTest {
 
 	@Test
 	public void testCellStyleNotFoundUseDefault() {
-		CellStyle defaultStyle = new CellStyleImpl("Arial", 12, 
-				new Color(10, 20, 30), new Color(75, 70, 65), true, true, true);
+		CellStyle defaultStyle = new CellStyleImpl.Builder()
+				.setFontName("Arial")
+				.setFontHeight(12.0)
+				.setColor(new Color(10, 20, 30))
+				.setFillColor(new Color(75, 70, 65))
+				.setItalic(true)
+				.setBold(true)
+				.setShrinkToFit(true)
+				.setAlignment(CellAlignment.CENTER)
+				.setFormat("text")
+				.build();
 		CellStyle style = config.getCellStyle("CellStyle_DoesNotExist", defaultStyle, false);
 		assertThat(style.getFontName()).isEqualTo("Arial");
 		assertThat(style.getFontHeight()).isEqualTo(12);
@@ -194,5 +204,7 @@ public class XMLConfigWrapperTest {
 		assertThat(style.getItalic()).isEqualTo(true);
 		assertThat(style.getBold()).isEqualTo(true);
 		assertThat(style.getShrinkToFit()).isEqualTo(true);
+		assertThat(style.getAlignment()).isEqualTo(CellAlignment.CENTER);
+		assertThat(style.getFormat()).isEqualTo("text");
 	}
 }

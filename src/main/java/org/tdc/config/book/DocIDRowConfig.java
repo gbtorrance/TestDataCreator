@@ -9,4 +9,5 @@ public interface DocIDRowConfig {
 	String getLabel();
 	int getIndex();
 	int getRowNum();
+	boolean isIdentityEqual(DocIDRowConfig compareTo);
 }
