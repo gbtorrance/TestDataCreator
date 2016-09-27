@@ -16,13 +16,14 @@ public class ModelCustomizerConfigImpl implements ModelCustomizerConfig {
 	
 	private final Path filePath;
 	private final CellStyle defaultStyle;
-	private final CellStyle defaultHeaderStyle;
-	private final CellStyle defaultNodeDetailColumnStyle;
-	private final CellStyle defaultNodeStyle;
-	private final CellStyle parentNodeStyle;
-	private final CellStyle attribNodeStyle;
-	private final CellStyle compositorNodeStyle;
-	private final CellStyle choiceMarkerStyle;
+	private final CellStyle nodeHeaderStyle; 		// based on defaultStyle
+	private final CellStyle defaultNodeStyle; 		// based on defaultStyle
+	private final CellStyle parentNodeStyle;		// based on defaultNodeStyle
+	private final CellStyle attribNodeStyle;		// based on defaultNodeStyle
+	private final CellStyle compositorNodeStyle;	// based on defaultNodeStyle
+	private final CellStyle choiceMarkerNodeStyle;	// based on defaultNodeStyle
+	private final CellStyle nodeDetailHeaderStyle;	// based on defaultStyle
+	private final CellStyle defaultNodeDetailStyle;	// based on defaultStyle (parent to detail column styles)
 	private final int nodeColumnCount;
 	private final int nodeColumnWidth;
 	private final int headerRowCount;
@@ -39,13 +40,14 @@ public class ModelCustomizerConfigImpl implements ModelCustomizerConfig {
 	private ModelCustomizerConfigImpl(Builder builder) {
 		this.filePath = builder.filePath;
 		this.defaultStyle = builder.defaultStyle;
-		this.defaultHeaderStyle = builder.defaultHeaderStyle;
-		this.defaultNodeDetailColumnStyle = builder.defaultNodeDetailColumnStyle;
+		this.nodeHeaderStyle = builder.nodeHeaderStyle;
 		this.defaultNodeStyle = builder.defaultNodeStyle;
 		this.parentNodeStyle = builder.parentNodeStyle;
 		this.attribNodeStyle = builder.attribNodeStyle;
 		this.compositorNodeStyle = builder.compositorNodeStyle;
-		this.choiceMarkerStyle = builder.choiceMarkerStyle;
+		this.choiceMarkerNodeStyle = builder.choiceMarkerNodeStyle;
+		this.nodeDetailHeaderStyle = builder.nodeDetailHeaderStyle;
+		this.defaultNodeDetailStyle = builder.defaultNodeDetailStyle;
 		this.nodeColumnCount = builder.nodeColumnCount;
 		this.nodeColumnWidth = builder.nodeColumnWidth;
 		this.headerRowCount = builder.headerRowCount;
@@ -71,15 +73,10 @@ public class ModelCustomizerConfigImpl implements ModelCustomizerConfig {
 	}
 	
 	@Override
-	public CellStyle getDefaultHeaderStyle() {
-		return defaultHeaderStyle;
+	public CellStyle getNodeHeaderStyle() {
+		return nodeHeaderStyle;
 	}
-	
-	@Override
-	public CellStyle getDefaultNodeDetailColumnStyle() {
-		return defaultNodeDetailColumnStyle;
-	}
-	
+
 	@Override
 	public CellStyle getDefaultNodeStyle() {
 		return defaultNodeStyle;
@@ -101,10 +98,20 @@ public class ModelCustomizerConfigImpl implements ModelCustomizerConfig {
 	}
 	
 	@Override
-	public CellStyle getChoiceMarkerStyle() {
-		return choiceMarkerStyle;
+	public CellStyle getChoiceMarkerNodeStyle() {
+		return choiceMarkerNodeStyle;
 	}
-	
+
+	@Override
+	public CellStyle getNodeDetailHeaderStyle() {
+		return nodeDetailHeaderStyle;
+	}
+
+	@Override
+	public CellStyle getDefaultNodeDetailStyle() {
+		return defaultNodeDetailStyle;
+	}
+
 	@Override
 	public int getNodeColumnCount() {
 		return nodeColumnCount;
@@ -178,13 +185,14 @@ public class ModelCustomizerConfigImpl implements ModelCustomizerConfig {
 
 		private Path filePath;
 		private CellStyle defaultStyle;
-		private CellStyle defaultHeaderStyle;
-		private CellStyle defaultNodeDetailColumnStyle;
+		private CellStyle nodeHeaderStyle;
 		private CellStyle defaultNodeStyle;
 		private CellStyle parentNodeStyle;
 		private CellStyle attribNodeStyle;
 		private CellStyle compositorNodeStyle;
-		private CellStyle choiceMarkerStyle;
+		private CellStyle choiceMarkerNodeStyle;
+		private CellStyle nodeDetailHeaderStyle;
+		private CellStyle defaultNodeDetailStyle;
 		private int nodeColumnCount;
 		private int nodeColumnWidth;
 		private int headerRowCount;
@@ -210,21 +218,34 @@ public class ModelCustomizerConfigImpl implements ModelCustomizerConfig {
 		public ModelCustomizerConfig build() {
 			ModelCustomizerConfig custConfig = null;
 			if (config.hasNode(CONFIG_PREFIX)) {
-				String fileNamePrefix = config.getString(CONFIG_PREFIX + ".FileNamePrefix", "Customizer_", false);
+				String fileNamePrefix = config.getString(
+						CONFIG_PREFIX + ".FileNamePrefix", "Customizer_", false);
 				String fileName = Util.legalizeName(fileNamePrefix + modelName) + ".xlsx";
 				filePath = modelConfigRoot.resolve(fileName);
-				defaultStyle = config.getCellStyle(CONFIG_PREFIX + ".DefaultStyle", null, true);
-				defaultHeaderStyle = config.getCellStyle(CONFIG_PREFIX + ".DefaultHeaderStyle", defaultStyle, false);
-				defaultNodeDetailColumnStyle = config.getCellStyle(
-						CONFIG_PREFIX + ".DefaultNodeDetailColumnStyle", defaultStyle, false);
-				defaultNodeStyle = config.getCellStyle(CONFIG_PREFIX + ".DefaultNodeStyle", defaultStyle, false);
-				parentNodeStyle = config.getCellStyle(CONFIG_PREFIX + ".ParentNodeStyle", defaultNodeStyle, false);
-				attribNodeStyle = config.getCellStyle(CONFIG_PREFIX + ".AttribNodeStyle", defaultNodeStyle, false);
-				compositorNodeStyle = config.getCellStyle(CONFIG_PREFIX + ".CompositorNodeStyle", defaultNodeStyle, false);
-				choiceMarkerStyle = config.getCellStyle(CONFIG_PREFIX + ".ChoiceMarkerStyle", defaultNodeStyle, false);
-				nodeColumnCount = config.getInt(CONFIG_PREFIX + ".NodeColumnCount", 0, true);
-				nodeColumnWidth = config.getInt(CONFIG_PREFIX + ".NodeColumnWidth", 0, true);
-				headerRowCount = config.getInt(CONFIG_PREFIX + ".HeaderRowCount", 1, false);
+				defaultStyle = config.getCellStyle(
+						CONFIG_PREFIX + ".DefaultStyle", null, true);
+				nodeHeaderStyle = config.getCellStyle(
+						CONFIG_PREFIX + ".NodeHeaderStyle", defaultStyle, false);
+				defaultNodeStyle = config.getCellStyle(
+						CONFIG_PREFIX + ".DefaultNodeStyle", defaultStyle, false);
+				parentNodeStyle = config.getCellStyle(
+						CONFIG_PREFIX + ".ParentNodeStyle", defaultNodeStyle, false);
+				attribNodeStyle = config.getCellStyle(
+						CONFIG_PREFIX + ".AttribNodeStyle", defaultNodeStyle, false);
+				compositorNodeStyle = config.getCellStyle(
+						CONFIG_PREFIX + ".CompositorNodeStyle", defaultNodeStyle, false);
+				choiceMarkerNodeStyle = config.getCellStyle(
+						CONFIG_PREFIX + ".ChoiceMarkerNodeStyle", defaultNodeStyle, false);
+				nodeDetailHeaderStyle = config.getCellStyle(
+						CONFIG_PREFIX + ".NodeDetailHeaderStyle", defaultStyle, false);
+				defaultNodeDetailStyle = config.getCellStyle(
+						CONFIG_PREFIX + ".DefaultNodeDetailStyle", defaultStyle, false);
+				nodeColumnCount = config.getInt(
+						CONFIG_PREFIX + ".NodeColumnCount", 0, true);
+				nodeColumnWidth = config.getInt(
+						CONFIG_PREFIX + ".NodeColumnWidth", 0, true);
+				headerRowCount = config.getInt(
+						CONFIG_PREFIX + ".HeaderRowCount", 1, false);
 				nodeHeaderLabels = config.getHeaderLabels(
 						CONFIG_PREFIX + ".NodeHeaderLabels", headerRowCount);
 				readOccursCountOverrideFromVariable = config.getString(
@@ -234,7 +255,7 @@ public class ModelCustomizerConfigImpl implements ModelCustomizerConfig {
 				nodeDetailColStart = nodeColStart + nodeColumnCount;
 				nodeDetailColumns = new ModelCustomizerColumnConfigImpl.Builder(
 						config, evaluatorFactory, headerRowCount, 
-						defaultNodeDetailColumnStyle, nodeDetailColStart).buildAll();
+						defaultNodeDetailStyle, nodeDetailColStart).buildAll();
 				nodeRowStart = headerRowStart + headerRowCount;
 				custConfig = new ModelCustomizerConfigImpl(this);
 			}

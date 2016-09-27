@@ -34,15 +34,17 @@ public class BookConfigImpl implements BookConfig {
 	private final Map<String, PageConfig> pageConfigs;
 	private final List<TaskConfig> taskConfigs;
 	private final CellStyle defaultStyle;
-	private final CellStyle defaultHeaderStyle;
-	private final CellStyle defaultNodeDetailColumnStyle;
-	private final CellStyle defaultNodeStyle;
-	private final CellStyle parentNodeStyle;
-	private final CellStyle attribNodeStyle;
-	private final CellStyle compositorNodeStyle;
-	private final CellStyle choiceMarkerStyle;
-	private final CellStyle occurMarkerStyle;
-	private final CellStyle conversionNewNodeStyle;
+	private final CellStyle nodeHeaderStyle; 		// based on defaultStyle
+	private final CellStyle defaultNodeStyle; 		// based on defaultStyle
+	private final CellStyle parentNodeStyle;		// based on defaultNodeStyle
+	private final CellStyle attribNodeStyle;		// based on defaultNodeStyle
+	private final CellStyle compositorNodeStyle;	// based on defaultNodeStyle
+	private final CellStyle choiceMarkerNodeStyle;	// based on defaultNodeStyle
+	private final CellStyle occurMarkerNodeStyle;	// based on defaultNodeStyle
+	private final CellStyle nodeDetailHeaderStyle;	// based on defaultStyle
+	private final CellStyle defaultNodeDetailStyle;	// based on defaultStyle (parent to detail column styles)
+	private final CellStyle docIDRowLabelStyle;		// based on defaultStyle
+	private final CellStyle conversionNewRowStyle;	// based on defaultStyle
 	private final int nodeColumnCount;
 	private final int nodeColumnWidth;
 	private final int headerRowCount;
@@ -59,15 +61,17 @@ public class BookConfigImpl implements BookConfig {
 		this.pageConfigs = Collections.unmodifiableMap(builder.pageConfigs); // unmodifiable
 		this.taskConfigs = Collections.unmodifiableList(builder.taskConfigs); // unmodifiable
 		this.defaultStyle = builder.defaultStyle;
-		this.defaultHeaderStyle = builder.defaultHeaderStyle;
-		this.defaultNodeDetailColumnStyle = builder.defaultNodeDetailColumnStyle;
+		this.nodeHeaderStyle = builder.nodeHeaderStyle;
 		this.defaultNodeStyle = builder.defaultNodeStyle;
 		this.parentNodeStyle = builder.parentNodeStyle;
 		this.attribNodeStyle = builder.attribNodeStyle;
 		this.compositorNodeStyle = builder.compositorNodeStyle;
-		this.choiceMarkerStyle = builder.choiceMarkerStyle;
-		this.occurMarkerStyle = builder.occurMarkerStyle;
-		this.conversionNewNodeStyle = builder.conversionNewNodeStyle;
+		this.choiceMarkerNodeStyle = builder.choiceMarkerNodeStyle;
+		this.occurMarkerNodeStyle = builder.occurMarkerNodeStyle;
+		this.nodeDetailHeaderStyle = builder.nodeDetailHeaderStyle;
+		this.defaultNodeDetailStyle = builder.defaultNodeDetailStyle;
+		this.docIDRowLabelStyle = builder.docIDRowLabelStyle;
+		this.conversionNewRowStyle = builder.conversionNewRowStyle;
 		this.nodeColumnCount = builder.nodeColumnCount;
 		this.nodeColumnWidth = builder.nodeColumnWidth;
 		this.headerRowCount = builder.headerRowCount;
@@ -134,15 +138,10 @@ public class BookConfigImpl implements BookConfig {
 	}
 	
 	@Override
-	public CellStyle getDefaultHeaderStyle() {
-		return defaultHeaderStyle;
+	public CellStyle getNodeHeaderStyle() {
+		return nodeHeaderStyle;
 	}
-	
-	@Override
-	public CellStyle getDefaultNodeDetailColumnStyle() {
-		return defaultNodeDetailColumnStyle;
-	}
-	
+
 	@Override
 	public CellStyle getDefaultNodeStyle() {
 		return defaultNodeStyle;
@@ -164,18 +163,33 @@ public class BookConfigImpl implements BookConfig {
 	}
 	
 	@Override
-	public CellStyle getChoiceMarkerStyle() {
-		return choiceMarkerStyle;
+	public CellStyle getChoiceMarkerNodeStyle() {
+		return choiceMarkerNodeStyle;
 	}
 
 	@Override
-	public CellStyle getOccurMarkerStyle() {
-		return occurMarkerStyle;
+	public CellStyle getOccurMarkerNodeStyle() {
+		return occurMarkerNodeStyle;
 	}
 
 	@Override
-	public CellStyle getConversionNewNodeStyle() {
-		return conversionNewNodeStyle;
+	public CellStyle getNodeDetailHeaderStyle() {
+		return nodeDetailHeaderStyle;
+	}
+
+	@Override
+	public CellStyle getDefaultNodeDetailStyle() {
+		return defaultNodeDetailStyle;
+	}
+
+	@Override
+	public CellStyle getDocIDRowLabelStyle() {
+		return docIDRowLabelStyle;
+	}
+
+	@Override
+	public CellStyle getConversionNewRowStyle() {
+		return conversionNewRowStyle;
 	}
 
 	@Override
@@ -213,15 +227,17 @@ public class BookConfigImpl implements BookConfig {
 		private Map<String, PageConfig> pageConfigs;
 		private List<TaskConfig> taskConfigs;
 		private CellStyle defaultStyle;
-		private CellStyle defaultHeaderStyle;
-		private CellStyle defaultNodeDetailColumnStyle;
+		private CellStyle nodeHeaderStyle;
 		private CellStyle defaultNodeStyle;
 		private CellStyle parentNodeStyle;
 		private CellStyle attribNodeStyle;
 		private CellStyle compositorNodeStyle;
-		private CellStyle choiceMarkerStyle;
-		private CellStyle occurMarkerStyle;
-		private CellStyle conversionNewNodeStyle;
+		private CellStyle choiceMarkerNodeStyle;
+		private CellStyle occurMarkerNodeStyle;
+		private CellStyle nodeDetailHeaderStyle;
+		private CellStyle defaultNodeDetailStyle;
+		private CellStyle docIDRowLabelStyle;
+		private CellStyle conversionNewRowStyle;
 		private int nodeColumnCount;
 		private int nodeColumnWidth;
 		private int headerRowCount;
@@ -254,22 +270,24 @@ public class BookConfigImpl implements BookConfig {
 			}
 			docTypeConfigs = new DocTypeConfigImpl.Builder(config).buildAll();
 			defaultStyle = config.getCellStyle("DefaultStyle", null, true);
-			defaultHeaderStyle = config.getCellStyle("DefaultHeaderStyle", defaultStyle, false);
-			defaultNodeDetailColumnStyle = config.getCellStyle("DefaultNodeDetailColumnStyle", defaultStyle, false);
+			nodeHeaderStyle = config.getCellStyle("NodeHeaderStyle", defaultStyle, false);
 			defaultNodeStyle = config.getCellStyle("DefaultNodeStyle", defaultStyle, false);
 			parentNodeStyle = config.getCellStyle("ParentNodeStyle", defaultNodeStyle, false);
 			attribNodeStyle = config.getCellStyle("AttribNodeStyle", defaultNodeStyle, false);
 			compositorNodeStyle = config.getCellStyle("CompositorNodeStyle", defaultNodeStyle, false);
-			choiceMarkerStyle = config.getCellStyle("ChoiceMarkerStyle", defaultNodeStyle, false);
-			occurMarkerStyle = config.getCellStyle("OccurMarkerStyle", defaultNodeStyle, false);
-			conversionNewNodeStyle = config.getCellStyle("ConversionNewNodeStyle", defaultNodeStyle, false); 
+			choiceMarkerNodeStyle = config.getCellStyle("ChoiceMarkerNodeStyle", defaultNodeStyle, false);
+			occurMarkerNodeStyle = config.getCellStyle("OccurMarkerNodeStyle", defaultNodeStyle, false);
+			nodeDetailHeaderStyle = config.getCellStyle("NodeDetailHeaderStyle", defaultStyle, false);
+			defaultNodeDetailStyle = config.getCellStyle("DefaultNodeDetailStyle", defaultStyle, false);
+			docIDRowLabelStyle = config.getCellStyle("DocIDRowLabelStyle", defaultStyle, false); 
+			conversionNewRowStyle = config.getCellStyle("ConversionNewRowStyle", defaultStyle, false); 
 			nodeColumnCount = config.getInt("NodeColumnCount", 0, true);
 			nodeColumnWidth = config.getInt("NodeColumnWidth", 0, true);
 			headerRowCount = config.getInt("HeaderRowCount", 1, false);
 			nodeHeaderLabels = config.getHeaderLabels(
 					"NodeHeaderLabels", headerRowCount);
 			pageConfigs = new PageConfigImpl.Builder(config, docTypeConfigs, modelConfigFactory, 
-					nodeColumnCount, headerRowCount, defaultNodeDetailColumnStyle).buildAll();
+					nodeColumnCount, headerRowCount, defaultNodeDetailStyle).buildAll();
 			taskConfigs = taskConfigFactory.createTaskConfigs(
 					config, "Tasks", bookConfigRoot, addr, bookName);
 			return new BookConfigImpl(this);

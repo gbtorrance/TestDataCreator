@@ -30,13 +30,16 @@ public class ModelCustomizerWriter extends AbstractModelCustomizer {
 
 	private int maxColumns;
 	
-	public ModelCustomizerWriter(ElementNodeDef rootElement, ModelCustomizerConfig config, 
+	public ModelCustomizerWriter(
+			ElementNodeDef rootElement, ModelCustomizerConfig config, 
 			SpreadsheetFile spreadsheetFile, MPathIndex<NodeDef> prevModelMPathIndex) {
+		
 		super(rootElement, config, spreadsheetFile);
 		this.prevModelMPathIndex = prevModelMPathIndex;
 	}
 	
 	public void writeCustomizer() {
+		initSpreadsheetDefaultStyle();
 		getSpreadsheetFile().createSpreadsheet(CUSTOMIZER_SHEET_NAME);
 		maxColumns = 0;
 		processTree();
@@ -44,6 +47,10 @@ public class ModelCustomizerWriter extends AbstractModelCustomizer {
 		writeHeaderLabels();
 	}
 	
+	private void initSpreadsheetDefaultStyle() {
+		getSpreadsheetFile().setDefaultCellStyle(getConfig().getDefaultStyle());
+	}
+
 	@Override
 	protected void processAttribNode(AttribNode node) {
 		trackMaxColumns(node);
@@ -57,7 +64,7 @@ public class ModelCustomizerWriter extends AbstractModelCustomizer {
 		trackMaxColumns(node);
 
 		if (node.isChildOfChoice()) {
-			outputChoiceMarker(node, getConfig().getChoiceMarkerStyle());
+			outputChoiceMarker(node, getConfig().getChoiceMarkerNodeStyle());
 		}
 		
 		outputNodeName(node, getConfig().getCompositorNodeStyle());
@@ -69,7 +76,7 @@ public class ModelCustomizerWriter extends AbstractModelCustomizer {
 		trackMaxColumns(node);
 
 		if (node.isChildOfChoice()) {
-			outputChoiceMarker(node, getConfig().getChoiceMarkerStyle());
+			outputChoiceMarker(node, getConfig().getChoiceMarkerNodeStyle());
 		}
 		
 		CellStyle cellStyle = getConfig().getDefaultNodeStyle();
@@ -137,16 +144,26 @@ public class ModelCustomizerWriter extends AbstractModelCustomizer {
 
 	private void writeHeaderLabels() {
 		int rowCount = getConfig().getHeaderRowCount();
-		CellStyle style = getConfig().getDefaultHeaderStyle();
 		List<ModelCustomizerColumnConfig> columns = getConfig().getNodeDetailColumns(); 
-		for (int row = 1; row <= rowCount; row++) {
-			getCustomizerSheet().setCellValue(
-					getConfig().getNodeHeaderLabel(row), row, 1, style);
+		for (int rowNum = 1; rowNum <= rowCount; rowNum++) {
+			writeNodeHeaderLabels(rowNum);
 			for (int colIndex = 0; colIndex < columns.size(); colIndex++) {
-				ModelCustomizerColumnConfig column = columns.get(colIndex);
-				getCustomizerSheet().setCellValue(
-						column.getHeaderLabel(row), row, column.getColNum(), style);
+				writeNodeDetailHeaderLabels(rowNum, columns.get(colIndex));
 			}
 		}
+	}
+
+	private void writeNodeHeaderLabels(int rowNum) {
+		CellStyle style = getConfig().getNodeHeaderStyle();
+		getCustomizerSheet().setCellValue(
+				getConfig().getNodeHeaderLabel(rowNum), rowNum, 1, style);
+	}
+
+	private void writeNodeDetailHeaderLabels(
+			int rowNum, ModelCustomizerColumnConfig columnConfig) {
+		
+		CellStyle style = getConfig().getNodeDetailHeaderStyle();
+		getCustomizerSheet().setCellValue(
+				columnConfig.getHeaderLabel(rowNum), rowNum, columnConfig.getColNum(), style);
 	}
 }

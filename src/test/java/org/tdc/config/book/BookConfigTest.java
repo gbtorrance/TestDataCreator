@@ -69,7 +69,7 @@ public class BookConfigTest {
 		assertThat(style.getFillColor()).isEqualTo(null);
 		assertThat(style.getShrinkToFit()).isNull();
 
-		style = bookConfig.getDefaultHeaderStyle();
+		style = bookConfig.getNodeHeaderStyle();
 		assertThat(style.getFontName()).isEqualTo("Calibri");
 		assertThat(style.getFontHeight()).isEqualTo(11);
 		assertThat(style.getBold()).isEqualTo(true);
@@ -78,7 +78,7 @@ public class BookConfigTest {
 		assertThat(style.getFillColor()).isEqualTo(null);
 		assertThat(style.getShrinkToFit()).isNull();
 		
-		style = bookConfig.getDefaultNodeDetailColumnStyle();
+		style = bookConfig.getDefaultNodeDetailStyle();
 		assertThat(style.getFontName()).isEqualTo("Calibri");
 		assertThat(style.getFontHeight()).isEqualTo(11);
 		assertThat(style.getBold()).isNull();
@@ -123,7 +123,7 @@ public class BookConfigTest {
 		assertThat(style.getFillColor()).isEqualTo(null);
 		assertThat(style.getShrinkToFit()).isNull();
 
-		style = bookConfig.getChoiceMarkerStyle();
+		style = bookConfig.getChoiceMarkerNodeStyle();
 		assertThat(style.getFontName()).isEqualTo("Calibri");
 		assertThat(style.getFontHeight()).isEqualTo(10);
 		assertThat(style.getBold()).isNull();

@@ -36,11 +36,11 @@
 			<ColorRGB>64 64 64</ColorRGB> <!-- dark gray -->
 			<Italic>true</Italic>
 		</CompositorNodeStyle>
-		<ChoiceMarkerStyle>
+		<ChoiceMarkerNodeStyle>
 			<FontName>Calibri</FontName>
 			<FontHeight>15</FontHeight>
 			<ColorRGB>255 0 0</ColorRGB> <!-- red -->
-		</ChoiceMarkerStyle>
+		</ChoiceMarkerNodeStyle>
 		<NodeColumnCount>12</NodeColumnCount>
 		<NodeColumnWidth>500</NodeColumnWidth>
 		<ReadOccursCountOverrideFromVariable>OCCURS_COUNT_OVERRIDE</ReadOccursCountOverrideFromVariable>

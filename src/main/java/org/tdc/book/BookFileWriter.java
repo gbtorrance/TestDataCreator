@@ -51,11 +51,13 @@ public class BookFileWriter {
 	}
 
 	public void write() {
+		initSpreadsheetDefaultStyle();
 		writePages(null, null);
 		writeConfigSheet();
 	}
 	
 	public void writeWithTestDataFromExistingBook(Book basedOnBook, SpreadsheetFile basedOnBookSF) {
+		initSpreadsheetDefaultStyle();
 		writePages(basedOnBook, basedOnBookSF);
 		writeConfigSheet();
 	}
@@ -69,6 +71,10 @@ public class BookFileWriter {
 		}
 	}
 	
+	private void initSpreadsheetDefaultStyle() {
+		spreadsheetFile.setDefaultCellStyle(config.getDefaultStyle());
+	}
+
 	private void writePages(Book basedOnBook, SpreadsheetFile basedOnBookSF) {
 		Collection<PageConfig> pageConfigs = config.getPageConfigs().values();
 		for (PageConfig pageConfig : pageConfigs) {
@@ -104,7 +110,6 @@ public class BookFileWriter {
 				basedOnColStart = basedOnPageConfig.getTestDocColStart();
 				basedOnColEnd = basedOnSheet.getLastColNum(
 						basedOnPageConfig.getCaseNumDocIDRowConfig().getRowNum());
-				basedOnColEnd = Math.max(basedOnColStart, basedOnColEnd);
 			}
 		}
 	}
@@ -143,7 +148,7 @@ public class BookFileWriter {
 	
 	private void writeDocIDRowLabels() {
 		List<DocIDRowConfig> docIDRows = currentPageConfig.getDocIDRowConfigs();
-		CellStyle style = config.getDefaultHeaderStyle();
+		CellStyle style = config.getDocIDRowLabelStyle();
 		int rowCount = docIDRows.size();
 		for (int row = 0; row < rowCount; row++) {
 			DocIDRowConfig docIDRow = docIDRows.get(row);
@@ -175,18 +180,30 @@ public class BookFileWriter {
 
 	private void writeHeaderLabels() {
 		int rowCount = config.getHeaderRowCount();
-		CellStyle style = config.getDefaultHeaderStyle();
 		List<PageNodeDetailColumnConfig> columns = currentPageConfig.getNodeDetailColumnConfigs(); 
-		for (int row = 0; row < rowCount; row++) {
-			currentSheet.setCellValue(
-					config.getNodeHeaderLabel(row+1), currentPageConfig.getHeaderRowStart() + row, 1, style);
+		for (int rowNum = 1; rowNum <= rowCount; rowNum++) {
+			writeNodeHeaderLabels(rowNum);
 			for (int colIndex = 0; colIndex < columns.size(); colIndex++) {
-				PageNodeDetailColumnConfig column = columns.get(colIndex);
-				currentSheet.setCellValue(
-						column.getHeaderLabel(row+1), 
-						currentPageConfig.getHeaderRowStart() + row, column.getColNum(), style);
+				writeNodeDetailHeaderLabels(rowNum, columns.get(colIndex));
 			}
 		}
+	}
+	
+	private void writeNodeHeaderLabels(int rowNum) {
+		CellStyle style = config.getNodeHeaderStyle();
+		currentSheet.setCellValue(
+				config.getNodeHeaderLabel(rowNum), 
+				currentPageConfig.getHeaderRowStart() + rowNum -1, 1, style);
+	}
+
+	private void writeNodeDetailHeaderLabels(
+			int rowNum, PageNodeDetailColumnConfig columnConfig) {
+		
+		CellStyle style = config.getNodeDetailHeaderStyle();
+		currentSheet.setCellValue(
+				columnConfig.getHeaderLabel(rowNum), 
+				currentPageConfig.getHeaderRowStart() + rowNum -1, 
+				columnConfig.getColNum(), style);
 	}
 
 	private void trackMaxColumns(TDCNode node) {
@@ -249,7 +266,7 @@ public class BookFileWriter {
 		do {
 			if (possibleRepeatingNode.getOccurCount() > 1) {
 				currentSheet.setCellValue("" + possibleRepeatingNode.getOccurNum(), 
-						rowNum, getNodeCol(possibleRepeatingNode) - 1, config.getOccurMarkerStyle());
+						rowNum, getNodeCol(possibleRepeatingNode) - 1, config.getOccurMarkerNodeStyle());
 			}
 			possibleRepeatingNode = (NonAttribNodeInst)possibleRepeatingNode.getParent();
 		} 
@@ -287,9 +304,12 @@ public class BookFileWriter {
 	}
 
 	private void markNodeAsNew(TDCNode node) {
-		for (int basedOnColNum = basedOnColStart; basedOnColNum <= basedOnColEnd; basedOnColNum++) {
+		for (int basedOnColNum = basedOnColStart; 
+				basedOnColNum <= basedOnColEnd; basedOnColNum++) {
+			
 			int colNum = basedOnToCurrentColNum(basedOnColNum);
-			currentSheet.setCellValue("NEW", getNodeRow(node), colNum);
+			currentSheet.setCellStyle(getNodeRow(node), 
+					colNum, config.getConversionNewRowStyle());
 		}
 	}
 
@@ -335,7 +355,7 @@ public class BookFileWriter {
 		public void visit(CompositorNode node) {
 			trackMaxColumns(node);
 			if (node.isChildOfChoice()) {
-				writeChoiceMarker(node, config.getChoiceMarkerStyle());
+				writeChoiceMarker(node, config.getChoiceMarkerNodeStyle());
 			}
 			writeNodeName(node, config.getCompositorNodeStyle());
 			writeOccurrenceMarkers(node);
@@ -347,7 +367,7 @@ public class BookFileWriter {
 		public void visit(ElementNode node) {
 			trackMaxColumns(node);
 			if (node.isChildOfChoice()) {
-				writeChoiceMarker(node, config.getChoiceMarkerStyle());
+				writeChoiceMarker(node, config.getChoiceMarkerNodeStyle());
 			}
 			CellStyle cellStyle = config.getDefaultNodeStyle();
 			if (node.hasChild()) {

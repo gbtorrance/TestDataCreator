@@ -72,9 +72,9 @@ public class ModelConfigTest {
 		assertThat(cust.getCompositorNodeStyle().getFontHeight()).isEqualTo(14);
 		assertThat(cust.getCompositorNodeStyle().getColor()).isEqualTo(new Color(64, 64, 64));
 		assertThat(cust.getCompositorNodeStyle().getItalic()).isEqualTo(true);
-		assertThat(cust.getChoiceMarkerStyle().getFontName()).isEqualTo("Calibri");
-		assertThat(cust.getChoiceMarkerStyle().getFontHeight()).isEqualTo(15);
-		assertThat(cust.getChoiceMarkerStyle().getColor()).isEqualTo(new Color(255, 0, 0));
+		assertThat(cust.getChoiceMarkerNodeStyle().getFontName()).isEqualTo("Calibri");
+		assertThat(cust.getChoiceMarkerNodeStyle().getFontHeight()).isEqualTo(15);
+		assertThat(cust.getChoiceMarkerNodeStyle().getColor()).isEqualTo(new Color(255, 0, 0));
 		assertThat(cust.getNodeColumnCount()).isEqualTo(12);
 		assertThat(cust.getNodeColumnWidth()).isEqualTo(500);
 		assertThat(cust.getAllowMinMaxInvalidOccursCountOverride()).isEqualTo(true);

@@ -79,12 +79,12 @@
 		<FontName>Calibri</FontName>
 		<FontHeight>11</FontHeight>
 	</DefaultStyle>
-	<DefaultHeaderStyle>
+	<NodeHeaderStyle>
 		<Bold>true</Bold>
-	</DefaultHeaderStyle>
-	<DefaultNodeDetailColumnStyle>
+	</NodeHeaderStyle>
+	<DefaultNodeDetailStyle>
 		<ShrinkToFit>true</ShrinkToFit>
-	</DefaultNodeDetailColumnStyle>
+	</DefaultNodeDetailStyle>
 	<DefaultNodeStyle>
 		<FontHeight>10</FontHeight>
 	</DefaultNodeStyle>
@@ -103,10 +103,10 @@
 		<ColorRGB>64 64 64</ColorRGB> <!-- dark gray -->
 		<Italic>true</Italic>
 	</CompositorNodeStyle>
-	<ChoiceMarkerStyle>
+	<ChoiceMarkerNodeStyle>
 		<FontName>Calibri</FontName>
 		<ColorRGB>255 0 0</ColorRGB> <!-- red -->
-	</ChoiceMarkerStyle>
+	</ChoiceMarkerNodeStyle>
 	<NodeColumnCount>12</NodeColumnCount>
 	<NodeColumnWidth>500</NodeColumnWidth>
 	

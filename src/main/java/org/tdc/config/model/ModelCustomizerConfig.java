@@ -11,13 +11,14 @@ import org.tdc.spreadsheet.CellStyle;
 public interface ModelCustomizerConfig {
 	Path getFilePath();
 	CellStyle getDefaultStyle();
-	CellStyle getDefaultHeaderStyle();
-	CellStyle getDefaultNodeDetailColumnStyle();
+	CellStyle getNodeHeaderStyle();
 	CellStyle getDefaultNodeStyle();
 	CellStyle getParentNodeStyle();
 	CellStyle getAttribNodeStyle();
 	CellStyle getCompositorNodeStyle();
-	CellStyle getChoiceMarkerStyle();
+	CellStyle getChoiceMarkerNodeStyle();
+	CellStyle getNodeDetailHeaderStyle();
+	CellStyle getDefaultNodeDetailStyle();
 	int getNodeColumnCount();
 	int getNodeColumnWidth();
 	int getHeaderRowCount();

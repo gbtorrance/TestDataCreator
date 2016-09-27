@@ -33,7 +33,7 @@ public class BookSpreadsheetLogWriter {
 	public BookSpreadsheetLogWriter(Book book, SpreadsheetFile spreadsheetFile) {
 		this.book = book;
 		this.spreadsheetFile = spreadsheetFile;
-		this.boldStyle = book.getConfig().getDefaultHeaderStyle(); // TODO log-specific style configuration
+		this.boldStyle = book.getConfig().getNodeHeaderStyle(); // TODO log-specific style configuration
 		this.defaulStyle = book.getConfig().getDefaultStyle(); // TODO log-specific style configuration 
 	}
 	
