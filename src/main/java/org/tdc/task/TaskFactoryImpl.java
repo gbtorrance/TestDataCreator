@@ -3,6 +3,7 @@ package org.tdc.task;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.util.Map;
 
 import org.tdc.book.Book;
 import org.tdc.config.book.TaskConfig;
@@ -13,11 +14,11 @@ import org.tdc.config.book.TaskConfig;
 public class TaskFactoryImpl implements TaskFactory {
 
 	@Override
-	public Task createTask(TaskConfig config, Book book) {
+	public Task createTask(TaskConfig config, Book book, Map<String, String> taskParams) {
 		String className = config.getTaskClassName();
 		Class<?> classy = getClass(className);
 		Method buildMethod = getBuildMethod(classy);
-		Task task = buildTask(buildMethod, config, book);
+		Task task = buildTask(buildMethod, config, book, taskParams);
 		return task;
 	}
 
@@ -33,7 +34,7 @@ public class TaskFactoryImpl implements TaskFactory {
 	private Method getBuildMethod(Class<?> classy) {
 		Method buildMethod = null;
 		try {
-			buildMethod = classy.getMethod("build", TaskConfig.class, Book.class);
+			buildMethod = classy.getMethod("build", TaskConfig.class, Book.class, Map.class);
 		} 
 		catch (NoSuchMethodException | SecurityException ex) {
 			throwBuildMethodNotFoundException(classy, ex);
@@ -46,20 +47,26 @@ public class TaskFactoryImpl implements TaskFactory {
 
 	private void throwBuildMethodNotFoundException(Class<?> classy, Exception ex) {
 		String message =
-				"Class '" + classy.getName() + 
-				"' must have a static build(TaskConfig config, Book book) method";
+				"Class '" + classy.getName() + "' must have a static " + 
+				"build(TaskConfig config, Book book, Map<String, String> taskParams) method";
 		throw new RuntimeException(message, ex);
 	}
 
-	private Task buildTask(Method buildMethod, TaskConfig config, Book book) {
+	private Task buildTask(
+			Method buildMethod, TaskConfig config, 
+			Book book, Map<String, String> taskParams) {
+		
 		Object task = null;
 		try {
-			task = buildMethod.invoke(null, config, book);
+			task = buildMethod.invoke(null, config, book, taskParams);
 		} 
-		catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
-			throw new RuntimeException(
-					"Unable to execute static build(TaskConfig config, Book book) " + 
-					"method for Task '" + config.getTaskClassName() + "'", ex);
+		catch (IllegalAccessException e) {
+			throw new RuntimeException("Unable to execute static " + 
+					"build(TaskConfig config, Book book, Map<String, String> taskParams) " + 
+					"method for Task '" + config.getTaskClassName() + "'", e);
+		} 
+		catch (InvocationTargetException e) {
+			throw new RuntimeException(e.getTargetException().getMessage(), e);
 		}
 		if (!(task instanceof Task)) {
 			throw new RuntimeException("Class '" + task.getClass().getName() + 

@@ -39,7 +39,8 @@ public class BookReaderTest {
 		Util.purgeDirectory(Paths.get("testfiles/Temp/ExportRoot"));
 		Files.deleteIfExists(targetPath);
 		
-		processor.loadAndProcessBookWithLogOutput(bookPath, true, true, targetPath, true);
+		processor.loadAndProcessBookWithLogOutput(
+				bookPath, true, true, null, null, targetPath, true);
 
 		assertThat(Files.exists(targetPath)).isEqualTo(true);
 	}

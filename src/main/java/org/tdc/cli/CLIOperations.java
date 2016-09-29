@@ -4,6 +4,9 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -22,6 +25,9 @@ import org.tdc.util.Util;
 import joptsimple.OptionException;
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
+import joptsimple.OptionSpec;
+import joptsimple.util.KeyValuePair;
+import joptsimple.util.PathConverter;
 
 /**
  * Handles processing of command-line operations. 
@@ -40,21 +46,44 @@ public class CLIOperations {
 	private static final String OP_L = "l";
 	private static final String OP_LIST = "list";
 	
-	private static final String OP_TARGET = "target";
-
-	private static final String OP_C = "c";
-	private static final String OP_CREATE_BOOK = "create-book";
-	private static final String OP_BASED_ON_BOOK = "based-on-book";
-	
 	private static final String OP_Z = "z";
 	private static final String OP_CREATE_CUSTOMIZER = "create-customizer";
 	private static final String OP_BASED_ON_MODEL = "based-on-model";
 	
+	private static final String OP_C = "c";
+	private static final String OP_CREATE_BOOK = "create-book";
+	private static final String OP_BASED_ON_BOOK = "based-on-book";
+	
+	private static final String OP_P = "p";
+	private static final String OP_PROCESS_BOOK = "process-book";
+	private static final String OP_NO_LOG = "no-log";
+	private static final String OP_SCHEMA_VALIDATE = "schema-validate";
+	private static final String OP_PROCESS_TASKS = "process-tasks";
+	private static final String OP_TASK_PARAM = "task-param";
+	
+	private static final String OP_TARGET = "target"; // applies to "z", "c", and "p"
+
 	private static final int INDENT_SPACES = 3;
+	private static final int MAX_BACKUPS = 3;
 	
 	private final OptionParser parser = new OptionParser();
 	private final boolean admin;
 
+	private OptionSpec<?> opHelp;
+	private OptionSpec<Path> opSchemasConfigRoot;
+	private OptionSpec<Path> opBooksConfigRoot;
+	private OptionSpec<CLIArgsConfigType> opList;
+	private OptionSpec<Addr> opCreateCustomizer;
+	private OptionSpec<Addr> opBasedOnModel;
+	private OptionSpec<Addr> opCreateBook;
+	private OptionSpec<Path> opBasedOnBook;
+	private OptionSpec<Path> opProcessBook;
+	private OptionSpec<?> opNoLog;
+	private OptionSpec<?> opSchemaValidate;
+	private OptionSpec<String> opProcessTasks;
+	private OptionSpec<KeyValuePair> opTaskParam;
+	private OptionSpec<Path> opTarget;
+	
 	private Path schemasConfigRoot;
 	private Path booksConfigRoot;
 	private Processor processor;
@@ -65,59 +94,104 @@ public class CLIOperations {
 	}
 	
 	private void initParser() {
-		// help
-		parser.acceptsAll(Arrays.asList(
+		initParserHelp();
+		initParserSchemasConfigRoot();
+		initParserBooksConfigRoot();
+		initParserList();
+		initParserCreateCustomizer();
+		initParserCreateBook();
+		initParserProcessBook();
+		initParserProcessTarget();
+	}
+	
+	private void initParserHelp() {
+		opHelp = parser.acceptsAll(Arrays.asList(
 				OP_H, OP_HELP, OP_QUESTION), "help")
 				.forHelp();
-		
-		// schemas config root dir
-		parser.acceptsAll(Arrays.asList(
+	}
+	
+	private void initParserSchemasConfigRoot() {
+		opSchemasConfigRoot = parser.acceptsAll(Arrays.asList(
 				OP_S, OP_SCHEMAS_CONFIG_ROOT), "schemas config root dir")
-				.withRequiredArg();
-		
-		// books config root dir
-		parser.acceptsAll(Arrays.asList(
+				.withRequiredArg()
+				.withValuesConvertedBy(new PathConverter())
+				.required();
+	}
+	
+	private void initParserBooksConfigRoot() {
+		opBooksConfigRoot = parser.acceptsAll(Arrays.asList(
 				OP_B, OP_BOOKS_CONFIG_ROOT), "books config root dir")
-				.withRequiredArg();
-		
-		// list
-		parser.acceptsAll(Arrays.asList(
+				.withRequiredArg()
+				.withValuesConvertedBy(new PathConverter())
+				.required();
+	}
+	
+	private void initParserList() {
+		opList = parser.acceptsAll(Arrays.asList(
 				OP_L, OP_LIST), "list config schema|model|book")
 				.withRequiredArg()
 				.ofType(CLIArgsConfigType.class);
-		
-		// create book
-		parser.acceptsAll(Arrays.asList(
-				OP_C, OP_CREATE_BOOK), "create book")
-				.withRequiredArg()
-				.ofType(Addr.class)
-				.describedAs("book address");
-		parser.accepts(
-				OP_BASED_ON_BOOK, "book file with test data for book creation")
-				.availableIf(OP_CREATE_BOOK)
-				.withRequiredArg()
-				.ofType(String.class)
-				.describedAs("based-on book file");
-		
-		// create customizer
-		parser.acceptsAll(Arrays.asList(
+	}
+	
+	private void initParserCreateCustomizer() {
+		opCreateCustomizer = parser.acceptsAll(Arrays.asList(
 				OP_Z, OP_CREATE_CUSTOMIZER), "create customizer")
 				.withRequiredArg()
 				.ofType(Addr.class)
 				.describedAs("model address");
-		parser.accepts(
+		opBasedOnModel = parser.accepts(
 				OP_BASED_ON_MODEL, "model address for model on which to based new customizer")
-				.availableIf(OP_CREATE_CUSTOMIZER)
+				.availableIf(opCreateCustomizer)
 				.withRequiredArg()
 				.ofType(Addr.class)
 				.describedAs("based-on model address");
-
-		// target file (used by book and customizer creation)
-		parser.accepts(
-				OP_TARGET, "target file for book/customizer creation")
-				.availableIf(OP_CREATE_BOOK, OP_CREATE_CUSTOMIZER)
+	}
+	
+	private void initParserCreateBook() {
+		opCreateBook = parser.acceptsAll(Arrays.asList(
+				OP_C, OP_CREATE_BOOK), "create book")
 				.withRequiredArg()
-				.ofType(String.class)
+				.ofType(Addr.class)
+				.describedAs("book address");
+		opBasedOnBook = parser.accepts(
+				OP_BASED_ON_BOOK, "book file with test data for book creation")
+				.availableIf(opCreateBook)
+				.withRequiredArg()
+				.withValuesConvertedBy(new PathConverter())
+				.describedAs("based-on book file");
+	}
+	
+	private void initParserProcessBook() {
+		opProcessBook = parser.acceptsAll(Arrays.asList(
+				OP_P, OP_PROCESS_BOOK), "process book")
+				.withRequiredArg()
+				.withValuesConvertedBy(new PathConverter())
+				.describedAs("book file to process");
+		opNoLog = parser.accepts(
+				OP_NO_LOG, "do not write out log info")
+				.availableIf(opProcessBook);
+		opSchemaValidate = parser.accepts(
+				OP_SCHEMA_VALIDATE, "schema validate")
+				.availableIf(opProcessBook);
+		opProcessTasks = parser.accepts(
+				OP_PROCESS_TASKS, "process tasks")
+				.availableIf(opProcessBook)
+				.withOptionalArg()
+				.ofType(String.class);
+		opTaskParam = parser.accepts(
+				OP_TASK_PARAM, "task parameter")
+				.availableIf(opProcessTasks)
+				.withRequiredArg()
+				.ofType(KeyValuePair.class);
+	}
+	
+	private void initParserProcessTarget() {
+		// used by customizer creation, book creation, and book processing)
+		opTarget = parser.accepts(
+				OP_TARGET, "target file for book/customizer creation")
+				.availableIf(opCreateCustomizer, opCreateBook, opProcessBook)
+				.withRequiredArg()
+				.withValuesConvertedBy(new PathConverter())
 				.describedAs("target file name");
 	}
 
@@ -132,7 +206,7 @@ public class CLIOperations {
 	}
 	
 	private void executeOptions(OptionSet options) {
-		if (!options.hasOptions() || options.has(OP_HELP)) {
+		if (!options.hasOptions() || options.has(opHelp)) {
 			executeHelp();
 			System.exit(0);
 		}
@@ -140,36 +214,41 @@ public class CLIOperations {
 		initConfigDirs(options);
 		initProcessor();
 		
-		if (options.has(OP_LIST)) {
+		if (options.has(opList)) {
 			CLIArgsConfigType configType = (CLIArgsConfigType)options.valueOf(OP_LIST);
 			executeListConfig(configType);
 		}
-		else if (options.has(OP_CREATE_BOOK)) {
-			Addr bookAddr = (Addr)options.valueOf(OP_CREATE_BOOK);
-			Path targetFile = null;
-			Path basedOnBookPath = null;
-			if (options.has(OP_TARGET)) {
-				String fileStr = (String)options.valueOf(OP_TARGET);
-				targetFile = Paths.get(fileStr);
-			}
-			if (options.has(OP_BASED_ON_BOOK)) {
-				String fileStr = (String)options.valueOf(OP_BASED_ON_BOOK);
-				basedOnBookPath = Paths.get(fileStr);
-			}
-			executeCreateBook(bookAddr, targetFile, basedOnBookPath);
+		else if (options.has(opCreateCustomizer)) {
+			Addr modelAddr = options.valueOf(opCreateCustomizer);
+			Path targetPath = options.valueOf(opTarget);
+			Addr basedOnModelAddr = options.valueOf(opBasedOnModel);
+			executeCreateCustomizer(modelAddr, targetPath, basedOnModelAddr);
 		}
-		else if (options.has(OP_CREATE_CUSTOMIZER)) {
-			Addr modelAddr = (Addr)options.valueOf(OP_CREATE_CUSTOMIZER);
-			Path targetFile = null;
-			Addr basedOnModelAddr = null;
-			if (options.has(OP_TARGET)) {
-				String fileStr = (String)options.valueOf(OP_TARGET);
-				targetFile = Paths.get(fileStr);
+		else if (options.has(opCreateBook)) {
+			Addr bookAddr = options.valueOf(opCreateBook);
+			Path targetPath = options.valueOf(opTarget);
+			Path basedOnBookPath = options.valueOf(opBasedOnBook);
+			executeCreateBook(bookAddr, targetPath, basedOnBookPath);
+		}
+		else if (options.has(opProcessBook)) {
+			Path bookPath = options.valueOf(opProcessBook);
+			Path targetPath = options.valueOf(opTarget);
+			boolean noLog = options.has(opNoLog);
+			boolean schemaValidate = options.has(opSchemaValidate);
+			boolean processTasks = options.has(opProcessTasks);
+			List<String> taskIDsToProcess = options.hasArgument(opProcessTasks) ? 
+					options.valuesOf(opProcessTasks) : null;
+			List<KeyValuePair> keyValues = options.hasArgument(opTaskParam) ? 
+					options.valuesOf(opTaskParam) : null;
+			Map<String, String> taskParams = null;
+			if (keyValues != null) {
+				taskParams = new HashMap<>();
+				for (KeyValuePair keyValue : keyValues) {
+					taskParams.put(keyValue.key, keyValue.value);
+				}
 			}
-			if (options.has(OP_BASED_ON_MODEL)) {
-				basedOnModelAddr = (Addr)options.valueOf(OP_BASED_ON_MODEL);
-			}
-			executeCreateCustomizer(modelAddr, targetFile, basedOnModelAddr);
+			executeProcessBook(bookPath, schemaValidate, processTasks, 
+					taskIDsToProcess, taskParams, targetPath, noLog);
 		}
 		else {
 			outputAndEnd("No commands specified");
@@ -184,14 +263,12 @@ public class CLIOperations {
 	}
 
 	private void initConfigDirs(OptionSet options) {
-		schemasConfigRoot = options.has(OP_SCHEMAS_CONFIG_ROOT) ?  
-				Paths.get("" + options.valueOf(OP_SCHEMAS_CONFIG_ROOT)) : null;
+		schemasConfigRoot = options.valueOf(opSchemasConfigRoot);
 		if (schemasConfigRoot == null || !Files.isDirectory(schemasConfigRoot)) {
 			outputAndEnd("A valid Schemas Config Root dir must be specified with option -" + 
 					OP_S + " or --" + OP_SCHEMAS_CONFIG_ROOT);
 		}
-		booksConfigRoot = options.has(OP_BOOKS_CONFIG_ROOT) ? 
-				Paths.get("" + options.valueOf(OP_BOOKS_CONFIG_ROOT)) : null;
+		booksConfigRoot = options.valueOf(opBooksConfigRoot);
 		if (booksConfigRoot == null || !Files.isDirectory(booksConfigRoot)) {
 			outputAndEnd("A valid Books Config Root dir must be specified with option -" +
 					OP_B + " or --" + OP_BOOKS_CONFIG_ROOT);
@@ -259,54 +336,14 @@ public class CLIOperations {
 		outputErrors(errors);
 	}
 
-	private void executeCreateBook(Addr bookAddr, Path targetFile, Path basedOnBookPath) {
-		verifyBookAddr(bookAddr);
-		String bookName = processor.getBookConfig(bookAddr).getBookName();
-		String targetExtension = processor.getTargetBookFileExtension(bookAddr);
-		targetFile = verifyTargetOrProvideDefault(targetFile, bookName, targetExtension);
-		verifyBasedOnBookIfExists(basedOnBookPath);
-		processor.createBook(bookAddr, targetFile, basedOnBookPath, false);
-	}
-
-	private void verifyBookAddr(Addr bookAddr) {
-		if (!processor.isBookConfig(bookAddr)) {
-			outputAndEnd(bookAddr + " does not represent a Book Config address");
-		}
-	}
-
-	private Path verifyTargetOrProvideDefault(Path target, String name, String targetExtension) {
-		if (target == null) {
-			String defaultName = Util.legalizeName(name) + "." + targetExtension;
-			target = Paths.get(defaultName);
-		}
-		if (!target.toString().endsWith("." + targetExtension)) {
-			outputAndEnd("Target file " + target + " must end with ." + targetExtension + " extension");
-		}
-		if (Files.exists(target)) {
-			outputAndEnd("Target file " + target + 
-					" already exists; delete first or specify an alternative file name with --target option");
-		}
-		target = target.toAbsolutePath();
-		if (!Files.isDirectory(target.getParent())) {
-			outputAndEnd("Target directory " + target.getParent() + " does not exist");
-		}
-		return target;
-	}
-
-	private void verifyBasedOnBookIfExists(Path basedOnBookPath) {
-		if (basedOnBookPath != null && Files.notExists(basedOnBookPath)) {
-			outputAndEnd("Based-on book " + basedOnBookPath + " does not exists");
-		}
-	}
-	
-	private void executeCreateCustomizer(Addr modelAddr, Path targetFile, Addr basedOnModelAddr) {
+	private void executeCreateCustomizer(Addr modelAddr, Path targetPath, Addr basedOnModelAddr) {
 		verifyModelAddr(modelAddr);
 		ModelConfig config = processor.getModelConfig(modelAddr); 
 		verifyModelCustomizerConfigured(config);
 		String customizerName = getCustomizerName(config);
-		targetFile = verifyTargetOrProvideDefault(targetFile, customizerName, "xlsx");
+		targetPath = verifyTargetOrProvideDefault(targetPath, customizerName, "xlsx");
 		verifyBasedOnModelIfExists(basedOnModelAddr);
-		processor.createCustomizer(modelAddr, targetFile, basedOnModelAddr, false);
+		processor.createCustomizer(modelAddr, targetPath, basedOnModelAddr, false);
 	}
 
 	private String getCustomizerName(ModelConfig config) {
@@ -334,6 +371,135 @@ public class CLIOperations {
 		}
 	}
 	
+	private void executeCreateBook(Addr bookAddr, Path targetPath, Path basedOnBookPath) {
+		verifyBookAddr(bookAddr);
+		String bookName = processor.getBookConfig(bookAddr).getBookName();
+		String targetExtension = processor.getTargetBookFileExtension(bookAddr);
+		targetPath = verifyTargetOrProvideDefault(targetPath, bookName, targetExtension);
+		verifyBasedOnBookIfExists(basedOnBookPath);
+		processor.createBook(bookAddr, targetPath, basedOnBookPath, false);
+	}
+
+	private void verifyBookAddr(Addr bookAddr) {
+		if (!processor.isBookConfig(bookAddr)) {
+			outputAndEnd(bookAddr + " does not represent a Book Config address");
+		}
+	}
+
+	private void verifyBasedOnBookIfExists(Path basedOnBookPath) {
+		if (basedOnBookPath != null && Files.notExists(basedOnBookPath)) {
+			outputAndEnd("Based-on book " + basedOnBookPath + " does not exists");
+		}
+	}
+	
+	private Path verifyTargetOrProvideDefault(Path targetPath, String name, String targetExtension) {
+		if (targetPath == null) {
+			String defaultName = Util.legalizeName(name) + "." + targetExtension;
+			targetPath = Paths.get(defaultName);
+		}
+		if (!targetPath.toString().endsWith("." + targetExtension)) {
+			outputAndEnd("Target file " + targetPath + " must end with ." + targetExtension + " extension");
+		}
+		if (Files.exists(targetPath)) {
+			outputAndEnd("Target file " + targetPath + 
+					" already exists; delete first or specify an alternative file name with --target option");
+		}
+		targetPath = targetPath.toAbsolutePath();
+		if (!Files.isDirectory(targetPath.getParent())) {
+			outputAndEnd("Target directory " + targetPath.getParent() + " does not exist");
+		}
+		return targetPath;
+	}
+	
+	private void executeProcessBook(
+			Path bookPath, boolean schemaValidate, boolean processTasks, 
+			List<String> taskIDsToProcess, Map<String, String> taskParams, 
+			Path targetPath, boolean noLog) {
+		
+		if (noLog) {
+			processor.loadAndProcessBook(
+					bookPath, schemaValidate, processTasks, 
+					taskIDsToProcess, taskParams);
+		}
+		else {
+			if (targetPath != null) {
+				String bookExtension = Util.getExtension(bookPath);
+				verifyTargetOrProvideDefault(targetPath, null, bookExtension);
+				processor.loadAndProcessBookWithLogOutput(
+						bookPath, schemaValidate, processTasks, 
+						taskIDsToProcess, taskParams, targetPath, false);
+			}
+			else {
+				ensureFileNotCurrentlyInUse(bookPath);
+				Path tempPath = createTempCopy(bookPath);
+				processor.loadAndProcessBookWithLogOutput(
+						tempPath, schemaValidate, processTasks, 
+						taskIDsToProcess, taskParams, tempPath, true);
+				backupAndRenameFiles(bookPath, tempPath);
+			}
+		}
+	}
+
+	private void ensureFileNotCurrentlyInUse(Path bookPath) {
+		Path parentPath = bookPath.toAbsolutePath().getParent();
+		String fileName = bookPath.getFileName().toString();
+		Path path1 = parentPath.resolve("~$" + fileName);
+		Path path2 = parentPath.resolve(".~lock." + fileName + "#");
+		boolean found = Files.exists(path1) || Files.exists(path2);
+		if (found) {
+			outputAndEnd("It appears this Book file is in use. Please close then try again.");
+		}
+	}
+
+	private Path createTempCopy(Path bookPath) {
+		Path parentPath = bookPath.toAbsolutePath().getParent();
+		String fileName = bookPath.getFileName().toString();
+		Path tempPath = parentPath.resolve(fileName + ".tmp");
+		try {
+			Files.copy(bookPath, tempPath, StandardCopyOption.REPLACE_EXISTING);
+		}
+		catch (IOException e) {
+			throw new RuntimeException("Unable to create temporary file: " + tempPath, e);
+		}
+		return tempPath;
+	}
+
+	private void backupAndRenameFiles(Path bookPath, Path tempPath) {
+		Path parentPath = bookPath.toAbsolutePath().getParent();
+		String fileName = bookPath.getFileName().toString();
+		String timestamp = LocalDateTime.now().format(Util.EXPORT_DATE_TIME_FORMATTER);
+		Path backupPath = parentPath.resolve(fileName + ".backup" + timestamp);
+		try {
+			Files.move(bookPath, backupPath);
+		}
+		catch (IOException e) {
+			throw new RuntimeException("Unable to rename original file to backup: " + backupPath);
+		}
+		try {
+			Files.move(tempPath, bookPath);
+		}
+		catch (IOException e) {
+			throw new RuntimeException("Unable to rename temp file to original : " + bookPath);
+		}
+		deleteOldBackups(parentPath, fileName + ".backup");
+	}
+
+	private void deleteOldBackups(Path backupPath, String backupMatch) {
+		try {
+			List<Path> backupFiles = new ArrayList<>();
+			Files.find(backupPath, 1, 
+					(path, attrib) -> path.getFileName().toString().startsWith(backupMatch))
+					.sorted()
+					.forEach(path -> backupFiles.add(path));
+			for (int i = 0; i < backupFiles.size() - MAX_BACKUPS; i++) {
+				Files.delete(backupFiles.get(i));
+			}
+		}
+		catch (IOException e) {
+			throw new RuntimeException("Unable to delete old backup files", e);
+		}
+	}
+
 	private void outputErrors(Map<Addr, Exception> errors) {
 		if (errors.size() > 0) {
 			output("Errors:");

@@ -3,9 +3,11 @@ package org.tdc.extension.mef.export;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,15 +31,22 @@ import org.tdc.util.Util;
  * XML files (corresponding to the {@link TestDoc}s in the {@link TestCase}).
  */
 public class MeFExportTask implements Task {
+	public static final String EXPORT_ROOT_OVERRIDE = "export-root";
+
 	private static final Logger log = LoggerFactory.getLogger(MeFExportTask.class);
 
 	public final MeFExportTaskConfig config;
 	public final Book book;
+	public final Path exportRoot;
 	public final TestDocXMLGenerator xmlGenerator;
 
-	public MeFExportTask(MeFExportTaskConfig config, Book book, TestDocXMLGenerator xmlGenerator) {
+	public MeFExportTask(
+			MeFExportTaskConfig config, Book book, 
+			Path exportRoot, TestDocXMLGenerator xmlGenerator) {
+		
 		this.config = config;
 		this.book = book;
+		this.exportRoot = exportRoot;
 		this.xmlGenerator = xmlGenerator;
 	}
 	
@@ -171,7 +180,7 @@ public class MeFExportTask implements Task {
 		String bookName = book.getConfig().getBookName();
 		String batchDirName = Util.legalizeName(bookName) + "_" + 
 				LocalDateTime.now().format(Util.EXPORT_DATE_TIME_FORMATTER);
-		Path batchDir = config.getExportRoot().resolve(batchDirName);
+		Path batchDir = exportRoot.resolve(batchDirName);
 		createDirectory(batchDir);
 		return batchDir;
 	}
@@ -218,12 +227,30 @@ public class MeFExportTask implements Task {
 		}
 	}
 	
-	public static Task build(TaskConfig taskConfig, Book book) {
+	public static Task build(
+			TaskConfig taskConfig, Book book, Map<String, String> taskParams) {
+		
 		if (!(taskConfig instanceof MeFExportTaskConfig)) {
 			throw new IllegalStateException("TaskConfig '" + taskConfig.getTaskID() + 
 					"' must be an instance of " + MeFExportTaskConfig.class.getName());
 		}
 		TestDocXMLGenerator xmlGenerator = new TestDocXMLGenerator();
-		return new MeFExportTask((MeFExportTaskConfig)taskConfig, book, xmlGenerator);
+		MeFExportTaskConfig config = (MeFExportTaskConfig)taskConfig;
+		Path exportRoot = getExportRoot(config, taskParams);
+		return new MeFExportTask(config, book, exportRoot, xmlGenerator);
+	}
+	
+	private static Path getExportRoot(
+			MeFExportTaskConfig config, Map<String, String> taskParams) {
+		
+		Path exportRoot = config.getExportRoot();
+		if (taskParams != null && taskParams.containsKey(EXPORT_ROOT_OVERRIDE)) {
+			exportRoot = Paths.get(taskParams.get(EXPORT_ROOT_OVERRIDE));
+			if (!Files.isDirectory(exportRoot)) {
+				throw new RuntimeException("Task parameter '" + EXPORT_ROOT_OVERRIDE + 
+						"' does not refer to a valid directory: " + exportRoot);
+			}
+		}
+		return exportRoot;
 	}
 }

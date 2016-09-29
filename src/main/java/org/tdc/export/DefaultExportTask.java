@@ -5,6 +5,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -167,7 +168,9 @@ public class DefaultExportTask implements Task {
 		}
 	}
 	
-	public static Task build(TaskConfig taskConfig, Book book) {
+	public static Task build(
+			TaskConfig taskConfig, Book book, Map<String, String> taskParams) {
+		
 		if (!(taskConfig instanceof DefaultExportTaskConfig)) {
 			throw new IllegalStateException("TaskConfig '" + taskConfig.getTaskID() + 
 					"' must be an instance of " + DefaultExportTaskConfig.class.getName());

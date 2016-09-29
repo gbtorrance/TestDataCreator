@@ -66,8 +66,10 @@ public interface Processor {
 			Path basedOnBookPath, boolean overwriteExisting);
 	
 	Book loadAndProcessBook(
-			Path bookPath, boolean schemaValidate, boolean processTasks);
+			Path bookPath, boolean schemaValidate, boolean processTasks,
+			List<String> taskIDsToProcess, Map<String, String> taskParams);
 	Book loadAndProcessBookWithLogOutput(
-			Path bookPath, boolean schemaValidate, boolean processTasks, 
+			Path bookPath, boolean schemaValidate, boolean processTasks,
+			List<String> taskIDsToProcess, Map<String, String> taskParams,
 			Path targetPath, boolean overwriteExisting);
 }

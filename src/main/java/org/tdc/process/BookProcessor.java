@@ -1,6 +1,8 @@
 package org.tdc.process;
 
 import java.nio.file.Path;
+import java.util.List;
+import java.util.Map;
 
 import org.tdc.book.Book;
 import org.tdc.book.BookFileWriter;
@@ -113,13 +115,11 @@ class BookProcessor {
 		}
 	}
 
-	public Book loadAndProcessBook(Path bookPath, boolean schemaValidate, boolean processTasks) {
-		return loadAndProcessBookWithLogOutput(bookPath, schemaValidate, processTasks, null, false);
-	}
-
-	public Book loadAndProcessBookWithLogOutput(Path bookPath, boolean schemaValidate, boolean processTasks,
+	public Book loadAndProcessBook(
+			Path bookPath, boolean schemaValidate, boolean processTasks,
+			List<String> taskIDsToProcess, Map<String, String> taskParams,
 			Path targetPath, boolean overwriteExisting) {
-
+		
 		SpreadsheetFileFactory spreadsheetFileFactory = processor.getSpreadsheetFileFactory();
 		SpreadsheetFile spreadsheetFile = 
 				targetPath == null ? 
@@ -129,13 +129,16 @@ class BookProcessor {
 		BookTestDataLoader loader = new BookTestDataLoader(book, spreadsheetFile);
 		loader.loadTestData();
 		if (schemaValidate) {
-			BookSchemaValidator schemaValidator = 
-					new BookSchemaValidator(book, processor.getSchemaValidatorFactory());
+			BookSchemaValidator schemaValidator = new BookSchemaValidator(
+					book, processor.getSchemaValidatorFactory());
 			schemaValidator.validate();
 		}
 		if (processTasks) {
 			TaskProcessor taskProcessor = new TaskProcessor
-					.Builder(processor.getTaskFactory(), book).build();
+					.Builder(processor.getTaskFactory(), book)
+					.setTaskIDList(taskIDsToProcess) 
+					.setTaskParams(taskParams)
+					.build();
 			taskProcessor.processTasks();
 		}
 		if (targetPath != null) {

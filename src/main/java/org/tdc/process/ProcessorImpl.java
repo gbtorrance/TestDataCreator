@@ -201,18 +201,24 @@ public class ProcessorImpl implements Processor {
 
 	@Override
 	public Book loadAndProcessBook(
-			Path bookPath, boolean schemaValidate, boolean processTasks) {
+			Path bookPath, boolean schemaValidate, boolean processTasks,
+			List<String> taskIDsToProcess, Map<String, String> taskParams) {
 		
-		return bookProcessor.loadAndProcessBook(bookPath, schemaValidate, processTasks);
+		return bookProcessor.loadAndProcessBook(
+				bookPath, schemaValidate, processTasks, 
+				taskIDsToProcess, taskParams, null, false);
 	}
 
 	@Override
 	public Book loadAndProcessBookWithLogOutput(
 			Path bookPath, boolean schemaValidate, boolean processTasks,
+			List<String> taskIDsToProcess, Map<String, String> taskParams,
 			Path targetPath, boolean overwriteExisting) {
 
-		return bookProcessor.loadAndProcessBookWithLogOutput(
-				bookPath, schemaValidate, processTasks, targetPath, overwriteExisting);
+		return bookProcessor.loadAndProcessBook(
+				bookPath, schemaValidate, processTasks, 
+				taskIDsToProcess, taskParams,
+				targetPath, overwriteExisting);
 	}
 
 	public static class Builder {

@@ -2,6 +2,7 @@ package org.tdc.task;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.tdc.book.Book;
 import org.tdc.config.book.TaskConfig;
@@ -11,11 +12,9 @@ import org.tdc.config.book.TaskConfig;
  * against a particular {@link Book}.
  */
 public class TaskProcessor {
-	private final Book book;
 	private final List<Task> tasks;
 	
 	private TaskProcessor(Builder builder) {
-		this.book = builder.book;
 		this.tasks = builder.tasks;
 	}
 	
@@ -33,11 +32,23 @@ public class TaskProcessor {
 		private final TaskFactory taskFactory;
 		private final Book book;
 		
+		private List<String> taskIDsToProcess;
+		private Map<String, String> taskParams;
 		private List<Task> tasks;
 		
 		public Builder(TaskFactory taskFactory, Book book) {
 			this.taskFactory = taskFactory;
 			this.book = book;
+		}
+		
+		public Builder setTaskIDList(List<String> taskIDsToProcess) {
+			this.taskIDsToProcess = taskIDsToProcess;
+			return this;
+		}
+		
+		public Builder setTaskParams(Map<String, String> taskParams) {
+			this.taskParams = taskParams;
+			return this;
 		}
 		
 		public TaskProcessor build() {
@@ -49,10 +60,22 @@ public class TaskProcessor {
 			List<Task> list = new ArrayList<>();
 			List<TaskConfig> taskConfigs = book.getConfig().getTaskConfigs();
 			for (TaskConfig taskConfig : taskConfigs) {
-				Task task = taskFactory.createTask(taskConfig, book);
-				list.add(task);
+				if (processThisTask(taskConfig)) {
+					Task task = taskFactory.createTask(taskConfig, book, taskParams);
+					list.add(task);
+				}
 			}
 			return list;
+		}
+
+		private boolean processThisTask(TaskConfig taskConfig) {
+			boolean processTask = true;
+			if (taskIDsToProcess != null) {
+				processTask = taskIDsToProcess.stream().anyMatch(
+						taskID -> taskID.equals(taskConfig.getTaskID()));
+				
+			}
+			return processTask;
 		}
 	}
 }

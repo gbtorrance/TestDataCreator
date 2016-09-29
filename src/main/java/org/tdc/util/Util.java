@@ -98,7 +98,7 @@ public class Util {
 	/**
 	 * Purges the content of a directory of any files or sub-directories.
 	 * 
-	 * @param dir Path of directory to purge
+	 * @param dir Path of directory to purge.
 	 */
 	public static void purgeDirectory(Path dirToPurge) {
 		if (Files.isDirectory(dirToPurge)) {
@@ -122,5 +122,17 @@ public class Util {
 				throw new RuntimeException(e);
 			}
 		}
+	}
+
+	/**
+	 * Returns the extension of the provided file path.
+	 * 
+	 * @param path Path to a file (for which extension will be provided). 
+	 * @return File extension string.
+	 */
+	public static String getExtension(Path path) {
+		String pathStr = path.toString();
+		int index = pathStr.lastIndexOf(".");
+		return index == -1 ? "" : pathStr.substring(index + 1);
 	}
 }
