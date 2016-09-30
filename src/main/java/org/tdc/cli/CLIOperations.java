@@ -468,7 +468,7 @@ public class CLIOperations {
 		Path parentPath = bookPath.toAbsolutePath().getParent();
 		String fileName = bookPath.getFileName().toString();
 		String timestamp = LocalDateTime.now().format(Util.EXPORT_DATE_TIME_FORMATTER);
-		Path backupPath = parentPath.resolve(fileName + ".backup" + timestamp);
+		Path backupPath = parentPath.resolve(fileName + "." + timestamp + ".backup");
 		try {
 			Files.move(bookPath, backupPath);
 		}
@@ -481,14 +481,16 @@ public class CLIOperations {
 		catch (IOException e) {
 			throw new RuntimeException("Unable to rename temp file to original : " + bookPath);
 		}
-		deleteOldBackups(parentPath, fileName + ".backup");
+		deleteOldBackups(parentPath, fileName + ".", ".backup");
 	}
 
-	private void deleteOldBackups(Path backupPath, String backupMatch) {
+	private void deleteOldBackups(Path parentPath, String matchPrefix, String matchSuffix) {
 		try {
 			List<Path> backupFiles = new ArrayList<>();
-			Files.find(backupPath, 1, 
-					(path, attrib) -> path.getFileName().toString().startsWith(backupMatch))
+			Files.find(parentPath, 1, 
+					(path, attrib) -> 
+							path.getFileName().toString().startsWith(matchPrefix) &&
+							path.getFileName().toString().endsWith(matchSuffix))
 					.sorted()
 					.forEach(path -> backupFiles.add(path));
 			for (int i = 0; i < backupFiles.size() - MAX_BACKUPS; i++) {
