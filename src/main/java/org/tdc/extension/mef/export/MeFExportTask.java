@@ -17,6 +17,7 @@ import org.tdc.book.TestDoc;
 import org.tdc.book.TestSet;
 import org.tdc.config.book.TaskConfig;
 import org.tdc.dom.TestDocXMLGenerator;
+import org.tdc.filter.Filter;
 import org.tdc.result.Message;
 import org.tdc.result.Results;
 import org.tdc.result.TaskResult;
@@ -35,19 +36,21 @@ public class MeFExportTask implements Task {
 
 	private static final Logger log = LoggerFactory.getLogger(MeFExportTask.class);
 
-	public final MeFExportTaskConfig config;
-	public final Book book;
-	public final Path exportRoot;
-	public final TestDocXMLGenerator xmlGenerator;
+	private final MeFExportTaskConfig config;
+	private final Book book;
+	private final Path exportRoot;
+	private final TestDocXMLGenerator xmlGenerator;
+	private final Filter filter;
 
 	public MeFExportTask(
 			MeFExportTaskConfig config, Book book, 
-			Path exportRoot, TestDocXMLGenerator xmlGenerator) {
+			Path exportRoot, TestDocXMLGenerator xmlGenerator, Filter filter) {
 		
 		this.config = config;
 		this.book = book;
 		this.exportRoot = exportRoot;
 		this.xmlGenerator = xmlGenerator;
+		this.filter = filter;
 	}
 	
 	@Override
@@ -67,15 +70,17 @@ public class MeFExportTask implements Task {
 		List<TestSet> testSets = book.getTestSets();
 		int seq = 1;
 		for (TestSet testSet : testSets) {
-			if (testSets.size() == 1 && testSet.getSetName().equals("")) {
-				// if we only have a "default" set, won't need an index
-				exportTestSet(testSet, batchDir, -1);
-			}
-			else {
-				// if we have multiple sets, use index = 0 for the default,
-				// and an incrementing sequence for the rest
-				exportTestSet(testSet, batchDir, 
-						testSet.getSetName().equals("") ? 0 : seq++);
+			if (filter == null || !filter.ignoreTestSet(testSet)) {
+				if (testSets.size() == 1 && testSet.getSetName().equals("")) {
+					// if we only have a "default" set, won't need an index
+					exportTestSet(testSet, batchDir, -1);
+				}
+				else {
+					// if we have multiple sets, use index = 0 for the default,
+					// and an incrementing sequence for the rest
+					exportTestSet(testSet, batchDir, 
+							testSet.getSetName().equals("") ? 0 : seq++);
+				}
 			}
 		}
 	}
@@ -88,8 +93,10 @@ public class MeFExportTask implements Task {
 			Path setDir = createSetDir(batchDir, seq, testSet.getSetName());
 			List<TestCase> testCases = testSet.getTestCases();
 			for (TestCase testCase : testCases) {
-				String submissionID = exportTestCase(testCase, setDir);
-				submissionIDs.append(submissionID).append(System.lineSeparator());
+				if (filter == null || !filter.ignoreTestCase(testSet, testCase)) {
+					String submissionID = exportTestCase(testSet, testCase, setDir);
+					submissionIDs.append(submissionID).append(System.lineSeparator());
+				}
 			}
 			writeSubmissionIDsToFile(setDir, submissionIDs.toString());
 			success = true;
@@ -110,7 +117,7 @@ public class MeFExportTask implements Task {
 		}
 	}
 
-	private String exportTestCase(TestCase testCase, Path setDir) {
+	private String exportTestCase(TestSet testSet, TestCase testCase, Path setDir) {
 		log.debug("Exporting TestCase: {}", testCase.getCaseNum());
 		boolean success = false;
 		try {
@@ -118,7 +125,9 @@ public class MeFExportTask implements Task {
 			Path caseDir = createCaseDir(setDir, submissionID);
 			List<TestDoc> testDocs = testCase.getTestDocs();
 			for (TestDoc testDoc : testDocs) {
-				exportTestDoc(testDoc, caseDir, submissionID);
+				if (filter == null || !filter.ignoreTestDoc(testSet, testCase, testDoc)) {
+					exportTestDoc(testDoc, caseDir, submissionID);
+				}
 			}
 			success = true;
 			return submissionID;
@@ -228,7 +237,7 @@ public class MeFExportTask implements Task {
 	}
 	
 	public static Task build(
-			TaskConfig taskConfig, Book book, Map<String, String> taskParams) {
+			TaskConfig taskConfig, Book book, Map<String, String> taskParams, Filter filter) {
 		
 		if (!(taskConfig instanceof MeFExportTaskConfig)) {
 			throw new IllegalStateException("TaskConfig '" + taskConfig.getTaskID() + 
@@ -237,7 +246,7 @@ public class MeFExportTask implements Task {
 		TestDocXMLGenerator xmlGenerator = new TestDocXMLGenerator();
 		MeFExportTaskConfig config = (MeFExportTaskConfig)taskConfig;
 		Path exportRoot = getExportRoot(config, taskParams);
-		return new MeFExportTask(config, book, exportRoot, xmlGenerator);
+		return new MeFExportTask(config, book, exportRoot, xmlGenerator, filter);
 	}
 	
 	private static Path getExportRoot(

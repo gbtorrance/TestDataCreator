@@ -6,6 +6,7 @@ import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.tdc.config.model.ModelConfig;
+import org.tdc.filter.Filter;
 import org.tdc.result.Result;
 import org.tdc.schemavalidate.SchemaValidator;
 import org.tdc.schemavalidate.SchemaValidatorFactory;
@@ -19,16 +20,22 @@ public class BookSchemaValidator {
 	
 	private final Book book;
 	private final SchemaValidatorFactory schemaValidatorFactory;
+	private final Filter filter;
 	
-	public BookSchemaValidator(Book book, SchemaValidatorFactory schemaValidatorFactory) {
+	public BookSchemaValidator(Book book, 
+			SchemaValidatorFactory schemaValidatorFactory, Filter filter) {
+		
 		this.book = book;
 		this.schemaValidatorFactory = schemaValidatorFactory;
+		this.filter = filter;
 	}
 	
 	public void validate() {
 		List<TestSet> testSets = book.getTestSets();
 		for (TestSet testSet : testSets) {
-			validateTestSet(testSet);
+			if (filter == null || !filter.ignoreTestSet(testSet)) {
+				validateTestSet(testSet);
+			}
 		}
 	}
 
@@ -36,15 +43,19 @@ public class BookSchemaValidator {
 		log.debug("Schema validating TestSet: {}", testSet.getSetName());
 		List<TestCase> testCases = testSet.getTestCases();
 		for (TestCase testCase : testCases) {
-			validateTestCase(testCase);
+			if (filter == null || !filter.ignoreTestCase(testSet, testCase)) {
+				validateTestCase(testSet, testCase);
+			}
 		}
 	}
 
-	private void validateTestCase(TestCase testCase) {
+	private void validateTestCase(TestSet testSet, TestCase testCase) {
 		log.debug("Schema validating TestCase: {}", testCase.getCaseNum());
 		List<TestDoc> testDocs = testCase.getTestDocs();
 		for (TestDoc testDoc : testDocs) {
-			validateTestDoc(testDoc);
+			if (filter == null || !filter.ignoreTestDoc(testSet, testCase, testDoc)) {
+				validateTestDoc(testDoc);
+			}
 		}
 	}
 

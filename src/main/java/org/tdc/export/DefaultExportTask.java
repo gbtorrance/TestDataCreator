@@ -15,6 +15,7 @@ import org.tdc.book.TestDoc;
 import org.tdc.book.TestSet;
 import org.tdc.config.book.TaskConfig;
 import org.tdc.dom.TestDocXMLGenerator;
+import org.tdc.filter.Filter;
 import org.tdc.result.Message;
 import org.tdc.result.Results;
 import org.tdc.result.TaskResult;
@@ -28,14 +29,19 @@ import org.tdc.util.Util;
 public class DefaultExportTask implements Task {
 	private static final Logger log = LoggerFactory.getLogger(DefaultExportTask.class);
 
-	public final DefaultExportTaskConfig config;
-	public final Book book;
-	public final TestDocXMLGenerator xmlGenerator;
+	private final DefaultExportTaskConfig config;
+	private final Book book;
+	private final TestDocXMLGenerator xmlGenerator;
+	private final Filter filter;
 
-	public DefaultExportTask(DefaultExportTaskConfig config, Book book, TestDocXMLGenerator xmlGenerator) {
+	public DefaultExportTask(
+			DefaultExportTaskConfig config, Book book, 
+			TestDocXMLGenerator xmlGenerator, Filter filter) {
+		
 		this.config = config;
 		this.book = book;
 		this.xmlGenerator = xmlGenerator;
+		this.filter = filter;
 	}
 	
 	@Override
@@ -55,15 +61,17 @@ public class DefaultExportTask implements Task {
 		List<TestSet> testSets = book.getTestSets();
 		int seq = 1;
 		for (TestSet testSet : testSets) {
-			if (testSets.size() == 1 && testSet.getSetName().equals("")) {
-				// if we only have a "default" set, won't need an index
-				exportTestSet(testSet, batchDir, -1);
-			}
-			else {
-				// if we have multiple sets, use index = 0 for the default,
-				// and an incrementing sequence for the rest
-				exportTestSet(testSet, batchDir, 
-						testSet.getSetName().equals("") ? 0 : seq++);
+			if (filter == null || !filter.ignoreTestSet(testSet)) {
+				if (testSets.size() == 1 && testSet.getSetName().equals("")) {
+					// if we only have a "default" set, won't need an index
+					exportTestSet(testSet, batchDir, -1);
+				}
+				else {
+					// if we have multiple sets, use index = 0 for the default,
+					// and an incrementing sequence for the rest
+					exportTestSet(testSet, batchDir, 
+							testSet.getSetName().equals("") ? 0 : seq++);
+				}
 			}
 		}
 	}
@@ -75,7 +83,9 @@ public class DefaultExportTask implements Task {
 			Path setDir = createSetDir(batchDir, seq, testSet.getSetName());
 			List<TestCase> testCases = testSet.getTestCases();
 			for (TestCase testCase : testCases) {
-				exportTestCase(testCase, setDir);
+				if (filter == null || !filter.ignoreTestCase(testSet, testCase)) {
+					exportTestCase(testSet, testCase, setDir);
+				}
 			}
 			success = true;
 		}
@@ -84,7 +94,7 @@ public class DefaultExportTask implements Task {
 		}
 	}
 
-	private void exportTestCase(TestCase testCase, Path setDir) {
+	private void exportTestCase(TestSet testSet, TestCase testCase, Path setDir) {
 		log.debug("Exporting TestCase: {}", testCase.getCaseNum());
 		boolean success = false;
 		try {
@@ -92,7 +102,9 @@ public class DefaultExportTask implements Task {
 			List<TestDoc> testDocs = testCase.getTestDocs();
 			int seq = 1;
 			for (TestDoc testDoc : testDocs) {
-				exportTestDoc(testDoc, caseDir, seq++);
+				if (filter == null || !filter.ignoreTestDoc(testSet, testCase, testDoc)) {
+					exportTestDoc(testDoc, caseDir, seq++);
+				}
 			}
 			success = true;
 		}
@@ -169,13 +181,13 @@ public class DefaultExportTask implements Task {
 	}
 	
 	public static Task build(
-			TaskConfig taskConfig, Book book, Map<String, String> taskParams) {
+			TaskConfig taskConfig, Book book, Map<String, String> taskParams, Filter filter) {
 		
 		if (!(taskConfig instanceof DefaultExportTaskConfig)) {
 			throw new IllegalStateException("TaskConfig '" + taskConfig.getTaskID() + 
 					"' must be an instance of " + DefaultExportTaskConfig.class.getName());
 		}
 		TestDocXMLGenerator xmlGenerator = new TestDocXMLGenerator();
-		return new DefaultExportTask((DefaultExportTaskConfig)taskConfig, book, xmlGenerator);
+		return new DefaultExportTask((DefaultExportTaskConfig)taskConfig, book, xmlGenerator, filter);
 	}
 }

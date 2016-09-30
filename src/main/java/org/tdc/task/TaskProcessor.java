@@ -6,6 +6,7 @@ import java.util.Map;
 
 import org.tdc.book.Book;
 import org.tdc.config.book.TaskConfig;
+import org.tdc.filter.Filter;
 
 /**
  * Responsible for processing, in sequence, a series of {@link Task}s
@@ -34,6 +35,7 @@ public class TaskProcessor {
 		
 		private List<String> taskIDsToProcess;
 		private Map<String, String> taskParams;
+		private Filter filter;
 		private List<Task> tasks;
 		
 		public Builder(TaskFactory taskFactory, Book book) {
@@ -51,6 +53,11 @@ public class TaskProcessor {
 			return this;
 		}
 		
+		public Builder setFilter(Filter filter) {
+			this.filter = filter;
+			return this;
+		}
+		
 		public TaskProcessor build() {
 			this.tasks = createTasks();
 			return new TaskProcessor(this);
@@ -61,7 +68,7 @@ public class TaskProcessor {
 			List<TaskConfig> taskConfigs = book.getConfig().getTaskConfigs();
 			for (TaskConfig taskConfig : taskConfigs) {
 				if (processThisTask(taskConfig)) {
-					Task task = taskFactory.createTask(taskConfig, book, taskParams);
+					Task task = taskFactory.createTask(taskConfig, book, taskParams, filter);
 					list.add(task);
 				}
 			}
@@ -73,7 +80,6 @@ public class TaskProcessor {
 			if (taskIDsToProcess != null) {
 				processTask = taskIDsToProcess.stream().anyMatch(
 						taskID -> taskID.equals(taskConfig.getTaskID()));
-				
 			}
 			return processTask;
 		}

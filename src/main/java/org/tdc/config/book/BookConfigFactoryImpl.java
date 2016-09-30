@@ -25,14 +25,17 @@ public class BookConfigFactoryImpl implements BookConfigFactory {
 	private final Cache<Addr,BookConfig> cache = new SimpleCache<>();
 	private final Path booksConfigRoot;
 	private final ModelConfigFactory modelConfigFactory;
+	private final FilterConfigFactory filterConfigFactory;
 	private final TaskConfigFactory taskConfigFactory;
 	
 	public BookConfigFactoryImpl(Path booksConfigRoot, 
 			ModelConfigFactory modelConfigFactory,
+			FilterConfigFactory filterConfigFactory,
 			TaskConfigFactory taskConfigFactory) {
 		
 		this.booksConfigRoot = booksConfigRoot;
 		this.modelConfigFactory = modelConfigFactory;
+		this.filterConfigFactory = filterConfigFactory;
 		this.taskConfigFactory = taskConfigFactory;
 	}
 
@@ -41,7 +44,8 @@ public class BookConfigFactoryImpl implements BookConfigFactory {
 		BookConfig bookConfig = cache.get(addr);
 		if (bookConfig == null) {
 			bookConfig = new BookConfigImpl.Builder(
-					booksConfigRoot, addr, modelConfigFactory, taskConfigFactory).build();
+					booksConfigRoot, addr, modelConfigFactory, 
+					filterConfigFactory, taskConfigFactory).build();
 			cache.put(addr, bookConfig);
 		}
 		else {

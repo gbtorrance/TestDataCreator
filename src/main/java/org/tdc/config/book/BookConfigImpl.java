@@ -32,6 +32,7 @@ public class BookConfigImpl implements BookConfig {
 	private final Path bookTemplateFile;
 	private final Map<String, DocTypeConfig> docTypeConfigs;
 	private final Map<String, PageConfig> pageConfigs;
+	private final List<FilterConfig> filterConfigs;
 	private final List<TaskConfig> taskConfigs;
 	private final CellStyle defaultStyle;
 	private final CellStyle nodeHeaderStyle; 		// based on defaultStyle
@@ -49,6 +50,7 @@ public class BookConfigImpl implements BookConfig {
 	private final int nodeColumnWidth;
 	private final int headerRowCount;
 	private final String[] nodeHeaderLabels;
+
 	
 	private BookConfigImpl(Builder builder) {
 		this.booksConfigRoot = builder.booksConfigRoot;
@@ -59,6 +61,7 @@ public class BookConfigImpl implements BookConfig {
 		this.bookTemplateFile = builder.bookTemplateFile;
 		this.docTypeConfigs = Collections.unmodifiableMap(builder.docTypeConfigs); // unmodifiable
 		this.pageConfigs = Collections.unmodifiableMap(builder.pageConfigs); // unmodifiable
+		this.filterConfigs = Collections.unmodifiableList(builder.filterConfigs); // unmodifiable
 		this.taskConfigs = Collections.unmodifiableList(builder.taskConfigs); // unmodifiable
 		this.defaultStyle = builder.defaultStyle;
 		this.nodeHeaderStyle = builder.nodeHeaderStyle;
@@ -127,6 +130,11 @@ public class BookConfigImpl implements BookConfig {
 		return pageConfigs;
 	}
 	
+	@Override
+	public List<FilterConfig> getFilterConfigs() {
+		return filterConfigs;
+	}
+
 	@Override
 	public List<TaskConfig> getTaskConfigs() {
 		return taskConfigs;
@@ -215,16 +223,18 @@ public class BookConfigImpl implements BookConfig {
 	public static class Builder {
 		private final XMLConfigWrapper config;
 		private final ModelConfigFactory modelConfigFactory;
+		private final FilterConfigFactory filterConfigFactory;
 		private final TaskConfigFactory taskConfigFactory;
 		private final Path booksConfigRoot;
 		private final Addr addr;
 		private final Path bookConfigRoot;
 		
-		public String bookName;
-		public String bookDescription;
-		public Path bookTemplateFile;
+		private String bookName;
+		private String bookDescription;
+		private Path bookTemplateFile;
 		private Map<String, DocTypeConfig> docTypeConfigs;
 		private Map<String, PageConfig> pageConfigs;
+		private List<FilterConfig> filterConfigs;
 		private List<TaskConfig> taskConfigs;
 		private CellStyle defaultStyle;
 		private CellStyle nodeHeaderStyle;
@@ -245,6 +255,7 @@ public class BookConfigImpl implements BookConfig {
 		
 		public Builder(Path booksConfigRoot, Addr addr, 
 				ModelConfigFactory modelConfigFactory, 
+				FilterConfigFactory filterConfigFactory,
 				TaskConfigFactory taskConfigFactory) {
 			
 			log.info("Creating BookConfig: {}", addr);
@@ -257,6 +268,7 @@ public class BookConfigImpl implements BookConfig {
 			Path bookConfigFile = bookConfigRoot.resolve(CONFIG_FILE);
 			this.config = new XMLConfigWrapper(bookConfigFile);
 			this.modelConfigFactory = modelConfigFactory;
+			this.filterConfigFactory = filterConfigFactory;
 			this.taskConfigFactory = taskConfigFactory;
 		}
 
@@ -288,6 +300,8 @@ public class BookConfigImpl implements BookConfig {
 					"NodeHeaderLabels", headerRowCount);
 			pageConfigs = new PageConfigImpl.Builder(config, docTypeConfigs, modelConfigFactory, 
 					nodeColumnCount, headerRowCount, defaultNodeDetailStyle).buildAll();
+			filterConfigs = filterConfigFactory.createFilterConfigs(
+					config, "Filters", bookConfigRoot, addr, bookName);
 			taskConfigs = taskConfigFactory.createTaskConfigs(
 					config, "Tasks", bookConfigRoot, addr, bookName);
 			return new BookConfigImpl(this);

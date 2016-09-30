@@ -5,6 +5,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.tdc.config.book.TaskConfig;
+import org.tdc.filter.Filter;
 import org.tdc.result.Message;
 import org.tdc.result.Result;
 import org.tdc.result.Results;
@@ -22,6 +23,7 @@ public class BookSpreadsheetLogWriter {
 	
 	private final Book book;
 	private final SpreadsheetFile spreadsheetFile;
+	private final Filter filter;
 	private final CellStyle boldStyle;
 	private final CellStyle defaulStyle;
 	
@@ -30,9 +32,10 @@ public class BookSpreadsheetLogWriter {
 	private int colNum;
 	
 	
-	public BookSpreadsheetLogWriter(Book book, SpreadsheetFile spreadsheetFile) {
+	public BookSpreadsheetLogWriter(Book book, SpreadsheetFile spreadsheetFile, Filter filter) {
 		this.book = book;
 		this.spreadsheetFile = spreadsheetFile;
+		this.filter = filter;
 		this.boldStyle = book.getConfig().getNodeHeaderStyle(); // TODO log-specific style configuration
 		this.defaulStyle = book.getConfig().getDefaultStyle(); // TODO log-specific style configuration 
 	}
@@ -55,7 +58,9 @@ public class BookSpreadsheetLogWriter {
 	private void writeBook() {
 		List<TestSet> testSets = book.getTestSets();
 		for (TestSet testSet : testSets) {
-			writeTestSet(testSet);
+			if (filter == null || !filter.ignoreTestSet(testSet)) {
+				writeTestSet(testSet);
+			}
 		}
 	}
 
@@ -67,13 +72,15 @@ public class BookSpreadsheetLogWriter {
 		colNum++;
 		List<TestCase> testCases = testSet.getTestCases();
 		for (TestCase testCase : testCases) {
-			writeTestCase(testCase);
+			if (filter == null || !filter.ignoreTestCase(testSet, testCase)) {
+				writeTestCase(testSet, testCase);
+			}
 		}
 		writeResults(testSet.getResults());
 		colNum--;
 	}
 
-	private void writeTestCase(TestCase testCase) {
+	private void writeTestCase(TestSet testSet, TestCase testCase) {
 		String setLabel = testCase.getSetName().equals("") ? 
 				"" : " [Set Name: " + testCase.getSetName() + "]";
 		String caseLabel = "Test Case: " + testCase.getCaseNum() + setLabel;
@@ -82,7 +89,9 @@ public class BookSpreadsheetLogWriter {
 		colNum++;
 		List<TestDoc> testDocs = testCase.getTestDocs();
 		for (TestDoc testDoc : testDocs) {
-			writeTestDoc(testDoc);
+			if (filter == null || !filter.ignoreTestDoc(testSet, testCase, testDoc)) {
+				writeTestDoc(testDoc);
+			}
 		}
 		writeResults(testCase.getResults());
 		colNum--;

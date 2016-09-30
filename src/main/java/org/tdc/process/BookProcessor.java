@@ -10,6 +10,8 @@ import org.tdc.book.BookSchemaValidator;
 import org.tdc.book.BookSpreadsheetLogWriter;
 import org.tdc.book.BookTestDataLoader;
 import org.tdc.config.book.BookConfig;
+import org.tdc.filter.CompositeFilter;
+import org.tdc.filter.Filter;
 import org.tdc.spreadsheet.SpreadsheetFile;
 import org.tdc.spreadsheet.SpreadsheetFileFactory;
 import org.tdc.task.TaskProcessor;
@@ -126,11 +128,14 @@ class BookProcessor {
 				spreadsheetFileFactory.createReadOnlySpreadsheetFileFromPath(bookPath) : 
 				spreadsheetFileFactory.createEditableSpreadsheetFileFromPath(bookPath); 
 		Book book = processor.getBookFactory().getBook(spreadsheetFile);
-		BookTestDataLoader loader = new BookTestDataLoader(book, spreadsheetFile);
+		Filter filter = new CompositeFilter
+				.Builder(processor.getFilterFactory(), book)
+				.build();
+		BookTestDataLoader loader = new BookTestDataLoader(book, spreadsheetFile, filter);
 		loader.loadTestData();
 		if (schemaValidate) {
 			BookSchemaValidator schemaValidator = new BookSchemaValidator(
-					book, processor.getSchemaValidatorFactory());
+					book, processor.getSchemaValidatorFactory(), filter);
 			schemaValidator.validate();
 		}
 		if (processTasks) {
@@ -138,11 +143,13 @@ class BookProcessor {
 					.Builder(processor.getTaskFactory(), book)
 					.setTaskIDList(taskIDsToProcess) 
 					.setTaskParams(taskParams)
+					.setFilter(filter)
 					.build();
 			taskProcessor.processTasks();
 		}
 		if (targetPath != null) {
-			BookSpreadsheetLogWriter logWriter = new BookSpreadsheetLogWriter(book, spreadsheetFile);
+			BookSpreadsheetLogWriter logWriter = 
+					new BookSpreadsheetLogWriter(book, spreadsheetFile, filter);
 			logWriter.writeLog();
 			if (overwriteExisting) {
 				spreadsheetFile.save(targetPath);

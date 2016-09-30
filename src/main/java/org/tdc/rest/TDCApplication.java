@@ -11,6 +11,8 @@ import org.tdc.book.BookFactory;
 import org.tdc.book.BookFactoryImpl;
 import org.tdc.config.book.BookConfigFactory;
 import org.tdc.config.book.BookConfigFactoryImpl;
+import org.tdc.config.book.FilterConfigFactory;
+import org.tdc.config.book.FilterConfigFactoryImpl;
 import org.tdc.config.book.TaskConfigFactory;
 import org.tdc.config.book.TaskConfigFactoryImpl;
 import org.tdc.config.model.ModelConfigFactory;
@@ -48,6 +50,7 @@ public class TDCApplication extends Application {
 	private final ServerConfig serverConfig;
 	private final SchemaConfigFactory schemaConfigFactory;
 	private final ModelConfigFactory modelConfigFactory;
+	private final FilterConfigFactory filterConfigFactory;
 	private final TaskConfigFactory taskConfigFactory;
 	private final BookConfigFactory bookConfigFactory;
 	private final SpreadsheetFileFactory spreadsheetFileFactory;
@@ -67,10 +70,12 @@ public class TDCApplication extends Application {
 		schemaConfigFactory = new SchemaConfigFactoryImpl(
 				serverConfig.getSchemasConfigRoot());
 		modelConfigFactory = new ModelConfigFactoryImpl(schemaConfigFactory);
+		filterConfigFactory = new FilterConfigFactoryImpl();
 		taskConfigFactory = new TaskConfigFactoryImpl();
 		bookConfigFactory = new BookConfigFactoryImpl(
 				serverConfig.getBooksConfigRoot(), 
-				modelConfigFactory, 
+				modelConfigFactory,
+				filterConfigFactory,
 				taskConfigFactory);
 		
 		spreadsheetFileFactory = new ExcelSpreadsheetFileFactory();

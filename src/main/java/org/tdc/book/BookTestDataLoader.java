@@ -1,13 +1,16 @@
 package org.tdc.book;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.tdc.config.book.PageConfig;
 import org.tdc.config.model.ModelConfig;
 import org.tdc.dom.TestDocDOMBuilder;
+import org.tdc.filter.Filter;
 import org.tdc.model.AttribNode;
 import org.tdc.model.CompositorNode;
 import org.tdc.model.ElementNode;
@@ -32,21 +35,43 @@ public class BookTestDataLoader {
 	private final TestDocDOMBuilder testDocDOMBuilder;
 	private final Book book;
 	private final SpreadsheetFile spreadsheetFile;
+	private final Filter filter;
 	
-	public BookTestDataLoader(Book book, SpreadsheetFile spreadsheetFile) {
+	public BookTestDataLoader(Book book, SpreadsheetFile spreadsheetFile, Filter filter) {
 		this.testDocDOMBuilder = new TestDocDOMBuilder();
 		this.book = book;
 		this.spreadsheetFile = spreadsheetFile;
+		this.filter = filter;
 	}
 
 	public void loadTestData() {
 		Collection<Page> pages = book.getPages().values();
+		Set<TestDoc> docsToFilter = getTestDocsToFilter();
 		for (Page page : pages) {
-			loadPageTestData(page);
+			loadPageTestData(page, docsToFilter);
 		}
 	}
 	
-	private void loadPageTestData(Page page) {
+	private Set<TestDoc> getTestDocsToFilter() {
+		Set<TestDoc> docs = new HashSet<>();
+		if (filter != null) {
+			for (TestSet testSet : book.getTestSets()) {
+				boolean ignoreSet = filter.ignoreTestSet(testSet); 
+				for (TestCase testCase : testSet.getTestCases()) {
+					boolean ignoreCase = ignoreSet || filter.ignoreTestCase(testSet, testCase);
+					for (TestDoc testDoc : testCase.getTestDocs()) {
+						boolean ignoreDoc = ignoreCase || filter.ignoreTestDoc(testSet, testCase, testDoc);
+						if (ignoreDoc) {
+							docs.add(testDoc);
+						}
+					}
+				}
+			}
+		}
+		return docs;
+	}
+
+	private void loadPageTestData(Page page, Set<TestDoc> docsToFilter) {
 		log.debug("About to load TestDoc DOM documents for Page: " + page.getName());
 		
 		ModelInst modelInst = page.getModelInst();
@@ -67,7 +92,9 @@ public class BookTestDataLoader {
 		
 		List<TestDoc> testDocs = page.getTestDocs();
 		for (TestDoc testDoc : testDocs) {
-			loadTestDocData(testDoc);
+			if (!docsToFilter.contains(testDoc)) {
+				loadTestDocData(testDoc);
+			}
 		}
 	}
 

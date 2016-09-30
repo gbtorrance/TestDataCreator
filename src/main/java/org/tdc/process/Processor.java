@@ -8,11 +8,13 @@ import org.tdc.book.Book;
 import org.tdc.book.BookFactory;
 import org.tdc.config.book.BookConfig;
 import org.tdc.config.book.BookConfigFactory;
+import org.tdc.config.book.FilterConfigFactory;
 import org.tdc.config.book.TaskConfigFactory;
 import org.tdc.config.model.ModelConfig;
 import org.tdc.config.model.ModelConfigFactory;
 import org.tdc.config.schema.SchemaConfig;
 import org.tdc.config.schema.SchemaConfigFactory;
+import org.tdc.filter.FilterFactory;
 import org.tdc.modeldef.ModelDefFactory;
 import org.tdc.modelinst.ModelInstFactory;
 import org.tdc.schema.SchemaFactory;
@@ -33,6 +35,7 @@ public interface Processor {
 	
 	SchemaConfigFactory getSchemaConfigFactory();
 	ModelConfigFactory getModelConfigFactory();
+	FilterConfigFactory getFilterConfigFactory();
 	TaskConfigFactory getTaskConfigFactory();
 	BookConfigFactory getBookConfigFactory();
 	SpreadsheetFileFactory getSpreadsheetFileFactory();
@@ -40,6 +43,7 @@ public interface Processor {
 	ModelDefFactory getModelDefFactory();
 	ModelInstFactory getModelInstFactory();
 	BookFactory getBookFactory();
+	FilterFactory getFilterFactory();
 	SchemaValidatorFactory getSchemaValidatorFactory();
 	TaskFactory getTaskFactory();
 	

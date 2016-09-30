@@ -10,6 +10,8 @@ import org.tdc.book.BookFactoryImpl;
 import org.tdc.config.book.BookConfig;
 import org.tdc.config.book.BookConfigFactory;
 import org.tdc.config.book.BookConfigFactoryImpl;
+import org.tdc.config.book.FilterConfigFactory;
+import org.tdc.config.book.FilterConfigFactoryImpl;
 import org.tdc.config.book.TaskConfigFactory;
 import org.tdc.config.book.TaskConfigFactoryImpl;
 import org.tdc.config.model.ModelConfig;
@@ -18,6 +20,8 @@ import org.tdc.config.model.ModelConfigFactoryImpl;
 import org.tdc.config.schema.SchemaConfig;
 import org.tdc.config.schema.SchemaConfigFactory;
 import org.tdc.config.schema.SchemaConfigFactoryImpl;
+import org.tdc.filter.FilterFactory;
+import org.tdc.filter.FilterFactoryImpl;
 import org.tdc.modeldef.ModelDefFactory;
 import org.tdc.modeldef.ModelDefFactoryImpl;
 import org.tdc.modelinst.ModelInstFactory;
@@ -40,6 +44,7 @@ public class ProcessorImpl implements Processor {
 	private final Path booksConfigRoot;
 	private final SchemaConfigFactory schemaConfigFactory;
 	private final ModelConfigFactory modelConfigFactory;
+	private final FilterConfigFactory filterConfigFactory;
 	private final TaskConfigFactory taskConfigFactory;
 	private final BookConfigFactory bookConfigFactory;
 	private final SpreadsheetFileFactory spreadsheetFileFactory;
@@ -47,7 +52,8 @@ public class ProcessorImpl implements Processor {
 	private final ModelDefFactory modelDefFactory;
 	private final ModelInstFactory modelInstFactory;
 	private final BookFactory bookFactory;
-	private final SchemaValidatorFactory schemaValidatorFactory; 
+	private final FilterFactory filterFactory;
+	private final SchemaValidatorFactory schemaValidatorFactory;
 	private final TaskFactory taskFactory;
 	private final ModelProcessor modelProcessor;
 	private final BookProcessor bookProcessor;
@@ -57,6 +63,7 @@ public class ProcessorImpl implements Processor {
 		this.booksConfigRoot = builder.booksConfigRoot;
 		this.schemaConfigFactory = builder.schemaConfigFactory;
 		this.modelConfigFactory = builder.modelConfigFactory;
+		this.filterConfigFactory = builder.filterConfigFactory;
 		this.taskConfigFactory = builder.taskConfigFactory;
 		this.bookConfigFactory = builder.bookConfigFactory;
 		this.spreadsheetFileFactory = builder.spreadsheetFileFactory;
@@ -64,6 +71,7 @@ public class ProcessorImpl implements Processor {
 		this.modelDefFactory = builder.modelDefFactory;
 		this.modelInstFactory = builder.modelInstFactory;
 		this.bookFactory = builder.bookFactory;
+		this.filterFactory = builder.filterFactory;
 		this.schemaValidatorFactory = builder.schemaValidatorFactory;
 		this.taskFactory = builder.taskFactory;
 		this.modelProcessor = builder.modelProcessor;
@@ -88,6 +96,11 @@ public class ProcessorImpl implements Processor {
 	@Override
 	public ModelConfigFactory getModelConfigFactory() {
 		return modelConfigFactory;
+	}
+
+	@Override
+	public FilterConfigFactory getFilterConfigFactory() {
+		return filterConfigFactory;
 	}
 
 	@Override
@@ -123,6 +136,11 @@ public class ProcessorImpl implements Processor {
 	@Override
 	public BookFactory getBookFactory() {
 		return bookFactory;
+	}
+
+	@Override
+	public FilterFactory getFilterFactory() {
+		return filterFactory;
 	}
 
 	@Override
@@ -227,6 +245,7 @@ public class ProcessorImpl implements Processor {
 
 		private SchemaConfigFactory schemaConfigFactory;
 		private ModelConfigFactory modelConfigFactory;
+		private FilterConfigFactory filterConfigFactory;
 		private TaskConfigFactory taskConfigFactory;
 		private BookConfigFactory bookConfigFactory;
 		private SpreadsheetFileFactory spreadsheetFileFactory;
@@ -234,6 +253,7 @@ public class ProcessorImpl implements Processor {
 		private ModelDefFactory modelDefFactory;
 		private ModelInstFactory modelInstFactory;
 		private BookFactory bookFactory;
+		private FilterFactory filterFactory;
 		private SchemaValidatorFactory schemaValidatorFactory; 
 		private TaskFactory taskFactory;
 		
@@ -248,14 +268,17 @@ public class ProcessorImpl implements Processor {
 		public Builder defaultFactories() {
 			schemaConfigFactory = new SchemaConfigFactoryImpl(schemasConfigRoot);
 			modelConfigFactory = new ModelConfigFactoryImpl(schemaConfigFactory);
+			filterConfigFactory = new FilterConfigFactoryImpl();
 			taskConfigFactory = new TaskConfigFactoryImpl();
 			bookConfigFactory = new BookConfigFactoryImpl(
-					booksConfigRoot, modelConfigFactory, taskConfigFactory);
+					booksConfigRoot, modelConfigFactory, 
+					filterConfigFactory, taskConfigFactory);
 			spreadsheetFileFactory = new ExcelSpreadsheetFileFactory();
 			schemaFactory = new SchemaFactoryImpl();
 			modelDefFactory = new ModelDefFactoryImpl(schemaFactory, spreadsheetFileFactory);
 			modelInstFactory = new ModelInstFactoryImpl(modelDefFactory);
 			bookFactory = new BookFactoryImpl(bookConfigFactory, modelInstFactory);
+			filterFactory = new FilterFactoryImpl();
 			schemaValidatorFactory = new SchemaValidatorFactoryImpl();
 			taskFactory = new TaskFactoryImpl();
 			return this;
@@ -268,6 +291,11 @@ public class ProcessorImpl implements Processor {
 
 		public Builder setModelConfigFactory(ModelConfigFactory modelConfigFactory) {
 			this.modelConfigFactory = modelConfigFactory;
+			return this;
+		}
+
+		public Builder setFilterConfigFactory(FilterConfigFactory filterConfigFactory) {
+			this.filterConfigFactory = filterConfigFactory;
 			return this;
 		}
 
@@ -303,6 +331,11 @@ public class ProcessorImpl implements Processor {
 
 		public Builder setBookFactory(BookFactory bookFactory) {
 			this.bookFactory = bookFactory;
+			return this;
+		}
+
+		public Builder setFilterFactory(FilterFactory filterFactory) {
+			this.filterFactory = filterFactory;
 			return this;
 		}
 

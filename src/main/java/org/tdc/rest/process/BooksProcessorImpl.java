@@ -112,7 +112,7 @@ public class BooksProcessorImpl implements BooksProcessor {
 		SpreadsheetFile spreadsheetFile = 
 				spreadsheetFileFactory.createReadOnlySpreadsheetFileFromPath(spreadsheetPath);
 		Book book = bookFactory.getBook(spreadsheetFile);
-		BookTestDataLoader loader = new BookTestDataLoader(book, spreadsheetFile);
+		BookTestDataLoader loader = new BookTestDataLoader(book, spreadsheetFile, null);
 		loader.loadTestData();
 		// TODO possibly move validation elsewhere; leave it here for now
 		schemaValidateBook(book);
@@ -120,7 +120,7 @@ public class BooksProcessorImpl implements BooksProcessor {
 	}
 	
 	private void schemaValidateBook(Book book) {
-		BookSchemaValidator validator = new BookSchemaValidator(book, schemaValidatorFactory);
+		BookSchemaValidator validator = new BookSchemaValidator(book, schemaValidatorFactory, null);
 		validator.validate();
 	}
 

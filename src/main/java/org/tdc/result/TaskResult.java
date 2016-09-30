@@ -7,7 +7,7 @@ import org.tdc.task.Task;
  * resulting from processing {@link Task}s.
  */
 public class TaskResult extends Result {
-	public final String taskID;
+	private final String taskID;
 	
 	public TaskResult(String taskID) {
 		this.taskID = taskID;

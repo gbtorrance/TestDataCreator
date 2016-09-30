@@ -20,6 +20,7 @@ public interface BookConfig {
 	String getBookTemplateFileExtension();
 	Map<String, DocTypeConfig> getDocTypeConfigs();
 	Map<String, PageConfig> getPageConfigs();
+	List<FilterConfig> getFilterConfigs();
 	List<TaskConfig> getTaskConfigs();
 	CellStyle getDefaultStyle();
 	CellStyle getNodeHeaderStyle();
