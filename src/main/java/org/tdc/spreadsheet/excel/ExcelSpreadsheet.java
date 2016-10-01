@@ -3,8 +3,10 @@ package org.tdc.spreadsheet.excel;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import org.apache.poi.ss.usermodel.Hyperlink;
 import org.apache.poi.ss.util.CellReference;
 import org.apache.poi.xssf.usermodel.XSSFCell;
+import org.apache.poi.xssf.usermodel.XSSFCreationHelper;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -26,10 +28,12 @@ public class ExcelSpreadsheet implements Spreadsheet {
 	private static final Logger log = LoggerFactory.getLogger(ExcelSpreadsheet.class);
 
 	private final XSSFSheet xssfSheet;
+	private XSSFCreationHelper xssfCreationHelper;
 	private final ExcelStyleManager styleManager;
 	
 	private ExcelSpreadsheet(Builder builder) {
 		this.xssfSheet = builder.xssfSheet;
+		this.xssfCreationHelper = builder.xssfCreationHelper;
 		this.styleManager = builder.styleManager;
 	}
 	
@@ -129,6 +133,18 @@ public class ExcelSpreadsheet implements Spreadsheet {
 		return CellReference.convertNumToColString(colNum-1);
 	}
 
+	@Override
+	public void setHyperlink(String targetPage, String targetCellRef, 
+			String value, int rowNum, int colNum, CellStyle style) {
+		
+		String linkAddr = "'" + targetPage + "'!" + targetCellRef;
+		XSSFCell cell = getCellCreateIfNotExist(rowNum, colNum);
+		Hyperlink hl = xssfCreationHelper.createHyperlink(Hyperlink.LINK_DOCUMENT);
+		hl.setAddress(linkAddr);
+		cell.setHyperlink(hl);
+		cell.setCellValue(value);
+	}
+	
 	private String getCellValue(XSSFCell cell) {
 		return getCellValueByType(cell, cell.getCellType());
 	}
@@ -204,6 +220,7 @@ public class ExcelSpreadsheet implements Spreadsheet {
 		private final ExcelStyleManager styleManager;
 		
 		private XSSFSheet xssfSheet;
+		private XSSFCreationHelper xssfCreationHelper;
 		
 		public Builder(XSSFWorkbook workbook, ExcelStyleManager styleManager) {
 			this.workbook = workbook;
@@ -229,6 +246,7 @@ public class ExcelSpreadsheet implements Spreadsheet {
 		
 		private Spreadsheet build(XSSFSheet xssfSheet) {
 			this.xssfSheet = xssfSheet;
+			xssfCreationHelper = workbook.getCreationHelper();
 			return new ExcelSpreadsheet(this);
 		}
 	}

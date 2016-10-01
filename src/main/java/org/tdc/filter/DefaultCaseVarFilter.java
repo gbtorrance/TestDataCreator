@@ -1,6 +1,5 @@
 package org.tdc.filter;
 
-import org.tdc.book.Book;
 import org.tdc.book.TestCase;
 import org.tdc.book.TestSet;
 import org.tdc.config.book.FilterConfig;
@@ -17,11 +16,9 @@ import org.tdc.config.book.FilterConfig;
  */
 public class DefaultCaseVarFilter extends AbstractFilter {
 	private final DefaultCaseVarFilterConfig config;
-	private final Book book;
 	
-	public DefaultCaseVarFilter(DefaultCaseVarFilterConfig config, Book book) {
+	public DefaultCaseVarFilter(DefaultCaseVarFilterConfig config) {
 		this.config = config;
-		this.book = book;
 	}
 	
 	@Override
@@ -30,14 +27,13 @@ public class DefaultCaseVarFilter extends AbstractFilter {
 		return filterStr != null && filterStr.trim().length() > 0;
 	}
 
-	public static Filter build(FilterConfig filterConfig, Book book) {
-		
+	public static Filter build(FilterConfig filterConfig) {
 		if (!(filterConfig instanceof DefaultCaseVarFilterConfig)) {
 			throw new IllegalStateException(
 					"FilterConfig '" + filterConfig.getFilterClassName() + 
 					"' must be an instance of " + 
 					DefaultCaseVarFilterConfig.class.getName());
 		}
-		return new DefaultCaseVarFilter((DefaultCaseVarFilterConfig)filterConfig, book);
+		return new DefaultCaseVarFilter((DefaultCaseVarFilterConfig)filterConfig);
 	}
 }

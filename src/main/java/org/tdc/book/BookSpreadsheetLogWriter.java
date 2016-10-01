@@ -9,6 +9,7 @@ import org.tdc.filter.Filter;
 import org.tdc.result.Message;
 import org.tdc.result.Result;
 import org.tdc.result.Results;
+import org.tdc.schemavalidate.SchemaValidatorErrorHandler;
 import org.tdc.spreadsheet.CellStyle;
 import org.tdc.spreadsheet.Spreadsheet;
 import org.tdc.spreadsheet.SpreadsheetFile;
@@ -24,8 +25,6 @@ public class BookSpreadsheetLogWriter {
 	private final Book book;
 	private final SpreadsheetFile spreadsheetFile;
 	private final Filter filter;
-	private final CellStyle boldStyle;
-	private final CellStyle defaulStyle;
 	
 	private Spreadsheet logSheet;
 	private int rowNum;
@@ -36,8 +35,6 @@ public class BookSpreadsheetLogWriter {
 		this.book = book;
 		this.spreadsheetFile = spreadsheetFile;
 		this.filter = filter;
-		this.boldStyle = book.getConfig().getNodeHeaderStyle(); // TODO log-specific style configuration
-		this.defaulStyle = book.getConfig().getDefaultStyle(); // TODO log-specific style configuration 
 	}
 	
 	public void writeLog() {
@@ -65,9 +62,9 @@ public class BookSpreadsheetLogWriter {
 	}
 
 	private void writeTestSet(TestSet testSet) {
-		String setName = testSet.getSetName().equals("") ? "{default}" : testSet.getSetName(); 
+		String setName = testSet.getSetName().equals("") ? "[none]" : testSet.getSetName(); 
 		String setLabel = "Test Set: " + setName;
-		logSheet.setCellValue(setLabel, rowNum, colNum, boldStyle);
+		logSheet.setCellValue(setLabel, rowNum, colNum, book.getConfig().getHeaderLogStyle());
 		rowNum++;
 		colNum++;
 		List<TestCase> testCases = testSet.getTestCases();
@@ -84,7 +81,7 @@ public class BookSpreadsheetLogWriter {
 		String setLabel = testCase.getSetName().equals("") ? 
 				"" : " [Set Name: " + testCase.getSetName() + "]";
 		String caseLabel = "Test Case: " + testCase.getCaseNum() + setLabel;
-		logSheet.setCellValue(caseLabel, rowNum, colNum, boldStyle);
+		logSheet.setCellValue(caseLabel, rowNum, colNum, book.getConfig().getHeaderLogStyle());
 		rowNum++;
 		colNum++;
 		List<TestDoc> testDocs = testCase.getTestDocs();
@@ -98,11 +95,8 @@ public class BookSpreadsheetLogWriter {
 	}
 
 	private void writeTestDoc(TestDoc testDoc) {
-		String docLabel = "Document: " + 
-				testDoc.getPageConfig().getPageName() + 
-				" [Column: " + testDoc.getColLetter() + ", Type: " + 
-				testDoc.getPageConfig().getDocTypeConfig().getDocTypeName() + "]";
-		logSheet.setCellValue(docLabel, rowNum, colNum, boldStyle);
+		String docLabel = "Document: " + testDoc.getPageConfig().getPageName();
+		logSheet.setCellValue(docLabel, rowNum, colNum, book.getConfig().getHeaderLogStyle());
 		rowNum++;
 		colNum++;
 		writeResults(testDoc.getResults());
@@ -119,7 +113,7 @@ public class BookSpreadsheetLogWriter {
 
 	private void writePhase(Result result, String phaseName) {
 		for (Message message : result.getMessages()) {
-			logSheet.setCellValue(phaseName, rowNum, colNum, defaulStyle);
+			logSheet.setCellValue(phaseName, rowNum, colNum, book.getConfig().getDefaultLogStyle());
 			colNum++;
 			writeMessage(message);
 			colNum--;
@@ -127,12 +121,27 @@ public class BookSpreadsheetLogWriter {
 	}
 
 	private void writeMessage(Message message) {
-		logSheet.setCellValue(message.getMessage(), rowNum, colNum + 1, defaulStyle);
+		CellStyle style = getMessageStyle(message);
+		logSheet.setCellValue(message.getMessage(), rowNum, colNum + 1, style);
+		createHyperlink(message);
 		rowNum++;
-		// TODO add linking to error location
-		// TODO add detailed message information
-		// TODO add message "type"
-		// TODO add counts
-		// TODO possibly add summary info (with linking to details)
+	}
+
+	private CellStyle getMessageStyle(Message message) {
+		CellStyle style = book.getConfig().getDefaultLogStyle();
+		if (message.getType().equals(SchemaValidatorErrorHandler.MESSAGE_TYPE_SCHEMA_ERROR) ||
+				message.getType().equals(SchemaValidatorErrorHandler.MESSAGE_TYPE_SCHEMA_FATAL_ERROR)) {
+			style = book.getConfig().getErrorLogStyle();
+		}
+		return style;
+	}
+
+	private void createHyperlink(Message message) {
+		String pageName = message.getPageName() == null ? "" : message.getPageName();
+		String cellRef = message.getCellRef() == null ? "" : message.getCellRef();
+		if (pageName.length() > 0 && cellRef.length() > 0) {
+			logSheet.setHyperlink(pageName, cellRef, "<------", rowNum, colNum, 
+					book.getConfig().getDefaultLogStyle());
+		}
 	}
 }

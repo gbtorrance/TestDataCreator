@@ -19,12 +19,13 @@ import org.xml.sax.SAXParseException;
  * {@link ErrorHandler} implementation that collects {@link Message}s 
  * during the validation of a {@link TestDoc}.  
  */
-class SchemaValidatorErrorHandler implements ErrorHandler {
+public class SchemaValidatorErrorHandler implements ErrorHandler {
 	
+	public static final String MESSAGE_TYPE_SCHEMA_ERROR = "schema-error";
+	public static final String MESSAGE_TYPE_SCHEMA_FATAL_ERROR = "schema-fatal-error";
+	public static final String MESSAGE_TYPE_SCHEMA_WARNING = "schema-warning";
+
 	private static final String CURRENT_ELEMENT_PROPERTY = "http://apache.org/xml/properties/dom/current-element-node";
-	private static final String MESSAGE_TYPE_SCHEMA_ERROR = "schema-error";
-	private static final String MESSAGE_TYPE_SCHEMA_FATAL_ERROR = "schema-fatal-error";
-	private static final String MESSAGE_TYPE_SCHEMA_WARNING = "schema-warning";
 	
 	private final Validator validator;
 	private final TestDoc testDoc;
@@ -60,10 +61,12 @@ class SchemaValidatorErrorHandler implements ErrorHandler {
 			NodeInst currentNodeInst = (NodeInst)currentElement.getUserData(DOMUtil.DOM_USER_DATA_RELATED_TDC_NODE);
 			int rowNum = testDoc.getPageConfig().getNodeRowStart() + currentNodeInst.getRowOffset();
 			int colNum = testDoc.getColNum();
+			String pageName = testDoc.getPageConfig().getPageName();
 			String cellRef = testDoc.getColLetter() + rowNum;
 			Message message = 
 					new Message.Builder(type, ex.getMessage())
 					.setRowNumColNum(rowNum, colNum)
+					.setPageName(pageName)
 					.setCellRef(cellRef)
 					.setValue(currentElement.getNodeValue())
 					.build();

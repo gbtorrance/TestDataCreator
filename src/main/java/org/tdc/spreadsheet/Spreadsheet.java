@@ -111,7 +111,7 @@ public interface Spreadsheet {
 	/**
 	 * Get column num (1-based) of last column in specified row in Spreadsheet.
 	 * 
-	 * @param rowNum Run number to inspect (1-based).
+	 * @param rowNum Row number to inspect (1-based).
 	 * @return Number of last column in row containing a value (1-based) 
 	 */
 	int getLastColNum(int rowNum);
@@ -123,4 +123,17 @@ public interface Spreadsheet {
 	 * @return Column letter.
 	 */
 	String getColLetter(int colNum);
+
+	/**
+	 * Create a hyperlink in the sheet to the specified location.
+	 * 
+	 * @param targetPage Name of target page for hyperlink.
+	 * @param targetCellRef Cell reference target for hyperlink.
+	 * @param value Value to display in hyperlink cell.
+	 * @param rowNum Row number where hyperlink should be stored (1-based).
+	 * @param colNum Column number where hyperlink should be sored (1-based.
+	 * @param style Style to use for hyperlink cell.
+	 */
+	void setHyperlink(String targetPage, String targetCellRef, String value, 
+			int rowNum, int colNum, CellStyle style);
 }

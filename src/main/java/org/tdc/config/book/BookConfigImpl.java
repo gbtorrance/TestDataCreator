@@ -46,6 +46,9 @@ public class BookConfigImpl implements BookConfig {
 	private final CellStyle defaultNodeDetailStyle;	// based on defaultStyle (parent to detail column styles)
 	private final CellStyle docIDRowLabelStyle;		// based on defaultStyle
 	private final CellStyle conversionNewRowStyle;	// based on defaultStyle
+	private final CellStyle defaultLogStyle;		// based on defaultStyle
+	private final CellStyle headerLogStyle;			// based on defaultLogStyle
+	private final CellStyle errorLogStyle;			// based on defaultLogStyle
 	private final int nodeColumnCount;
 	private final int nodeColumnWidth;
 	private final int headerRowCount;
@@ -75,6 +78,9 @@ public class BookConfigImpl implements BookConfig {
 		this.defaultNodeDetailStyle = builder.defaultNodeDetailStyle;
 		this.docIDRowLabelStyle = builder.docIDRowLabelStyle;
 		this.conversionNewRowStyle = builder.conversionNewRowStyle;
+		this.defaultLogStyle = builder.defaultLogStyle;
+		this.headerLogStyle = builder.headerLogStyle;
+		this.errorLogStyle = builder.errorLogStyle;
 		this.nodeColumnCount = builder.nodeColumnCount;
 		this.nodeColumnWidth = builder.nodeColumnWidth;
 		this.headerRowCount = builder.headerRowCount;
@@ -201,6 +207,21 @@ public class BookConfigImpl implements BookConfig {
 	}
 
 	@Override
+	public CellStyle getDefaultLogStyle() {
+		return defaultLogStyle;
+	}
+
+	@Override
+	public CellStyle getHeaderLogStyle() {
+		return headerLogStyle;
+	}
+
+	@Override
+	public CellStyle getErrorLogStyle() {
+		return errorLogStyle;
+	}
+
+	@Override
 	public int getNodeColumnCount() {
 		return nodeColumnCount;
 	}
@@ -248,6 +269,9 @@ public class BookConfigImpl implements BookConfig {
 		private CellStyle defaultNodeDetailStyle;
 		private CellStyle docIDRowLabelStyle;
 		private CellStyle conversionNewRowStyle;
+		private CellStyle defaultLogStyle;
+		private CellStyle headerLogStyle;
+		private CellStyle errorLogStyle;
 		private int nodeColumnCount;
 		private int nodeColumnWidth;
 		private int headerRowCount;
@@ -293,6 +317,9 @@ public class BookConfigImpl implements BookConfig {
 			defaultNodeDetailStyle = config.getCellStyle("DefaultNodeDetailStyle", defaultStyle, false);
 			docIDRowLabelStyle = config.getCellStyle("DocIDRowLabelStyle", defaultStyle, false); 
 			conversionNewRowStyle = config.getCellStyle("ConversionNewRowStyle", defaultStyle, false); 
+			defaultLogStyle = config.getCellStyle("DefaultLogStyle", defaultStyle, false); 
+			headerLogStyle = config.getCellStyle("HeaderLogStyle", defaultLogStyle, false); 
+			errorLogStyle = config.getCellStyle("ErrorLogStyle", defaultLogStyle, false); 
 			nodeColumnCount = config.getInt("NodeColumnCount", 0, true);
 			nodeColumnWidth = config.getInt("NodeColumnWidth", 0, true);
 			headerRowCount = config.getInt("HeaderRowCount", 1, false);

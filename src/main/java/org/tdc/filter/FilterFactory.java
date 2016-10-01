@@ -1,6 +1,5 @@
 package org.tdc.filter;
 
-import org.tdc.book.Book;
 import org.tdc.config.book.FilterConfig;
 
 /**
@@ -8,5 +7,5 @@ import org.tdc.config.book.FilterConfig;
  * based on {@link FilterConfig} parameters.
  */
 public interface FilterFactory {
-	Filter createFilter(FilterConfig config, Book book);
+	Filter createFilter(FilterConfig config);
 }

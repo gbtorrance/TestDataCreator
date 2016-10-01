@@ -34,6 +34,9 @@ public interface BookConfig {
 	CellStyle getDefaultNodeDetailStyle();
 	CellStyle getDocIDRowLabelStyle();
 	CellStyle getConversionNewRowStyle();
+	CellStyle getDefaultLogStyle();
+	CellStyle getHeaderLogStyle();
+	CellStyle getErrorLogStyle();
 	int getNodeColumnCount();
 	int getNodeColumnWidth();
 	int getHeaderRowCount();

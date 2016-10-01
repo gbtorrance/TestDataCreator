@@ -61,7 +61,7 @@ public class CompositeFilter implements Filter {
 			List<Filter> list = new ArrayList<>();
 			List<FilterConfig> filterConfigs = book.getConfig().getFilterConfigs();
 			for (FilterConfig filterConfig : filterConfigs) {
-				Filter filter = filterFactory.createFilter(filterConfig, book);
+				Filter filter = filterFactory.createFilter(filterConfig);
 				list.add(filter);
 			}
 			return list;
