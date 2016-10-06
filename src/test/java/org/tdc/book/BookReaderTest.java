@@ -24,11 +24,10 @@ public class BookReaderTest {
 
 	@BeforeClass
 	public static void setup() {
-		Path schemasConfigRoot = Paths.get("testfiles/TDCFiles/Schemas");
-		Path booksConfigRoot = Paths.get("testfiles/TDCFiles/Books");
+		Path systemConfigRoot = Paths.get("testfiles/TDCFiles");
 		processor = new ProcessorImpl
-				.Builder(schemasConfigRoot, booksConfigRoot)
-				.defaultFactories()
+				.Builder()
+				.defaultFactories(systemConfigRoot)
 				.build();
 	}
 	

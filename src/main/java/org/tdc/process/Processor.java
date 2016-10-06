@@ -14,6 +14,7 @@ import org.tdc.config.model.ModelConfig;
 import org.tdc.config.model.ModelConfigFactory;
 import org.tdc.config.schema.SchemaConfig;
 import org.tdc.config.schema.SchemaConfigFactory;
+import org.tdc.config.system.SystemConfig;
 import org.tdc.filter.FilterFactory;
 import org.tdc.modeldef.ModelDefFactory;
 import org.tdc.modelinst.ModelInstFactory;
@@ -30,9 +31,7 @@ import org.tdc.util.Addr;
  * the main system processing layer. 
  */
 public interface Processor {
-	Path getSchemasConfigRoot();
-	Path getBooksConfigRoot();
-	
+	SystemConfig getSystemConfig();
 	SchemaConfigFactory getSchemaConfigFactory();
 	ModelConfigFactory getModelConfigFactory();
 	FilterConfigFactory getFilterConfigFactory();

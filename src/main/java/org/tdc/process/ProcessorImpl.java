@@ -20,6 +20,8 @@ import org.tdc.config.model.ModelConfigFactoryImpl;
 import org.tdc.config.schema.SchemaConfig;
 import org.tdc.config.schema.SchemaConfigFactory;
 import org.tdc.config.schema.SchemaConfigFactoryImpl;
+import org.tdc.config.system.SystemConfig;
+import org.tdc.config.system.SystemConfigImpl;
 import org.tdc.filter.FilterFactory;
 import org.tdc.filter.FilterFactoryImpl;
 import org.tdc.modeldef.ModelDefFactory;
@@ -40,8 +42,7 @@ import org.tdc.util.Addr;
  * A {@link Processor} implementation.
  */
 public class ProcessorImpl implements Processor {
-	private final Path schemasConfigRoot;
-	private final Path booksConfigRoot;
+	private final SystemConfig systemConfig;
 	private final SchemaConfigFactory schemaConfigFactory;
 	private final ModelConfigFactory modelConfigFactory;
 	private final FilterConfigFactory filterConfigFactory;
@@ -59,8 +60,7 @@ public class ProcessorImpl implements Processor {
 	private final BookProcessor bookProcessor;
 	
 	private ProcessorImpl(Builder builder) {
-		this.schemasConfigRoot = builder.schemasConfigRoot;
-		this.booksConfigRoot = builder.booksConfigRoot;
+		this.systemConfig = builder.systemConfig;
 		this.schemaConfigFactory = builder.schemaConfigFactory;
 		this.modelConfigFactory = builder.modelConfigFactory;
 		this.filterConfigFactory = builder.filterConfigFactory;
@@ -79,13 +79,8 @@ public class ProcessorImpl implements Processor {
 	}
 	
 	@Override
-	public Path getSchemasConfigRoot() {
-		return schemasConfigRoot;
-	}
-
-	@Override
-	public Path getBooksConfigRoot() {
-		return booksConfigRoot;
+	public SystemConfig getSystemConfig() {
+		return systemConfig;
 	}
 
 	@Override
@@ -240,9 +235,7 @@ public class ProcessorImpl implements Processor {
 	}
 
 	public static class Builder {
-		private final Path schemasConfigRoot;
-		private final Path booksConfigRoot;
-
+		private SystemConfig systemConfig;
 		private SchemaConfigFactory schemaConfigFactory;
 		private ModelConfigFactory modelConfigFactory;
 		private FilterConfigFactory filterConfigFactory;
@@ -260,18 +253,14 @@ public class ProcessorImpl implements Processor {
 		private ModelProcessor modelProcessor;
 		private BookProcessor bookProcessor;
 		
-		public Builder(Path schemasConfigRoot, Path booksConfigRoot) {
-			this.schemasConfigRoot = schemasConfigRoot;
-			this.booksConfigRoot = booksConfigRoot;
-		}
-		
-		public Builder defaultFactories() {
-			schemaConfigFactory = new SchemaConfigFactoryImpl(schemasConfigRoot);
+		public Builder defaultFactories(Path systemConfigRoot) {
+			systemConfig = new SystemConfigImpl.Builder(systemConfigRoot).build();
+			schemaConfigFactory = new SchemaConfigFactoryImpl(systemConfig.getSchemasConfigRoot());
 			modelConfigFactory = new ModelConfigFactoryImpl(schemaConfigFactory);
 			filterConfigFactory = new FilterConfigFactoryImpl();
 			taskConfigFactory = new TaskConfigFactoryImpl();
 			bookConfigFactory = new BookConfigFactoryImpl(
-					booksConfigRoot, modelConfigFactory, 
+					systemConfig.getBooksConfigRoot(), modelConfigFactory, 
 					filterConfigFactory, taskConfigFactory);
 			spreadsheetFileFactory = new ExcelSpreadsheetFileFactory();
 			schemaFactory = new SchemaFactoryImpl();
@@ -281,6 +270,11 @@ public class ProcessorImpl implements Processor {
 			filterFactory = new FilterFactoryImpl();
 			schemaValidatorFactory = new SchemaValidatorFactoryImpl();
 			taskFactory = new TaskFactoryImpl();
+			return this;
+		}
+		
+		public Builder setSystemConfig(SystemConfig systemConfig) {
+			this.systemConfig = systemConfig;
 			return this;
 		}
 		

@@ -38,10 +38,7 @@ public class CLIOperations {
 	private static final String OP_QUESTION = "?";
 	
 	private static final String OP_S = "s";
-	private static final String OP_SCHEMAS_CONFIG_ROOT = "schemas-config-root";
-	
-	private static final String OP_B = "b";
-	private static final String OP_BOOKS_CONFIG_ROOT = "books-config-root";
+	private static final String OP_SYSTEM_CONFIG_ROOT = "system-config-root";
 	
 	private static final String OP_L = "l";
 	private static final String OP_LIST = "list";
@@ -70,8 +67,7 @@ public class CLIOperations {
 	private final boolean admin;
 
 	private OptionSpec<?> opHelp;
-	private OptionSpec<Path> opSchemasConfigRoot;
-	private OptionSpec<Path> opBooksConfigRoot;
+	private OptionSpec<Path> opSystemConfigRoot;
 	private OptionSpec<CLIArgsConfigType> opList;
 	private OptionSpec<Addr> opCreateCustomizer;
 	private OptionSpec<Addr> opBasedOnModel;
@@ -83,9 +79,8 @@ public class CLIOperations {
 	private OptionSpec<String> opProcessTasks;
 	private OptionSpec<KeyValuePair> opTaskParam;
 	private OptionSpec<Path> opTarget;
-	
-	private Path schemasConfigRoot;
-	private Path booksConfigRoot;
+
+	private Path systemConfigRoot;
 	private Processor processor;
 
 	public CLIOperations(boolean admin) {
@@ -95,8 +90,7 @@ public class CLIOperations {
 	
 	private void initParser() {
 		initParserHelp();
-		initParserSchemasConfigRoot();
-		initParserBooksConfigRoot();
+		initParserSystemConfigRoot();
 		initParserList();
 		initParserCreateCustomizer();
 		initParserCreateBook();
@@ -110,17 +104,9 @@ public class CLIOperations {
 				.forHelp();
 	}
 	
-	private void initParserSchemasConfigRoot() {
-		opSchemasConfigRoot = parser.acceptsAll(Arrays.asList(
-				OP_S, OP_SCHEMAS_CONFIG_ROOT), "schemas config root dir")
-				.withRequiredArg()
-				.withValuesConvertedBy(new PathConverter())
-				.required();
-	}
-	
-	private void initParserBooksConfigRoot() {
-		opBooksConfigRoot = parser.acceptsAll(Arrays.asList(
-				OP_B, OP_BOOKS_CONFIG_ROOT), "books config root dir")
+	private void initParserSystemConfigRoot() {
+		opSystemConfigRoot = parser.acceptsAll(Arrays.asList(
+				OP_S, OP_SYSTEM_CONFIG_ROOT), "system config root dir")
 				.withRequiredArg()
 				.withValuesConvertedBy(new PathConverter())
 				.required();
@@ -211,7 +197,7 @@ public class CLIOperations {
 			System.exit(0);
 		}
 
-		initConfigDirs(options);
+		initConfigDir(options);
 		initProcessor();
 		
 		if (options.has(opList)) {
@@ -257,21 +243,16 @@ public class CLIOperations {
 
 	private void initProcessor() {
 		processor = new ProcessorImpl
-				.Builder(schemasConfigRoot, booksConfigRoot)
-				.defaultFactories()
+				.Builder()
+				.defaultFactories(systemConfigRoot)
 				.build();
 	}
 
-	private void initConfigDirs(OptionSet options) {
-		schemasConfigRoot = options.valueOf(opSchemasConfigRoot);
-		if (schemasConfigRoot == null || !Files.isDirectory(schemasConfigRoot)) {
-			outputAndEnd("A valid Schemas Config Root dir must be specified with option -" + 
-					OP_S + " or --" + OP_SCHEMAS_CONFIG_ROOT);
-		}
-		booksConfigRoot = options.valueOf(opBooksConfigRoot);
-		if (booksConfigRoot == null || !Files.isDirectory(booksConfigRoot)) {
-			outputAndEnd("A valid Books Config Root dir must be specified with option -" +
-					OP_B + " or --" + OP_BOOKS_CONFIG_ROOT);
+	private void initConfigDir(OptionSet options) {
+		systemConfigRoot = options.valueOf(opSystemConfigRoot);
+		if (systemConfigRoot == null || !Files.isDirectory(systemConfigRoot)) {
+			outputAndEnd("A valid System Config Root dir must be specified with option -" + 
+					OP_S + " or --" + OP_SYSTEM_CONFIG_ROOT);
 		}
 	}
 
