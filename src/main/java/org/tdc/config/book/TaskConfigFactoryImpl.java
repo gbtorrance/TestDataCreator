@@ -69,7 +69,7 @@ public class TaskConfigFactoryImpl implements TaskConfigFactory {
 			throw new RuntimeException("TaskConfig '" + taskConfigKey + 
 					"' cannot have both a 'type' and 'class' defined");
 		}
-		if (className == null) {
+		if (className == null && type != null) {
 			className = getDefaultClassName(type);
 		}
 		if (className == null) {

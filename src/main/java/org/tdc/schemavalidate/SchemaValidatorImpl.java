@@ -43,7 +43,7 @@ public class SchemaValidatorImpl implements SchemaValidator {
 		try {
 			validator.validate(new DOMSource(domDocument));
 		}
-		catch(SchemaValidatorErrorHandler.MaxMessagesExceededException e) {
+		catch (SchemaValidatorErrorHandler.MaxMessagesExceededException e) {
 			// maximum messages exceeded; do nothing
 		}
 		catch (SAXException | IOException e) {

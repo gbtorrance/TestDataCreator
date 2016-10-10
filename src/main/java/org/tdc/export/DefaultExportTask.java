@@ -134,7 +134,7 @@ public class DefaultExportTask implements Task {
 		String taskID = config.getTaskID();
 		TaskResult taskResult = new TaskResult(taskID);
 		String msg = type + (success ? " exported successfully" : " export failed");
-		Message message = new Message.Builder("info", msg).build();
+		Message message = new Message.Builder(Message.MESSAGE_TYPE_INFO, msg).build();
 		taskResult.addMessage(message);
 		results.setTaskResult(taskID, taskResult);
 	}

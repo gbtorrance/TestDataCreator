@@ -60,10 +60,10 @@ public class MeFExportTask implements Task {
 	
 	@Override
 	public void process() {
-		export(book);
+		export();
 	}
 	
-	public void export(Book book) {
+	public void export() {
 		Path batchDir = createBatchDir();
 		// if only one set, and that set is the "default" set, 
 		// don't create a sub directory for it
@@ -180,7 +180,7 @@ public class MeFExportTask implements Task {
 		String taskID = config.getTaskID();
 		TaskResult taskResult = new TaskResult(taskID);
 		String msg = type + (success ? " exported successfully" : " export failed");
-		Message message = new Message.Builder("info", msg).build();
+		Message message = new Message.Builder(Message.MESSAGE_TYPE_INFO, msg).build();
 		taskResult.addMessage(message);
 		results.setTaskResult(taskID, taskResult);
 	}

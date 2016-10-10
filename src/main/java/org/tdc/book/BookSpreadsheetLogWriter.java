@@ -129,8 +129,10 @@ public class BookSpreadsheetLogWriter {
 
 	private CellStyle getMessageStyle(Message message) {
 		CellStyle style = book.getConfig().getDefaultLogStyle();
-		if (message.getType().equals(SchemaValidatorErrorHandler.MESSAGE_TYPE_SCHEMA_ERROR) ||
-				message.getType().equals(SchemaValidatorErrorHandler.MESSAGE_TYPE_SCHEMA_FATAL_ERROR)) {
+		String type = message.getType();
+		if (type.equals(SchemaValidatorErrorHandler.MESSAGE_TYPE_SCHEMA_ERROR) ||
+				type.equals(SchemaValidatorErrorHandler.MESSAGE_TYPE_SCHEMA_FATAL_ERROR) ||
+				type.equals(Message.MESSAGE_TYPE_ERROR)) {
 			style = book.getConfig().getErrorLogStyle();
 		}
 		return style;

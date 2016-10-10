@@ -20,10 +20,15 @@ import org.tdc.config.model.ModelConfigFactoryImpl;
 import org.tdc.config.schema.SchemaConfig;
 import org.tdc.config.schema.SchemaConfigFactory;
 import org.tdc.config.schema.SchemaConfigFactoryImpl;
+import org.tdc.config.system.InitializerConfigFactory;
+import org.tdc.config.system.InitializerConfigFactoryImpl;
 import org.tdc.config.system.SystemConfig;
 import org.tdc.config.system.SystemConfigImpl;
 import org.tdc.filter.FilterFactory;
 import org.tdc.filter.FilterFactoryImpl;
+import org.tdc.initializer.InitializerFactory;
+import org.tdc.initializer.InitializerFactoryImpl;
+import org.tdc.initializer.InitializerProcessor;
 import org.tdc.modeldef.ModelDefFactory;
 import org.tdc.modeldef.ModelDefFactoryImpl;
 import org.tdc.modelinst.ModelInstFactory;
@@ -45,8 +50,6 @@ public class ProcessorImpl implements Processor {
 	private final SystemConfig systemConfig;
 	private final SchemaConfigFactory schemaConfigFactory;
 	private final ModelConfigFactory modelConfigFactory;
-	private final FilterConfigFactory filterConfigFactory;
-	private final TaskConfigFactory taskConfigFactory;
 	private final BookConfigFactory bookConfigFactory;
 	private final SpreadsheetFileFactory spreadsheetFileFactory;
 	private final SchemaFactory schemaFactory;
@@ -63,8 +66,6 @@ public class ProcessorImpl implements Processor {
 		this.systemConfig = builder.systemConfig;
 		this.schemaConfigFactory = builder.schemaConfigFactory;
 		this.modelConfigFactory = builder.modelConfigFactory;
-		this.filterConfigFactory = builder.filterConfigFactory;
-		this.taskConfigFactory = builder.taskConfigFactory;
 		this.bookConfigFactory = builder.bookConfigFactory;
 		this.spreadsheetFileFactory = builder.spreadsheetFileFactory;
 		this.schemaFactory = builder.schemaFactory;
@@ -91,16 +92,6 @@ public class ProcessorImpl implements Processor {
 	@Override
 	public ModelConfigFactory getModelConfigFactory() {
 		return modelConfigFactory;
-	}
-
-	@Override
-	public FilterConfigFactory getFilterConfigFactory() {
-		return filterConfigFactory;
-	}
-
-	@Override
-	public TaskConfigFactory getTaskConfigFactory() {
-		return taskConfigFactory;
 	}
 
 	@Override
@@ -235,6 +226,7 @@ public class ProcessorImpl implements Processor {
 	}
 
 	public static class Builder {
+		private InitializerConfigFactory initializerConfigFactory;
 		private SystemConfig systemConfig;
 		private SchemaConfigFactory schemaConfigFactory;
 		private ModelConfigFactory modelConfigFactory;
@@ -242,6 +234,7 @@ public class ProcessorImpl implements Processor {
 		private TaskConfigFactory taskConfigFactory;
 		private BookConfigFactory bookConfigFactory;
 		private SpreadsheetFileFactory spreadsheetFileFactory;
+		private InitializerFactory initializerFactory;
 		private SchemaFactory schemaFactory;
 		private ModelDefFactory modelDefFactory;
 		private ModelInstFactory modelInstFactory;
@@ -249,12 +242,13 @@ public class ProcessorImpl implements Processor {
 		private FilterFactory filterFactory;
 		private SchemaValidatorFactory schemaValidatorFactory; 
 		private TaskFactory taskFactory;
-		
 		private ModelProcessor modelProcessor;
 		private BookProcessor bookProcessor;
 		
 		public Builder defaultFactories(Path systemConfigRoot) {
-			systemConfig = new SystemConfigImpl.Builder(systemConfigRoot).build();
+			initializerConfigFactory = new InitializerConfigFactoryImpl();
+			systemConfig = new SystemConfigImpl.Builder(
+					systemConfigRoot, initializerConfigFactory).build();
 			schemaConfigFactory = new SchemaConfigFactoryImpl(systemConfig.getSchemasConfigRoot());
 			modelConfigFactory = new ModelConfigFactoryImpl(schemaConfigFactory);
 			filterConfigFactory = new FilterConfigFactoryImpl();
@@ -263,6 +257,7 @@ public class ProcessorImpl implements Processor {
 					systemConfig.getBooksConfigRoot(), modelConfigFactory, 
 					filterConfigFactory, taskConfigFactory);
 			spreadsheetFileFactory = new ExcelSpreadsheetFileFactory();
+			initializerFactory = new InitializerFactoryImpl();
 			schemaFactory = new SchemaFactoryImpl();
 			modelDefFactory = new ModelDefFactoryImpl(schemaFactory, spreadsheetFileFactory);
 			modelInstFactory = new ModelInstFactoryImpl(modelDefFactory);
@@ -270,6 +265,11 @@ public class ProcessorImpl implements Processor {
 			filterFactory = new FilterFactoryImpl();
 			schemaValidatorFactory = new SchemaValidatorFactoryImpl();
 			taskFactory = new TaskFactoryImpl();
+			return this;
+		}
+		
+		public Builder setInitializerConfigFactory(InitializerConfigFactory initializerConfigFactory) {
+			this.initializerConfigFactory = initializerConfigFactory;
 			return this;
 		}
 		
@@ -305,6 +305,11 @@ public class ProcessorImpl implements Processor {
 
 		public Builder setSpreadsheetFileFactory(SpreadsheetFileFactory spreadsheetFileFactory) {
 			this.spreadsheetFileFactory = spreadsheetFileFactory;
+			return this;
+		}
+
+		public Builder setInitializerFactory(InitializerFactory initializerFactory) {
+			this.initializerFactory = initializerFactory;
 			return this;
 		}
 
@@ -349,7 +354,15 @@ public class ProcessorImpl implements Processor {
 			Processor processor = new ProcessorImpl(this);
 			modelProcessor.setProcessor(processor);
 			bookProcessor.setProcessor(processor);
+			processInitializers();
 			return processor;
+		}
+
+		private void processInitializers() {
+			InitializerProcessor processor = new InitializerProcessor
+					.Builder(initializerFactory, systemConfig)
+					.build();
+			processor.processInitializers();;
 		}
 	}
 }

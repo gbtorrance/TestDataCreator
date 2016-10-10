@@ -12,6 +12,9 @@ import org.tdc.book.TestSet;
  * {@link TestDoc}s , {@link TestCase}s, or {@link TestSet}s.  
  */
 public class Message {
+	public static final String MESSAGE_TYPE_INFO = "info";
+	public static final String MESSAGE_TYPE_ERROR = "error";
+	
 	private final String type;
 	private final String message;
 	private final String pageName;
