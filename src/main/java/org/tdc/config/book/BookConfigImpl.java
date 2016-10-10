@@ -35,26 +35,26 @@ public class BookConfigImpl implements BookConfig {
 	private final List<FilterConfig> filterConfigs;
 	private final List<TaskConfig> taskConfigs;
 	private final CellStyle defaultStyle;
-	private final CellStyle nodeHeaderStyle; 		// based on defaultStyle
-	private final CellStyle defaultNodeStyle; 		// based on defaultStyle
-	private final CellStyle parentNodeStyle;		// based on defaultNodeStyle
-	private final CellStyle attribNodeStyle;		// based on defaultNodeStyle
-	private final CellStyle compositorNodeStyle;	// based on defaultNodeStyle
-	private final CellStyle choiceMarkerNodeStyle;	// based on defaultNodeStyle
-	private final CellStyle occurMarkerNodeStyle;	// based on defaultNodeStyle
-	private final CellStyle nodeDetailHeaderStyle;	// based on defaultStyle
-	private final CellStyle defaultNodeDetailStyle;	// based on defaultStyle (parent to detail column styles)
-	private final CellStyle docIDRowLabelStyle;		// based on defaultStyle
-	private final CellStyle conversionNewRowStyle;	// based on defaultStyle
-	private final CellStyle defaultLogStyle;		// based on defaultStyle
-	private final CellStyle headerLogStyle;			// based on defaultLogStyle
-	private final CellStyle errorLogStyle;			// based on defaultLogStyle
+	private final CellStyle nodeHeaderStyle; 			// based on defaultStyle
+	private final CellStyle defaultNodeStyle; 			// based on defaultStyle
+	private final CellStyle parentNodeStyle;			// based on defaultNodeStyle
+	private final CellStyle attribNodeStyle;			// based on defaultNodeStyle
+	private final CellStyle compositorNodeStyle;		// based on defaultNodeStyle
+	private final CellStyle choiceMarkerNodeStyle;		// based on defaultNodeStyle
+	private final CellStyle occurMarkerNodeStyle;		// based on defaultNodeStyle
+	private final CellStyle nodeDetailHeaderStyle;		// based on defaultStyle
+	private final CellStyle defaultNodeDetailStyle;		// based on defaultStyle (parent to detail column styles)
+	private final CellStyle docIDRowLabelStyle;			// based on defaultStyle
+	private final CellStyle conversionNewRowStyle;		// based on defaultStyle
+	private final CellStyle conversionPrevNewRowStyle;	// based on defaultStyle
+	private final CellStyle defaultLogStyle;			// based on defaultStyle
+	private final CellStyle headerLogStyle;				// based on defaultLogStyle
+	private final CellStyle errorLogStyle;				// based on defaultLogStyle
 	private final int nodeColumnCount;
 	private final int nodeColumnWidth;
 	private final int headerRowCount;
 	private final String[] nodeHeaderLabels;
 
-	
 	private BookConfigImpl(Builder builder) {
 		this.booksConfigRoot = builder.booksConfigRoot;
 		this.addr = builder.addr;
@@ -78,6 +78,7 @@ public class BookConfigImpl implements BookConfig {
 		this.defaultNodeDetailStyle = builder.defaultNodeDetailStyle;
 		this.docIDRowLabelStyle = builder.docIDRowLabelStyle;
 		this.conversionNewRowStyle = builder.conversionNewRowStyle;
+		this.conversionPrevNewRowStyle = builder.conversionPrevNewRowStyle;
 		this.defaultLogStyle = builder.defaultLogStyle;
 		this.headerLogStyle = builder.headerLogStyle;
 		this.errorLogStyle = builder.errorLogStyle;
@@ -207,6 +208,11 @@ public class BookConfigImpl implements BookConfig {
 	}
 
 	@Override
+	public CellStyle getConversionPrevNewRowStyle() {
+		return conversionPrevNewRowStyle;
+	}
+
+	@Override
 	public CellStyle getDefaultLogStyle() {
 		return defaultLogStyle;
 	}
@@ -269,6 +275,7 @@ public class BookConfigImpl implements BookConfig {
 		private CellStyle defaultNodeDetailStyle;
 		private CellStyle docIDRowLabelStyle;
 		private CellStyle conversionNewRowStyle;
+		private CellStyle conversionPrevNewRowStyle;
 		private CellStyle defaultLogStyle;
 		private CellStyle headerLogStyle;
 		private CellStyle errorLogStyle;
@@ -317,6 +324,7 @@ public class BookConfigImpl implements BookConfig {
 			defaultNodeDetailStyle = config.getCellStyle("DefaultNodeDetailStyle", defaultStyle, false);
 			docIDRowLabelStyle = config.getCellStyle("DocIDRowLabelStyle", defaultStyle, false); 
 			conversionNewRowStyle = config.getCellStyle("ConversionNewRowStyle", defaultStyle, false); 
+			conversionPrevNewRowStyle = config.getCellStyle("ConversionPrevNewRowStyle", defaultStyle, false); 
 			defaultLogStyle = config.getCellStyle("DefaultLogStyle", defaultStyle, false); 
 			headerLogStyle = config.getCellStyle("HeaderLogStyle", defaultLogStyle, false); 
 			errorLogStyle = config.getCellStyle("ErrorLogStyle", defaultLogStyle, false); 

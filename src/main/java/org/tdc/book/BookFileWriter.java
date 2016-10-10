@@ -1,7 +1,9 @@
 package org.tdc.book;
 
+import java.awt.Color;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 
 import org.tdc.config.book.BookConfig;
 import org.tdc.config.book.DocIDRowConfig;
@@ -329,16 +331,28 @@ public class BookFileWriter {
 		String value = basedOnSheet.getCellValue(basedOnRowNum, basedOnColNum);
 		CellStyle basedOnStyle = basedOnSheet.getCellStyle(basedOnRowNum, basedOnColNum);
 		CellStyle style = getColorOnlyStyle(basedOnStyle);
+		if (fillColorEqualsConversionNewRowFillColor(style)) {
+			style = config.getConversionPrevNewRowStyle();
+		}
 		currentSheet.setCellValue(value, rowNum, colNum, style);
 	}
 
-	private CellStyle getColorOnlyStyle(CellStyle basedOnStyle) {
-		return basedOnStyle == null ? 
+	private CellStyle getColorOnlyStyle(CellStyle style) {
+		return style == null ? 
 				null : new CellStyleImpl.Builder()
 				.setFrom(config.getDefaultStyle())
-				.setColor(basedOnStyle.getColor())
-				.setFillColor(basedOnStyle.getFillColor())
+				.setColor(style.getColor())
+				.setFillColor(style.getFillColor())
 				.build();
+	}
+
+	private boolean fillColorEqualsConversionNewRowFillColor(CellStyle style) {
+		Color conversionNewRowFillColor = 
+				config.getConversionNewRowStyle().getFillColor();
+		return style != null && 
+				style.getFillColor() != null && 
+				conversionNewRowFillColor != null &&
+				style.getFillColor().equals(conversionNewRowFillColor);
 	}
 
 	class ModelWriterVisitor implements ModelVisitor {
