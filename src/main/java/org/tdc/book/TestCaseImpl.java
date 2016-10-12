@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
@@ -45,6 +46,19 @@ public class TestCaseImpl implements TestCase {
 		return testDocs;
 	}
 
+	@Override
+	public TestDoc getTestDocOfType(String docType) {
+		Optional<TestDoc> testDoc = testDocs
+				.stream()
+				.filter(td -> td
+						.getPageConfig()
+						.getDocTypeConfig()
+						.getDocTypeName()
+						.equals(docType))
+				.findFirst();
+		return testDoc.orElseGet(null);
+	}
+	
 	@Override
 	public Map<String, String> getCaseVariables() {
 		return caseVariables;

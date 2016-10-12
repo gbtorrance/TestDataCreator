@@ -15,5 +15,6 @@ public interface TestCase extends CanHaveResults {
 	int getCaseNum();
 	String getSetName();
 	List<TestDoc> getTestDocs();
+	TestDoc getTestDocOfType(String docType);
 	Map<String, String> getCaseVariables();
 }

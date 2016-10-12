@@ -122,9 +122,28 @@ public class BookSpreadsheetLogWriter {
 
 	private void writeMessage(Message message) {
 		CellStyle style = getMessageStyle(message);
-		logSheet.setCellValue(message.getMessage(), rowNum, colNum + 1, style);
+		StringBuffer buf = new StringBuffer();
+		concat(buf, "Page", message.getPageName());
+		concat(buf, "Cell", message.getCellRef());
+		concat(buf, "Value", message.getValue());
+		concat(buf, "XPath", message.getXpath());
+		if (buf.length() > 0) {
+			buf.insert(0, " [");
+			buf.append("]");
+		}
+		buf.insert(0, message.getMessage());
+		logSheet.setCellValue(buf.toString(), rowNum, colNum + 1, style);
 		createHyperlink(message);
 		rowNum++;
+	}
+
+	private void concat(StringBuffer buf, String label, String value) {
+		if (value != null) {
+			if (buf.length() > 0) {
+				buf.append(", ");
+			}
+			buf.append(label).append(": ").append(value);
+		}
 	}
 
 	private CellStyle getMessageStyle(Message message) {
