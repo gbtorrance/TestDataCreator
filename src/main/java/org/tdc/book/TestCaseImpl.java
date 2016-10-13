@@ -56,7 +56,7 @@ public class TestCaseImpl implements TestCase {
 						.getDocTypeName()
 						.equals(docType))
 				.findFirst();
-		return testDoc.orElseGet(null);
+		return testDoc.isPresent() ? testDoc.get() : null;
 	}
 	
 	@Override
