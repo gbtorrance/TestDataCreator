@@ -8,6 +8,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 /**
@@ -15,7 +16,7 @@ import java.time.format.DateTimeFormatter;
  */
 public class Util {
 	
-	public static final DateTimeFormatter EXPORT_DATE_TIME_FORMATTER = 
+	public static final DateTimeFormatter DATE_TIME_FORMATTER = 
 			DateTimeFormatter.ofPattern("yyMMdd_kkmmss_SSS");
 	
 	public static final int UNDEFINED = -1;
@@ -134,5 +135,36 @@ public class Util {
 		String pathStr = path.toString();
 		int index = pathStr.lastIndexOf(".");
 		return index == -1 ? "" : pathStr.substring(index + 1);
+	}
+	
+	/**
+	 * Create a directory; throw RuntimeException in case of error.
+	 * 
+	 * @param dirPath Directory to create.
+	 */
+	public static void createDirectory(Path dirPath) {
+		try {
+			Files.createDirectory(dirPath);
+		}
+		catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+	}
+	
+	/**
+	 * Create a directory with a particular prefix within a root directory;
+	 * the directory will be suffixed with a date/time stamp.
+	 * 
+	 * @param root Root directory in which batch directory will be created.
+	 * @param prefix Prefix for new batch directory
+	 * @return The path of the new directory that was created.
+	 */
+	public static Path createBatchDir(Path root, String prefix) {
+		String batchDirName = 
+				Util.legalizeName(prefix) + "_" + 
+				LocalDateTime.now().format(Util.DATE_TIME_FORMATTER);
+		Path batchDir = root.resolve(batchDirName);
+		Util.createDirectory(batchDir);
+		return batchDir;
 	}
 }

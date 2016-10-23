@@ -68,6 +68,11 @@ public class TestCaseImpl implements TestCase {
 	public Results getResults() {
 		return results;
 	}
+	
+	@Override
+	public String toString() {
+		return caseNum + (setName == null || setName.length() == 0 ? "" : " [" + setName + "]");
+	}
 
 	public static class Builder {
 		private final String setName;

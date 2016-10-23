@@ -448,7 +448,7 @@ public class CLIOperations {
 	private void backupAndRenameFiles(Path bookPath, Path tempPath) {
 		Path parentPath = bookPath.toAbsolutePath().getParent();
 		String fileName = bookPath.getFileName().toString();
-		String timestamp = LocalDateTime.now().format(Util.EXPORT_DATE_TIME_FORMATTER);
+		String timestamp = LocalDateTime.now().format(Util.DATE_TIME_FORMATTER);
 		Path backupPath = parentPath.resolve(fileName + "." + timestamp + ".backup");
 		try {
 			Files.move(bookPath, backupPath);

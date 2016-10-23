@@ -23,6 +23,7 @@ import org.tdc.spreadsheet.SpreadsheetFile;
 import org.tdc.spreadsheet.SpreadsheetFileFactory;
 import org.tdc.util.Cache;
 import org.tdc.util.LRUCache;
+import org.tdc.util.Util;
 
 /**
  * Implementation of {@link BooksProcessor}.
@@ -73,13 +74,8 @@ public class BooksProcessorImpl implements BooksProcessor {
 				String bookID = getTrialBookID();
 				Path bookWorkingRoot = serverConfig.getBooksWorkingRoot().resolve(bookID);
 				if (!Files.exists(bookWorkingRoot)) {
-					try {
-						Files.createDirectory(bookWorkingRoot);
-						return bookID;
-					} 
-					catch (IOException e) {
-						throw new RuntimeException(e);
-					}
+					Util.createDirectory(bookWorkingRoot);
+					return bookID;
 				}
 			}
 		}
@@ -196,12 +192,7 @@ public class BooksProcessorImpl implements BooksProcessor {
 		
 		private void ensureBooksWorkingRootExists() {
 			if (!Files.isDirectory(serverConfig.getBooksWorkingRoot())) {
-				try {
-					Files.createDirectory(serverConfig.getBooksWorkingRoot());
-				}
-				catch (IOException e) {
-					throw new RuntimeException(e);
-				}
+				Util.createDirectory(serverConfig.getBooksWorkingRoot());
 			}
 		}
 	}

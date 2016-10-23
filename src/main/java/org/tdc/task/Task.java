@@ -2,6 +2,7 @@ package org.tdc.task;
 
 import org.tdc.book.Book;
 import org.tdc.config.book.TaskConfig;
+import org.tdc.spreadsheet.SpreadsheetFile;
 
 /**
  * Defines core functionality for custom Tasks that can be performed
@@ -10,5 +11,7 @@ import org.tdc.config.book.TaskConfig;
  */
 public interface Task {
 	TaskConfig getConfig();
+	void preProcessRead(SpreadsheetFile spreadsheetFile);
 	void process();
+	void postProcessWrite(SpreadsheetFile spreadsheetFile);
 }

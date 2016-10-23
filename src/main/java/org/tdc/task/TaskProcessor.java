@@ -7,6 +7,7 @@ import java.util.Map;
 import org.tdc.book.Book;
 import org.tdc.config.book.TaskConfig;
 import org.tdc.filter.Filter;
+import org.tdc.spreadsheet.SpreadsheetFile;
 
 /**
  * Responsible for processing, in sequence, a series of {@link Task}s
@@ -19,16 +20,24 @@ public class TaskProcessor {
 		this.tasks = builder.tasks;
 	}
 	
-	public void processTasks() {
+	public void preProcessRead(SpreadsheetFile spreadsheetFile) {
 		for (Task task : tasks) {
-			processTask(task);
+			task.preProcessRead(spreadsheetFile);
 		}
 	}
 	
-	private void processTask(Task task) {
-		task.process();
+	public void processTasks() {
+		for (Task task : tasks) {
+			task.process();
+		}
 	}
-
+	
+	public void postProcessWrite(SpreadsheetFile spreadsheetFile) {
+		for (Task task : tasks) {
+			task.postProcessWrite(spreadsheetFile);
+		}
+	}
+	
 	public static class Builder {
 		private final TaskFactory taskFactory;
 		private final Book book;

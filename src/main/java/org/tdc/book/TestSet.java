@@ -11,4 +11,5 @@ import java.util.List;
 public interface TestSet extends CanHaveResults {
 	String getSetName();
 	List<TestCase> getTestCases();
+	TestCase getTestCase(int caseNum);
 }

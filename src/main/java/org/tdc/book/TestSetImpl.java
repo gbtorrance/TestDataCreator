@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
@@ -36,8 +37,25 @@ public class TestSetImpl implements TestSet {
 	}
 	
 	@Override
+	public TestCase getTestCase(int caseNum) {
+		Optional<TestCase> testCase = 
+				testCases.stream()
+				.filter(x -> x.getCaseNum() == caseNum)
+				.findFirst();
+		if (!testCase.isPresent()) {
+			throw new IllegalStateException("Unable to find matching TestCase: " + caseNum);
+		}
+		return testCase.get();
+	}
+	
+	@Override
 	public Results getResults() {
 		return results;
+	}
+	
+	@Override
+	public String toString() {
+		return setName;
 	}
 
 	public static class Builder {

@@ -90,6 +90,12 @@ public class TestDocImpl implements TestDoc {
 		return results;
 	}
 
+	@Override
+	public String toString() {
+		return pageConfig.getPageName() + "!" + colLetter + " [" + caseNum + 
+				(setName == null || setName.length() == 0 ? "" : ", " + setName) + "]";
+	}
+
 	public static class Builder {
 		private final PageConfig pageConfig;
 		private final SpreadsheetFile spreadsheetFile;

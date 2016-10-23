@@ -3,6 +3,7 @@ package org.tdc.book;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,6 +44,18 @@ public class BookImpl implements Book {
 	@Override
 	public List<TestSet> getTestSets() {
 		return testSets;
+	}
+	
+	@Override
+	public TestSet getTestSet(String setName) {
+		Optional<TestSet> testSet = 
+				testSets.stream()
+				.filter(x -> x.getSetName().equals(setName))
+				.findFirst();
+		if (!testSet.isPresent()) {
+			throw new IllegalStateException("Unable to find matching TestSet: '" + setName + "'");
+		}
+		return testSet.get();
 	}
 	
 	public static class Builder {

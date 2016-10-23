@@ -23,4 +23,5 @@ public interface Book {
 	BookConfig getConfig();
 	Map<String, Page> getPages();
 	List<TestSet> getTestSets();
+	TestSet getTestSet(String setName);
 }

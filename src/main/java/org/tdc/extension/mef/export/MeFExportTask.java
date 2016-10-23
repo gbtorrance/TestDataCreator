@@ -5,7 +5,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -21,6 +20,7 @@ import org.tdc.filter.Filter;
 import org.tdc.result.Message;
 import org.tdc.result.Results;
 import org.tdc.result.TaskResult;
+import org.tdc.task.AbstractTask;
 import org.tdc.task.Task;
 import org.tdc.util.Util;
 
@@ -31,7 +31,7 @@ import org.tdc.util.Util;
  * (named with the Submission ID) and will contain a set of one or more
  * XML files (corresponding to the {@link TestDoc}s in the {@link TestCase}).
  */
-public class MeFExportTask implements Task {
+public class MeFExportTask extends AbstractTask {
 	public static final String EXPORT_ROOT_OVERRIDE = "export-root";
 
 	private static final Logger log = LoggerFactory.getLogger(MeFExportTask.class);
@@ -64,7 +64,9 @@ public class MeFExportTask implements Task {
 	}
 	
 	public void export() {
-		Path batchDir = createBatchDir();
+		Path batchDir = Util.createBatchDir(
+				exportRoot, 
+				book.getConfig().getBookName());
 		// if only one set, and that set is the "default" set, 
 		// don't create a sub directory for it
 		List<TestSet> testSets = book.getTestSets();
@@ -185,15 +187,6 @@ public class MeFExportTask implements Task {
 		results.setTaskResult(taskID, taskResult);
 	}
 
-	private Path createBatchDir() {
-		String bookName = book.getConfig().getBookName();
-		String batchDirName = Util.legalizeName(bookName) + "_" + 
-				LocalDateTime.now().format(Util.EXPORT_DATE_TIME_FORMATTER);
-		Path batchDir = exportRoot.resolve(batchDirName);
-		createDirectory(batchDir);
-		return batchDir;
-	}
-	
 	private Path createSetDir(Path batchDir, int index, String setName) {
 		Path setDir = batchDir;
 		if (index != -1) {
@@ -202,7 +195,7 @@ public class MeFExportTask implements Task {
 			// being the same
 			String suffix = setName.equals("") ? "DefaultSet" : Util.legalizeName(setName); 
 			setDir = setDir.resolve(index + "_" + suffix);
-			createDirectory(setDir);
+			Util.createDirectory(setDir);
 		}
 		return setDir;
 	}
@@ -219,23 +212,14 @@ public class MeFExportTask implements Task {
 
 	private Path createCaseDir(Path setDir, String submissionID) {
 		Path caseDir = setDir.resolve(submissionID);
-		createDirectory(caseDir);
-		createDirectory(caseDir.resolve("xml"));
-		createDirectory(caseDir.resolve("manifest"));
-		createDirectory(caseDir.resolve("irs"));
-		createDirectory(caseDir.resolve("irs").resolve("xml"));
+		Util.createDirectory(caseDir);
+		Util.createDirectory(caseDir.resolve("xml"));
+		Util.createDirectory(caseDir.resolve("manifest"));
+		Util.createDirectory(caseDir.resolve("irs"));
+		Util.createDirectory(caseDir.resolve("irs").resolve("xml"));
 		return caseDir;
 	}
 
-	private void createDirectory(Path dirPath) {
-		try {
-			Files.createDirectory(dirPath);
-		}
-		catch (IOException e) {
-			throw new RuntimeException("Unable to create dir: " + dirPath.toString(), e);
-		}
-	}
-	
 	public static Task build(
 			TaskConfig taskConfig, Book book, Map<String, String> taskParams, Filter filter) {
 		

@@ -122,6 +122,7 @@ class BookProcessor {
 			List<String> taskIDsToProcess, Map<String, String> taskParams,
 			Path targetPath, boolean overwriteExisting) {
 		
+		// load phase
 		SpreadsheetFileFactory spreadsheetFileFactory = processor.getSpreadsheetFileFactory();
 		SpreadsheetFile spreadsheetFile = 
 				targetPath == null ? 
@@ -133,24 +134,35 @@ class BookProcessor {
 				.build();
 		BookTestDataLoader loader = new BookTestDataLoader(book, spreadsheetFile, filter);
 		loader.loadTestData();
+		TaskProcessor taskProcessor = null;
+		if (processTasks) {
+			taskProcessor = new TaskProcessor
+					.Builder(processor.getTaskFactory(), book)
+					.setTaskIDList(taskIDsToProcess) 
+					.setTaskParams(taskParams)
+					.setFilter(filter)
+					.build();
+			taskProcessor.preProcessRead(spreadsheetFile);
+		}
+		
+		// validate / task process phase
 		if (schemaValidate) {
 			BookSchemaValidator schemaValidator = new BookSchemaValidator(
 					book, processor.getSchemaValidatorFactory(), filter);
 			schemaValidator.validate();
 		}
 		if (processTasks) {
-			TaskProcessor taskProcessor = new TaskProcessor
-					.Builder(processor.getTaskFactory(), book)
-					.setTaskIDList(taskIDsToProcess) 
-					.setTaskParams(taskParams)
-					.setFilter(filter)
-					.build();
 			taskProcessor.processTasks();
 		}
+		
+		// write phase (optional)
 		if (targetPath != null) {
 			BookSpreadsheetLogWriter logWriter = 
 					new BookSpreadsheetLogWriter(book, spreadsheetFile, filter);
 			logWriter.writeLog();
+			if (processTasks) {
+				taskProcessor.postProcessWrite(spreadsheetFile);
+			}
 			if (overwriteExisting) {
 				spreadsheetFile.save(targetPath);
 			}
