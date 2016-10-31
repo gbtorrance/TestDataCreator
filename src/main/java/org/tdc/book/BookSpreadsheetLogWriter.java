@@ -1,5 +1,7 @@
 package org.tdc.book;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -20,7 +22,9 @@ import org.tdc.spreadsheet.SpreadsheetFile;
  */
 public class BookSpreadsheetLogWriter {
 	private static final Logger log = LoggerFactory.getLogger(BookSpreadsheetLogWriter.class);
-	private static final String LOG_SPREADSHEET_NAME = "Log"; // TODO configuration
+	private static final String LOG_SPREADSHEET_NAME = "Log";
+	private static final DateTimeFormatter DATE_TIME_FORMATTER = 
+			DateTimeFormatter.ofPattern("E MM/dd/yyyy 'at' hh:mm:ssa");
 	
 	private final Book book;
 	private final SpreadsheetFile spreadsheetFile;
@@ -29,7 +33,6 @@ public class BookSpreadsheetLogWriter {
 	private Spreadsheet logSheet;
 	private int rowNum;
 	private int colNum;
-	
 	
 	public BookSpreadsheetLogWriter(Book book, SpreadsheetFile spreadsheetFile, Filter filter) {
 		this.book = book;
@@ -41,6 +44,7 @@ public class BookSpreadsheetLogWriter {
 		rowNum = 1;
 		colNum = 1;
 		initLogSpreadsheet();
+		writeProcessDateTime();
 		writeBook();
 	}
 
@@ -52,6 +56,12 @@ public class BookSpreadsheetLogWriter {
 		logSheet = spreadsheetFile.createSpreadsheet(LOG_SPREADSHEET_NAME);
 	}
 
+	private void writeProcessDateTime() {
+		String msg = "File processed: " + LocalDateTime.now().format(DATE_TIME_FORMATTER);
+		logSheet.setCellValue(msg, rowNum, colNum, book.getConfig().getHeaderLogStyle());
+		rowNum += 2;
+	}
+	
 	private void writeBook() {
 		List<TestSet> testSets = book.getTestSets();
 		for (TestSet testSet : testSets) {
