@@ -424,9 +424,26 @@ public class CLIOperations {
 	private void ensureFileNotCurrentlyInUse(Path bookPath) {
 		Path parentPath = bookPath.toAbsolutePath().getParent();
 		String fileName = bookPath.getFileName().toString();
-		Path path1 = parentPath.resolve("~$" + fileName);
-		Path path2 = parentPath.resolve(".~lock." + fileName + "#");
-		boolean found = Files.exists(path1) || Files.exists(path2);
+		Path excelBackup = parentPath.resolve("~$" + fileName);
+		Path libreOfficeBackup = parentPath.resolve(".~lock." + fileName + "#");
+		// do initial test for existence of Excel files; 
+		// if backup file can be deleted, that means it is not locked, 
+		//		and the backup file is likely an orphaned file;
+		// if backup file cannot be deleted (i.e. exception), that means
+		// 		it is locked, and we definitely want to output an error;
+		// after the delete attempt, we'll test for existence again;
+		// note: don't attempt to delete Libre Office backup files, as these
+		// will more than likely be on a Linux file system, so there will be
+		// no locking, and the delete will almost always succeed;
+		// testing for 'in use' files is quite a tricky task; 
+		// this is not ideal, but it's better than nothing
+		try {
+			Files.deleteIfExists(excelBackup);
+		}
+		catch (Exception e) {
+			// intentionally do nothing
+		}
+		boolean found = Files.exists(excelBackup) || Files.exists(libreOfficeBackup);
 		if (found) {
 			outputAndEnd("It appears this Book file is in use. Please close then try again.");
 		}
