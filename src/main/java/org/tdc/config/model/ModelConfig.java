@@ -31,4 +31,5 @@ public interface ModelConfig {
 	boolean hasModelCustomizerConfig();
 	int getTestLoadMaxMessages();
 	int getSchemaValidateMaxMessages();
+	boolean getSchemaValidateEnable();
 }

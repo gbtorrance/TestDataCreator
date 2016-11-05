@@ -63,11 +63,15 @@ public class BookSchemaValidator {
 		log.debug("Schema validating TestCase num {}, TestSet name '{}', column {}", 
 				testDoc.getCaseNum(), testDoc.getSetName(), testDoc.getColNum());
 		Optional<Result> schemaValidateResult = testDoc.getResults().getSchemaValidateResult();
+		ModelConfig modelConfig = testDoc.getPageConfig().getModelConfig(); 
 		if (schemaValidateResult.isPresent()) {
 			log.debug("Schema validation already complete for this TestDoc; skipping!");
 		}
+		else if (!modelConfig.getSchemaValidateEnable()) {
+			log.debug("Schema validation is not enabled for '" + 
+					modelConfig.getModelName() + "'; skipping!");
+		}
 		else {
-			ModelConfig modelConfig = testDoc.getPageConfig().getModelConfig(); 
 			SchemaValidator schemaValidator = schemaValidatorFactory.getSchemaValidator(modelConfig);
 			testDoc.getResults().setSchemaValidateResult(new Result());
 			schemaValidator.validate(testDoc);

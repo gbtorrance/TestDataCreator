@@ -44,6 +44,7 @@ public class ModelConfigImpl implements ModelConfig {
 	private final ModelCustomizerConfig modelCustomizerConfig;
 	private final int testLoadMaxMessages;
 	private final int schemaValidateMaxMessages;
+	private final boolean schemaValidateEnable;
 	
 	private ModelConfigImpl(Builder builder) {
 		this.schemaConfig = builder.schemaConfig;
@@ -62,6 +63,7 @@ public class ModelConfigImpl implements ModelConfig {
 		this.modelCustomizerConfig = builder.modelCustomizerConfig;
 		this.testLoadMaxMessages = builder.testLoadMaxMessages;
 		this.schemaValidateMaxMessages = builder.schemaValidateMaxMessages;
+		this.schemaValidateEnable = builder.schemaValidateEnable;
 	}
 	
 	@Override
@@ -154,6 +156,11 @@ public class ModelConfigImpl implements ModelConfig {
 		return schemaValidateMaxMessages;
 	}
 	
+	@Override
+	public boolean getSchemaValidateEnable() {
+		return schemaValidateEnable;
+	}
+	
 	public static class Builder {
 		private final XMLConfigWrapper config;
 		private final SchemaConfig schemaConfig;
@@ -175,6 +182,7 @@ public class ModelConfigImpl implements ModelConfig {
 		private ModelCustomizerConfig modelCustomizerConfig;
 		private int testLoadMaxMessages;
 		private int schemaValidateMaxMessages;
+		private boolean schemaValidateEnable;
 		
 		public Builder(SchemaConfig schemaConfig, String name, 
 				SchemaExtractorFactory schemaExtractorFactory, GeneralEvaluatorFactory evaluatorFactory) {
@@ -206,6 +214,7 @@ public class ModelConfigImpl implements ModelConfig {
 					config, modelConfigRoot, defaultOccursCount, modelName, evaluatorFactory).build();
 			testLoadMaxMessages = config.getInt("TestLoadMaxMessages", Util.NO_LIMIT, false);
 			schemaValidateMaxMessages = config.getInt("SchemaValidateMaxMessages", Util.NO_LIMIT, false);
+			schemaValidateEnable = config.getBoolean("SchemaValidateEnable", true, false);
 			return new ModelConfigImpl(this);
 		}
 	}
