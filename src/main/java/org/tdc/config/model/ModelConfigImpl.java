@@ -7,8 +7,9 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.tdc.config.XMLConfigWrapper;
 import org.tdc.config.schema.SchemaConfig;
+import org.tdc.config.util.Config;
+import org.tdc.config.util.ConfigImpl;
 import org.tdc.evaluator.factory.GeneralEvaluatorFactory;
 import org.tdc.schemaparse.extractor.SchemaExtractor;
 import org.tdc.schemaparse.extractor.SchemaExtractorFactory;
@@ -27,6 +28,7 @@ public class ModelConfigImpl implements ModelConfig {
 	public static final String CONFIG_FILE = "TDCModelConfig.xml";
 	
 	private static final Logger log = LoggerFactory.getLogger(ModelConfigImpl.class);
+	private static final String MODEL_CONFIG_ROOT_PROP_KEY = "modelConfigRoot";
 
 	private final SchemaConfig schemaConfig;
 	private final Addr addr;
@@ -79,6 +81,11 @@ public class ModelConfigImpl implements ModelConfig {
 	@Override
 	public Path getModelConfigRoot() {
 		return modelConfigRoot;
+	}
+	
+	@Override
+	public String getModelConfigRootPropKey() {
+		return MODEL_CONFIG_ROOT_PROP_KEY;
 	}
 
 	@Override
@@ -162,7 +169,7 @@ public class ModelConfigImpl implements ModelConfig {
 	}
 	
 	public static class Builder {
-		private final XMLConfigWrapper config;
+		private final Config config;
 		private final SchemaConfig schemaConfig;
 		private final Addr addr;
 		private final Path modelConfigRoot;
@@ -196,7 +203,16 @@ public class ModelConfigImpl implements ModelConfig {
 			this.schemaExtractorFactory = schemaExtractorFactory;
 			this.evaluatorFactory = evaluatorFactory;
 			Path modelConfigFile = modelConfigRoot.resolve(CONFIG_FILE);
-			this.config = new XMLConfigWrapper(modelConfigFile);
+			this.config = new ConfigImpl
+					.Builder(modelConfigFile)
+					.addLookup(
+							schemaConfig.getSchemasConfigRootPropKey(), 
+							schemaConfig.getSchemasConfigRoot().toString())
+					.addLookup(
+							schemaConfig.getSchemaConfigRootPropKey(), 
+							schemaConfig.getSchemaConfigRoot().toString())
+					.addLookup(MODEL_CONFIG_ROOT_PROP_KEY, modelConfigRoot.toString())
+					.build();
 		}
 
 		public ModelConfig build() {
@@ -215,6 +231,7 @@ public class ModelConfigImpl implements ModelConfig {
 			testLoadMaxMessages = config.getInt("TestLoadMaxMessages", Util.NO_LIMIT, false);
 			schemaValidateMaxMessages = config.getInt("SchemaValidateMaxMessages", Util.NO_LIMIT, false);
 			schemaValidateEnable = config.getBoolean("SchemaValidateEnable", true, false);
+			config.ensureNoUnprocessedKeys();
 			return new ModelConfigImpl(this);
 		}
 	}

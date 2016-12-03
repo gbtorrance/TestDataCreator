@@ -1,6 +1,6 @@
 package org.tdc.evaluator.factory;
 
-import org.tdc.config.XMLConfigWrapper;
+import org.tdc.config.util.Config;
 import org.tdc.evaluator.Evaluator;
 import org.tdc.evaluator.Source;
 import org.tdc.evaluator.VariableEvaluator;
@@ -14,7 +14,7 @@ public class VariableEvaluatorFactory implements TypeEvaluatorFactory {
 	private static final String TYPE = "variable"; 
 	
 	@Override
-	public Evaluator createEvaluator(XMLConfigWrapper config, String configKey, CellStyle defaultStyle) {
+	public Evaluator createEvaluator(Config config, String configKey, CellStyle defaultStyle) {
 		EvaluatorFactoryUtil.ensureCorrectEvalatorType(config, configKey, TYPE);
 		String sourceStr = config.getString(configKey + "[@source]", null, true);
 		Source source = null;

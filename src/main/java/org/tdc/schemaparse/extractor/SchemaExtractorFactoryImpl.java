@@ -6,7 +6,7 @@ import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.tdc.config.XMLConfigWrapper;
+import org.tdc.config.util.Config;
 
 /**
  * A {@link SchemaExtractorFactory} implementation.
@@ -14,7 +14,7 @@ import org.tdc.config.XMLConfigWrapper;
 public class SchemaExtractorFactoryImpl implements SchemaExtractorFactory {
 
 	@Override
-	public SchemaExtractor createSchemaExtractor(XMLConfigWrapper config, String extractorKey) {
+	public SchemaExtractor createSchemaExtractor(Config config, String extractorKey) {
 		String className = getClassName(config, extractorKey);
 		Class<?> classy = getClass(className);
 		Method buildMethod = getBuildMethod(classy);
@@ -23,7 +23,7 @@ public class SchemaExtractorFactoryImpl implements SchemaExtractorFactory {
 	}
 
 	@Override
-	public List<SchemaExtractor> createSchemaExtractors(XMLConfigWrapper config, String extractorsKey) {
+	public List<SchemaExtractor> createSchemaExtractors(Config config, String extractorsKey) {
 		String extractorKey = extractorsKey + ".SchemaExtractor"; 
 		int count = config.getCount(extractorKey);
 		List<SchemaExtractor> extractors = new ArrayList<>();
@@ -33,7 +33,7 @@ public class SchemaExtractorFactoryImpl implements SchemaExtractorFactory {
 		return extractors;
 	}
 	
-	private String getClassName(XMLConfigWrapper config, String extractorKey) {
+	private String getClassName(Config config, String extractorKey) {
 		// both are optional; but at least one of type or class is required
 		String type = config.getString(extractorKey + "[@type]", null, false); 
 		String className = config.getString(extractorKey + "[@class]", null, false);
@@ -73,7 +73,7 @@ public class SchemaExtractorFactoryImpl implements SchemaExtractorFactory {
 	private Method getBuildMethod(Class<?> classy) {
 		Method buildMethod = null;
 		try {
-			buildMethod = classy.getMethod("build", XMLConfigWrapper.class, String.class);
+			buildMethod = classy.getMethod("build", Config.class, String.class);
 		} 
 		catch (NoSuchMethodException | SecurityException ex) {
 			throwBuildMethodNotFoundException(classy, ex);
@@ -87,11 +87,11 @@ public class SchemaExtractorFactoryImpl implements SchemaExtractorFactory {
 	private void throwBuildMethodNotFoundException(Class<?> classy, Exception ex) {
 		String message =
 				"Class '" + classy.getName() + 
-				"' must have a static build() method with XMLConfigWrapper and String parameters";
+				"' must have a static build() method with Config and String parameters";
 		throw new RuntimeException(message, ex);
 	}
 
-	private SchemaExtractor buildExtractor(Method buildMethod, XMLConfigWrapper config, String extractorKey) {
+	private SchemaExtractor buildExtractor(Method buildMethod, Config config, String extractorKey) {
 		Object extractor = null;
 		try {
 			extractor = buildMethod.invoke(null, config, extractorKey);

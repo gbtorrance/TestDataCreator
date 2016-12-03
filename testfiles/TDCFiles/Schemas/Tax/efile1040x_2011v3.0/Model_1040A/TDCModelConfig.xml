@@ -41,12 +41,9 @@
 			<FontName>Calibri</FontName>
 			<FontHeight>11</FontHeight>
 		</DefaultStyle>
-		<DefaultHeaderStyle>
+		<NodeHeaderStyle>
 			<Bold>true</Bold>
-		</DefaultHeaderStyle>
-		<DefaultNodeDetailColumnStyle>
-			<ShrinkToFit>true</ShrinkToFit>
-		</DefaultNodeDetailColumnStyle>
+		</NodeHeaderStyle>
 		<DefaultNodeStyle/>
 		<ParentNodeStyle>
 			<ColorRGB>0 0 255</ColorRGB> <!-- blue -->
@@ -58,9 +55,15 @@
 			<ColorRGB>64 64 64</ColorRGB> <!-- dark gray -->
 			<Italic>true</Italic>
 		</CompositorNodeStyle>
-		<ChoiceMarkerStyle>
+		<ChoiceMarkerNodeStyle>
 			<ColorRGB>255 0 0</ColorRGB> <!-- red -->
-		</ChoiceMarkerStyle>
+		</ChoiceMarkerNodeStyle>
+		<NodeDetailHeaderStyle>
+			<Bold>true</Bold>
+		</NodeDetailHeaderStyle>
+		<DefaultNodeDetailStyle>
+			<ShrinkToFit>true</ShrinkToFit>
+		</DefaultNodeDetailStyle>
 		<HeaderRowCount>2</HeaderRowCount>
 		<NodeHeaderLabels>
 			<Label>Model Structure</Label>

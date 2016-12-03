@@ -57,7 +57,7 @@ public class SchemaConfigTest {
 	public void testConfigXmlDoesNotExist() {
 		Addr schemaAddrConfigXMLMissing = new Addr("/ConfigTest/SchemaConfigTest_ConfigXMLMissing");
 		exception.expect(IllegalStateException.class);
-		exception.expectMessage("Configuration file does not exist:");
+		exception.expectMessage("Unable to locate config file:");
 		schemaConfigFactory.getSchemaConfig(schemaAddrConfigXMLMissing);
 	}
 

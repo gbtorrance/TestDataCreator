@@ -16,6 +16,7 @@ public interface ModelConfig {
 	SchemaConfig getSchemaConfig();
 	Addr getAddr();
 	Path getModelConfigRoot();
+	String getModelConfigRootPropKey();
 	String getModelName();
 	String getModelDescription();
 	String getSchemaRootFile();

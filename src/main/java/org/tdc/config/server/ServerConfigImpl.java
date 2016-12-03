@@ -5,7 +5,8 @@ import java.nio.file.Path;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.tdc.config.XMLConfigWrapper;
+import org.tdc.config.util.Config;
+import org.tdc.config.util.ConfigImpl;
 
 /**
  * A {@link ServerConfig} implementation.
@@ -73,7 +74,7 @@ public class ServerConfigImpl implements ServerConfig {
 	}
 
 	public static class Builder {
-		private final XMLConfigWrapper config;
+		private final Config config;
 		private final Path serverConfigRoot;
 		
 		private Path schemasConfigRoot;
@@ -90,7 +91,7 @@ public class ServerConfigImpl implements ServerConfig {
 				throw new IllegalStateException("ServerConfigRoot dir does not exist: " + serverConfigRoot.toString());
 			}
 			Path serverConfigFile = serverConfigRoot.resolve(CONFIG_FILE);
-			this.config = new XMLConfigWrapper(serverConfigFile);
+			this.config = new ConfigImpl.Builder(serverConfigFile).build();
 		}
 
 		public ServerConfig build() {
@@ -109,6 +110,7 @@ public class ServerConfigImpl implements ServerConfig {
 			booksWorkingRoot = workingRoot.resolve(BOOKS_WORKING_DIR); // will be created as needed
 			serverPort = config.getInt("ServerPort", 0, true);
 			bookCacheMaxSize = config.getInt("BookCacheMaxSize", DEFAULT_BOOK_CACHE_MAX_SIZE, false);
+			config.ensureNoUnprocessedKeys();
 			return new ServerConfigImpl(this);
 		}
 	}

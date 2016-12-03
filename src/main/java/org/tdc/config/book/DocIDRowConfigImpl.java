@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import org.tdc.config.XMLConfigWrapper;
+import org.tdc.config.util.Config;
 
 /**
  * A {@link DocIDRowConfig} implementation.
@@ -61,7 +61,7 @@ public class DocIDRowConfigImpl implements DocIDRowConfig {
 	public static class Builder {
 		private static final String CONFIG_PREFIX = ".DocIDRows.Row";
 
-		private final XMLConfigWrapper config;
+		private final Config config;
 		private final String pageKey;
 		private final int docIDRowStart;
 		
@@ -70,7 +70,7 @@ public class DocIDRowConfigImpl implements DocIDRowConfig {
 		private String label;
 		private int index;
 		
-		public Builder(XMLConfigWrapper config, String pageKey, int docIDRowStart) {
+		public Builder(Config config, String pageKey, int docIDRowStart) {
 			this.config = config;
 			this.pageKey = pageKey;
 			this.docIDRowStart = docIDRowStart;

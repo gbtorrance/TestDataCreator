@@ -11,7 +11,7 @@ import org.apache.xerces.dom.DocumentImpl;
 import org.apache.xerces.xs.XSAnnotation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.tdc.config.XMLConfigWrapper;
+import org.tdc.config.util.Config;
 import org.tdc.modeldef.AttribNodeDef;
 import org.tdc.modeldef.ElementNodeDef;
 import org.tdc.modeldef.NodeDef;
@@ -68,17 +68,17 @@ public class DefaultSchemaAnnotationExtractor implements SchemaAnnotationExtract
 	/**
 	 * Static builder method to create an instance of this class based on XML configuration settings.
 	 * 
-	 * @param config XMLConfigWrapper class.
+	 * @param config Config class.
 	 * @param key Configuration key pointing to location of information to read.
 	 * @return Instance of this class.
 	 */
-	public static DefaultSchemaAnnotationExtractor build(XMLConfigWrapper config, String key) {
+	public static DefaultSchemaAnnotationExtractor build(Config config, String key) {
 		String annotationKey = key + ".Annotations.Annotation";
 		List<AnnotationInfo> annotations = getAnnotations(config, annotationKey);
 		return new DefaultSchemaAnnotationExtractor(annotations);
 	}
 	
-	private static List<AnnotationInfo> getAnnotations(XMLConfigWrapper config, String annotationsKey) {
+	private static List<AnnotationInfo> getAnnotations(Config config, String annotationsKey) {
 		int count = config.getCount(annotationsKey);
 		if (count == 0) {
 			throw new IllegalStateException("SchemaAnnotationExtractor must have at least 1 '" + annotationsKey + "'");

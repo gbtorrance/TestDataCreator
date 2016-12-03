@@ -3,10 +3,12 @@ package org.tdc.config.model;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.tdc.config.XMLConfigWrapper;
+import org.tdc.config.util.Config;
 import org.tdc.evaluator.Evaluator;
 import org.tdc.evaluator.factory.GeneralEvaluatorFactory;
 import org.tdc.spreadsheet.CellStyle;
+import org.tdc.spreadsheet.CellStyleImpl;
+import org.tdc.util.Util;
 
 /**
  * A {@link ModelCustomizerColumnConfig} implementation.
@@ -76,7 +78,7 @@ public class ModelCustomizerColumnConfigImpl implements ModelCustomizerColumnCon
 	public static class Builder {
 		private static final String CONFIG_PREFIX = "Customizer.NodeDetailColumns.Column";
 
-		private final XMLConfigWrapper config;
+		private final Config config;
 		private final GeneralEvaluatorFactory evaluatorFactory;
 		private final int headerRowCount;
 		private final CellStyle defaultNodeDetailStyle;
@@ -90,7 +92,7 @@ public class ModelCustomizerColumnConfigImpl implements ModelCustomizerColumnCon
 		private String storeValueWithVariableName;
 		private int index;
 		
-		public Builder(XMLConfigWrapper config, 
+		public Builder(Config config, 
 				GeneralEvaluatorFactory evaluatorFactory, int headerRowCount, 
 				CellStyle defaultNodeDetailStyle, int nodeDetailColStart) {
 			
@@ -113,10 +115,11 @@ public class ModelCustomizerColumnConfigImpl implements ModelCustomizerColumnCon
 	
 		private ModelCustomizerColumnConfig build() {
 			String indexPrefix = CONFIG_PREFIX + "(" + index + ").";
-			headerLabels = config.getHeaderLabels(
-					indexPrefix + "HeaderLabels", headerRowCount);
+			headerLabels = Util.getHeaderLabels(
+					config, indexPrefix + "HeaderLabels", headerRowCount);
 			width = config.getInt(indexPrefix + "Width", 0, true);
-			style = config.getCellStyle(indexPrefix + "Style", defaultNodeDetailStyle, false);
+			style = new CellStyleImpl.Builder().setFromConfig(
+					config, indexPrefix + "Style", defaultNodeDetailStyle, false).build();
 			initAsNewEvaluator = evaluatorFactory.createEvaluator(
 					config, indexPrefix + "InitializeAsNew.Evaluator", style);
 			initFromPrevEvaluator = evaluatorFactory.createEvaluator(

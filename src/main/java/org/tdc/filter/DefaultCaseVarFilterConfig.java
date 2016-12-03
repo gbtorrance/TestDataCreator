@@ -2,8 +2,8 @@ package org.tdc.filter;
 
 import java.nio.file.Path;
 
-import org.tdc.config.XMLConfigWrapper;
 import org.tdc.config.book.FilterConfig;
+import org.tdc.config.util.Config;
 import org.tdc.util.Addr;
 
 /**
@@ -26,9 +26,9 @@ public class DefaultCaseVarFilterConfig implements FilterConfig {
 	}
 	
 	public static FilterConfig build(
-			XMLConfigWrapper config, String key, 
+			Config config, String key, 
 			Path bookConfigRoot, Addr bookAddr, String bookName) {
-				
+	
 		String caseVarName = config.getString(key + ".CaseVariableName", null, true);
 		return new DefaultCaseVarFilterConfig(caseVarName);
 	}

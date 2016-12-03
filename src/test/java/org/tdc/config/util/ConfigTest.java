@@ -1,9 +1,10 @@
-package org.tdc.config;
+package org.tdc.config.util;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.awt.Color;
-import java.io.File;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.NoSuchElementException;
 
 import org.junit.BeforeClass;
@@ -16,37 +17,39 @@ import org.tdc.spreadsheet.CellStyleImpl;
 import org.tdc.util.Util;
 
 /**
- * Unit tests for {@link XMLConfigWrapper} and its related classes.
+ * Unit tests for {@link Config} and its related classes.
  */
-public class XMLConfigWrapperTest {
+public class ConfigTest {
 	
-	private static XMLConfigWrapper config;
+	private static Config config;
 	
 	@Rule
 	public final ExpectedException exception = ExpectedException.none();
 	
 	@BeforeClass
 	public static void setup() {
-		ClassLoader classLoader = XMLConfigWrapperTest.class.getClassLoader();
-		File file = new File(classLoader.getResource("XMLConfigWrapperTest.xml").getFile());
-		config = new XMLConfigWrapper(file);
+		ClassLoader classLoader = ConfigTest.class.getClassLoader();
+		Path path = Paths.get(classLoader.getResource(
+				"ConfigTest.xml").getPath().toString());
+		config = new ConfigImpl.Builder(path).build();
 	}
 
 	@Test
 	public void testConfigXmlDoesNotExistThrowsException() {
-		File file = new File("/PathDoesNotExist");
+		Path path = Paths.get("/PathDoesNotExist");
 		exception.expect(IllegalStateException.class);
-		exception.expectMessage("Configuration file does not exist:");
-		new XMLConfigWrapper(file);
+		exception.expectMessage("Unable to locate config file:");
+		new ConfigImpl.Builder(path).build();
 	}
 
 	@Test
 	public void testInvalidXmlThrowsException() {
-		ClassLoader classLoader = XMLConfigWrapperTest.class.getClassLoader();
-		File file = new File(classLoader.getResource("XMLConfigWrapperTest_InvalidXML.xml").getFile());
+		ClassLoader classLoader = ConfigTest.class.getClassLoader();
+		Path path = Paths.get(classLoader.getResource(
+				"ConfigTest_InvalidXML.xml").getPath().toString());
 		exception.expect(IllegalStateException.class);
-		exception.expectMessage("Unable to read configuration file:");
-		new XMLConfigWrapper(file);
+		exception.expectMessage("Unable to load config file:");
+		new ConfigImpl.Builder(path).build();
 	}
 	
 	@Test
@@ -170,7 +173,8 @@ public class XMLConfigWrapperTest {
 	
 	@Test
 	public void testCellStyleFound() {
-		CellStyle style = config.getCellStyle("CellStyle", null, false);
+		CellStyle style = new CellStyleImpl.Builder().setFromConfig(
+				config, "CellStyle", null, false).build();
 		assertThat(style.getFontName()).isEqualTo("Calibri");
 		assertThat(style.getFontHeight()).isEqualTo(11);
 		assertThat(style.getColorRed()).isEqualTo(50);
@@ -192,7 +196,8 @@ public class XMLConfigWrapperTest {
 				.setAlignment(CellAlignment.CENTER)
 				.setFormat("text")
 				.build();
-		CellStyle style = config.getCellStyle("CellStyle_DoesNotExist", defaultStyle, false);
+		CellStyle style = new CellStyleImpl.Builder().setFromConfig(
+				config, "CellStyle_DoesNotExist", defaultStyle, false).build();
 		assertThat(style.getFontName()).isEqualTo("Arial");
 		assertThat(style.getFontHeight()).isEqualTo(12);
 		assertThat(style.getColorRed()).isEqualTo(10);

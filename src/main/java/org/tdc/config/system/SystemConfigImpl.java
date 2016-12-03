@@ -6,7 +6,8 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.tdc.config.XMLConfigWrapper;
+import org.tdc.config.util.Config;
+import org.tdc.config.util.ConfigImpl;
 
 /**
  * A {@link SystemConfig} implementation.
@@ -17,6 +18,7 @@ public class SystemConfigImpl implements SystemConfig {
 	public static final String CONFIG_FILE = "TDCSystemConfig.xml";
 	
 	private static final Logger log = LoggerFactory.getLogger(SystemConfigImpl.class);
+	private static final String SYSTEM_CONFIG_ROOT_PROP_KEY = "systemConfigRoot";
 
 	private final Path systemConfigRoot;
 	private final Path schemasConfigRoot;
@@ -33,6 +35,11 @@ public class SystemConfigImpl implements SystemConfig {
 	@Override
 	public Path getSystemConfigRoot() {
 		return systemConfigRoot;
+	}
+
+	@Override
+	public String getSystemConfigRootPropKey() {
+		return SYSTEM_CONFIG_ROOT_PROP_KEY;
 	}
 
 	@Override
@@ -53,7 +60,7 @@ public class SystemConfigImpl implements SystemConfig {
 	public static class Builder {
 		private final Path systemConfigRoot;
 		private final InitializerConfigFactory initializerConfigFactory;
-		private final XMLConfigWrapper config;
+		private final Config config;
 		
 		private Path schemasConfigRoot;
 		private Path booksConfigRoot;
@@ -68,7 +75,10 @@ public class SystemConfigImpl implements SystemConfig {
 						systemConfigRoot.toString());
 			}
 			Path systemConfigFile = systemConfigRoot.resolve(CONFIG_FILE);
-			this.config = new XMLConfigWrapper(systemConfigFile);
+			this.config = new ConfigImpl
+					.Builder(systemConfigFile)
+					.addLookup(SYSTEM_CONFIG_ROOT_PROP_KEY, systemConfigRoot.toString())
+					.build();
 		}
 
 		public SystemConfig build() {
@@ -86,6 +96,7 @@ public class SystemConfigImpl implements SystemConfig {
 			}
 			initializerConfigs = initializerConfigFactory
 					.createInitializerConfigs(config, "Initializers", systemConfigRoot);
+			config.ensureNoUnprocessedKeys();
 			return new SystemConfigImpl(this);
 		}
 	}

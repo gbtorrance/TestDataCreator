@@ -7,7 +7,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.tdc.config.XMLConfigWrapper;
+import org.tdc.config.util.Config;
 
 /**
  * A {@link InitializerConfigFactory} implementation.
@@ -16,7 +16,7 @@ public class InitializerConfigFactoryImpl implements InitializerConfigFactory {
 
 	@Override
 	public InitializerConfig createInitializerConfig(
-			XMLConfigWrapper config, String initConfigKey, Path systemConfigRoot) {
+			Config config, String initConfigKey, Path systemConfigRoot) {
 		
 		String className = getClassName(config, initConfigKey);
 		Class<?> classy = getClass(className);
@@ -28,7 +28,7 @@ public class InitializerConfigFactoryImpl implements InitializerConfigFactory {
 
 	@Override
 	public List<InitializerConfig> createInitializerConfigs(
-			XMLConfigWrapper config, String initConfigsKey, Path systemConfigRoot) {
+			Config config, String initConfigsKey, Path systemConfigRoot) {
 		
 		String initConfigKey = initConfigsKey + ".Initializer"; 
 		int count = config.getCount(initConfigKey);
@@ -41,7 +41,7 @@ public class InitializerConfigFactoryImpl implements InitializerConfigFactory {
 		return initConfigs;
 	}
 	
-	private String getClassName(XMLConfigWrapper config, String initConfigKey) {
+	private String getClassName(Config config, String initConfigKey) {
 		// both are optional; but at least one of type or class is required
 		String type = config.getString(initConfigKey + "[@type]", null, false); 
 		String className = config.getString(initConfigKey + "[@class]", null, false);
@@ -77,7 +77,7 @@ public class InitializerConfigFactoryImpl implements InitializerConfigFactory {
 		Method buildMethod = null;
 		try {
 			buildMethod = classy.getMethod("build", 
-					XMLConfigWrapper.class, String.class, Path.class);
+					Config.class, String.class, Path.class);
 		} 
 		catch (NoSuchMethodException | SecurityException ex) {
 			throwBuildMethodNotFoundException(classy, ex);
@@ -91,12 +91,12 @@ public class InitializerConfigFactoryImpl implements InitializerConfigFactory {
 	private void throwBuildMethodNotFoundException(Class<?> classy, Exception ex) {
 		String message =
 				"Class '" + classy.getName() + "' must have a static " + 
-				"build(XMLConfigWrapper config, String key, Path systemConfigRoot) method";
+				"build(Config config, String key, Path systemConfigRoot) method";
 		throw new RuntimeException(message, ex);
 	}
 
 	private InitializerConfig buildInitializerConfig(
-			Method buildMethod, XMLConfigWrapper config, 
+			Method buildMethod, Config config, 
 			String initConfigKey, Path systemConfigRoot) {
 		
 		Object initConfig = null;

@@ -4,9 +4,10 @@ import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
 
-import org.tdc.config.XMLConfigWrapper;
+import org.tdc.config.util.Config;
 import org.tdc.evaluator.factory.GeneralEvaluatorFactory;
 import org.tdc.spreadsheet.CellStyle;
+import org.tdc.spreadsheet.CellStyleImpl;
 import org.tdc.util.Util;
 
 /**
@@ -175,7 +176,7 @@ public class ModelCustomizerConfigImpl implements ModelCustomizerConfig {
 	public static class Builder {
 		private static final String CONFIG_PREFIX = "Customizer";
 
-		private final XMLConfigWrapper config;
+		private final Config config;
 		private final Path modelConfigRoot;
 		private final int defaultOccursCount;
 		private final String modelName;
@@ -204,7 +205,7 @@ public class ModelCustomizerConfigImpl implements ModelCustomizerConfig {
 		private int nodeRowStart;
 		
 		public Builder(
-				XMLConfigWrapper config, Path modelConfigRoot, int defaultOccursCount,
+				Config config, Path modelConfigRoot, int defaultOccursCount,
 				String modelName, GeneralEvaluatorFactory evaluatorFactory) {
 			this.config = config;
 			this.modelConfigRoot = modelConfigRoot;
@@ -222,32 +223,32 @@ public class ModelCustomizerConfigImpl implements ModelCustomizerConfig {
 						CONFIG_PREFIX + ".FileNamePrefix", "Customizer_", false);
 				String fileName = Util.legalizeName(fileNamePrefix + modelName) + ".xlsx";
 				filePath = modelConfigRoot.resolve(fileName);
-				defaultStyle = config.getCellStyle(
-						CONFIG_PREFIX + ".DefaultStyle", null, true);
-				nodeHeaderStyle = config.getCellStyle(
-						CONFIG_PREFIX + ".NodeHeaderStyle", defaultStyle, false);
-				defaultNodeStyle = config.getCellStyle(
-						CONFIG_PREFIX + ".DefaultNodeStyle", defaultStyle, false);
-				parentNodeStyle = config.getCellStyle(
-						CONFIG_PREFIX + ".ParentNodeStyle", defaultNodeStyle, false);
-				attribNodeStyle = config.getCellStyle(
-						CONFIG_PREFIX + ".AttribNodeStyle", defaultNodeStyle, false);
-				compositorNodeStyle = config.getCellStyle(
-						CONFIG_PREFIX + ".CompositorNodeStyle", defaultNodeStyle, false);
-				choiceMarkerNodeStyle = config.getCellStyle(
-						CONFIG_PREFIX + ".ChoiceMarkerNodeStyle", defaultNodeStyle, false);
-				nodeDetailHeaderStyle = config.getCellStyle(
-						CONFIG_PREFIX + ".NodeDetailHeaderStyle", defaultStyle, false);
-				defaultNodeDetailStyle = config.getCellStyle(
-						CONFIG_PREFIX + ".DefaultNodeDetailStyle", defaultStyle, false);
+				defaultStyle = new CellStyleImpl.Builder().setFromConfig(
+						config, CONFIG_PREFIX + ".DefaultStyle", null, true).build();
+				nodeHeaderStyle = new CellStyleImpl.Builder().setFromConfig(
+						config, CONFIG_PREFIX + ".NodeHeaderStyle", defaultStyle, false).build();
+				defaultNodeStyle = new CellStyleImpl.Builder().setFromConfig(
+						config, CONFIG_PREFIX + ".DefaultNodeStyle", defaultStyle, false).build();
+				parentNodeStyle = new CellStyleImpl.Builder().setFromConfig(
+						config, CONFIG_PREFIX + ".ParentNodeStyle", defaultNodeStyle, false).build();
+				attribNodeStyle = new CellStyleImpl.Builder().setFromConfig(
+						config, CONFIG_PREFIX + ".AttribNodeStyle", defaultNodeStyle, false).build();
+				compositorNodeStyle = new CellStyleImpl.Builder().setFromConfig(
+						config, CONFIG_PREFIX + ".CompositorNodeStyle", defaultNodeStyle, false).build();
+				choiceMarkerNodeStyle = new CellStyleImpl.Builder().setFromConfig(
+						config, CONFIG_PREFIX + ".ChoiceMarkerNodeStyle", defaultNodeStyle, false).build();
+				nodeDetailHeaderStyle = new CellStyleImpl.Builder().setFromConfig(
+						config, CONFIG_PREFIX + ".NodeDetailHeaderStyle", defaultStyle, false).build();
+				defaultNodeDetailStyle = new CellStyleImpl.Builder().setFromConfig(
+						config, CONFIG_PREFIX + ".DefaultNodeDetailStyle", defaultStyle, false).build();
 				nodeColumnCount = config.getInt(
 						CONFIG_PREFIX + ".NodeColumnCount", 0, true);
 				nodeColumnWidth = config.getInt(
 						CONFIG_PREFIX + ".NodeColumnWidth", 0, true);
 				headerRowCount = config.getInt(
 						CONFIG_PREFIX + ".HeaderRowCount", 1, false);
-				nodeHeaderLabels = config.getHeaderLabels(
-						CONFIG_PREFIX + ".NodeHeaderLabels", headerRowCount);
+				nodeHeaderLabels = Util.getHeaderLabels(
+						config, CONFIG_PREFIX + ".NodeHeaderLabels", headerRowCount);
 				readOccursCountOverrideFromVariable = config.getString(
 						CONFIG_PREFIX + ".ReadOccursCountOverrideFromVariable", null, true);
 				allowMinMaxInvalidOccursCountOverride = config.getBoolean(

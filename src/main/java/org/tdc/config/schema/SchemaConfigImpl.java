@@ -5,7 +5,8 @@ import java.nio.file.Path;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.tdc.config.XMLConfigWrapper;
+import org.tdc.config.util.Config;
+import org.tdc.config.util.ConfigImpl;
 import org.tdc.util.Addr;
 
 /**
@@ -18,6 +19,8 @@ public class SchemaConfigImpl implements SchemaConfig {
 	public static final String CONFIG_FILE = "TDCSchemaConfig.xml";
 	
 	private static final Logger log = LoggerFactory.getLogger(SchemaConfigImpl.class);
+	private static final String SCHEMAS_CONFIG_ROOT_PROP_KEY = "schemasConfigRoot";
+	private static final String SCHEMA_CONFIG_ROOT_PROP_KEY = "schemaConfigRoot";
 
 	private final Path schemasConfigRoot;
 	private final Addr addr;
@@ -37,6 +40,11 @@ public class SchemaConfigImpl implements SchemaConfig {
 	}
 	
 	@Override
+	public String getSchemasConfigRootPropKey() {
+		return SCHEMAS_CONFIG_ROOT_PROP_KEY;
+	}
+	
+	@Override
 	public Addr getAddr() {
 		return addr; 
 	}
@@ -47,12 +55,17 @@ public class SchemaConfigImpl implements SchemaConfig {
 	}
 
 	@Override
+	public String getSchemaConfigRootPropKey() {
+		return SCHEMA_CONFIG_ROOT_PROP_KEY;
+	}
+	
+	@Override
 	public Path getSchemaFilesRoot() {
 		return schemaFilesRoot;
 	}
 
 	public static class Builder {
-		private final XMLConfigWrapper config;
+		private final Config config;
 		private final Path schemasConfigRoot;
 		private final Addr addr;
 		private final Path schemaConfigRoot;
@@ -68,7 +81,11 @@ public class SchemaConfigImpl implements SchemaConfig {
 				throw new IllegalStateException("SchemaConfig root dir does not exist: " + schemaConfigRoot.toString());
 			}
 			Path schemaConfigFile = schemaConfigRoot.resolve(CONFIG_FILE);
-			this.config = new XMLConfigWrapper(schemaConfigFile);
+			this.config = new ConfigImpl
+					.Builder(schemaConfigFile)
+					.addLookup(SCHEMAS_CONFIG_ROOT_PROP_KEY, schemasConfigRoot.toString())
+					.addLookup(SCHEMA_CONFIG_ROOT_PROP_KEY, schemaConfigRoot.toString())
+					.build();
 		}
 
 		public SchemaConfig build() {
@@ -76,6 +93,7 @@ public class SchemaConfigImpl implements SchemaConfig {
 			if (!Files.isDirectory(schemaFilesRoot)) {
 				throw new IllegalStateException("Schema files root dir does not exist: " + schemaFilesRoot.toString());
 			}
+			config.ensureNoUnprocessedKeys();
 			return new SchemaConfigImpl(this);
 		}
 	}

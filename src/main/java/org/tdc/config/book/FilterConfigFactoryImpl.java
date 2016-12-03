@@ -7,7 +7,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.tdc.config.XMLConfigWrapper;
+import org.tdc.config.util.Config;
 import org.tdc.util.Addr;
 
 /**
@@ -17,7 +17,7 @@ public class FilterConfigFactoryImpl implements FilterConfigFactory {
 
 	@Override
 	public FilterConfig createFilterConfig(
-			XMLConfigWrapper config, String filterConfigKey, 
+			Config config, String filterConfigKey, 
 			Path bookConfigRoot, Addr bookAddr, String bookName) {
 		
 		String className = getClassName(config, filterConfigKey);
@@ -31,7 +31,7 @@ public class FilterConfigFactoryImpl implements FilterConfigFactory {
 
 	@Override
 	public List<FilterConfig> createFilterConfigs(
-			XMLConfigWrapper config, String filterConfigsKey, 
+			Config config, String filterConfigsKey, 
 			Path bookConfigRoot, Addr bookAddr, String bookName) {
 		
 		String filterConfigKey = filterConfigsKey + ".Filter"; 
@@ -46,7 +46,7 @@ public class FilterConfigFactoryImpl implements FilterConfigFactory {
 		return filterConfigs;
 	}
 	
-	private String getClassName(XMLConfigWrapper config, String filterConfigKey) {
+	private String getClassName(Config config, String filterConfigKey) {
 		// both are optional; but at least one of type or class is required
 		String type = config.getString(filterConfigKey + "[@type]", null, false); 
 		String className = config.getString(filterConfigKey + "[@class]", null, false);
@@ -85,7 +85,7 @@ public class FilterConfigFactoryImpl implements FilterConfigFactory {
 		Method buildMethod = null;
 		try {
 			buildMethod = classy.getMethod("build", 
-					XMLConfigWrapper.class, String.class,
+					Config.class, String.class,
 					Path.class, Addr.class, String.class);
 		} 
 		catch (NoSuchMethodException | SecurityException ex) {
@@ -100,13 +100,13 @@ public class FilterConfigFactoryImpl implements FilterConfigFactory {
 	private void throwBuildMethodNotFoundException(Class<?> classy, Exception ex) {
 		String message =
 				"Class '" + classy.getName() + 
-				"' must have a static build(XMLConfigWrapper config, String key, " + 
+				"' must have a static build(Config config, String key, " + 
 				"Path bookConfigRoot, Addr bookAddr, String bookName) method";
 		throw new RuntimeException(message, ex);
 	}
 
 	private FilterConfig buildFilterConfig(
-			Method buildMethod, XMLConfigWrapper config, String filterConfigKey, 
+			Method buildMethod, Config config, String filterConfigKey, 
 			Path bookConfigRoot, Addr bookAddr, String bookName) {
 		
 		Object filterConfig = null;

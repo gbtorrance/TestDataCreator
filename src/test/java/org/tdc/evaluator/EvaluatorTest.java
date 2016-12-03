@@ -2,11 +2,13 @@ package org.tdc.evaluator;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.io.File;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.tdc.config.XMLConfigWrapper;
+import org.tdc.config.util.Config;
+import org.tdc.config.util.ConfigImpl;
 import org.tdc.evaluator.factory.GeneralEvaluatorFactory;
 import org.tdc.evaluator.factory.GeneralEvaluatorFactoryImpl;
 import org.tdc.evaluator.result.ValuePlusStyleResult;
@@ -19,13 +21,13 @@ import org.tdc.modeldef.ModelDefSharedState;
  */
 public class EvaluatorTest {
 	
-	private static XMLConfigWrapper config; 
+	private static Config config; 
 	
 	@BeforeClass
 	public static void beforeClass() {
 		ClassLoader classLoader = EvaluatorTest.class.getClassLoader();
-		File file = new File(classLoader.getResource("EvaluatorConfigTest.xml").getFile());
-		config = new XMLConfigWrapper(file);
+		Path path = Paths.get(classLoader.getResource("EvaluatorConfigTest.xml").getPath());
+		config = new ConfigImpl.Builder(path).build();
 	}
 	
 	@Test

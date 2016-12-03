@@ -6,9 +6,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import org.tdc.config.XMLConfigWrapper;
 import org.tdc.config.model.ModelConfig;
 import org.tdc.config.model.ModelConfigFactory;
+import org.tdc.config.util.Config;
 import org.tdc.spreadsheet.CellStyle;
 import org.tdc.util.Addr;
 
@@ -131,7 +131,7 @@ public class PageConfigImpl implements PageConfig {
 	public static class Builder {
 		private static final String CONFIG_PREFIX = "Pages.Page";
 
-		private final XMLConfigWrapper config;
+		private final Config config;
 		private final Map<String, DocTypeConfig> docTypeConfigs;
 		private final ModelConfigFactory modelConfigFactory;
 		private final int headerRowCount;
@@ -153,7 +153,7 @@ public class PageConfigImpl implements PageConfig {
 		private int nodeRowStart;
 		private int testDocColStart;
 		
-		public Builder(XMLConfigWrapper config, 
+		public Builder(Config config, 
 				Map<String, DocTypeConfig> docTypeConfigs, ModelConfigFactory modelConfigFactory,
 				int nodeColumnCount, int headerRowCount, CellStyle defaultNodeDetailColumnStyle) {
 			this.config = config;

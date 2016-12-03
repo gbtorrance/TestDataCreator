@@ -12,8 +12,10 @@ import org.tdc.util.Addr;
  */
 public interface BookConfig {
 	Path getBooksConfigRoot();
+	String getBooksConfigRootPropKey();
 	Addr getAddr();
 	Path getBookConfigRoot();
+	String getBookConfigRootPropKey();
 	String getBookName();
 	String getBookDescription();
 	Path getBookTemplateFile();

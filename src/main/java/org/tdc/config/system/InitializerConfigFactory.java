@@ -3,7 +3,7 @@ package org.tdc.config.system;
 import java.nio.file.Path;
 import java.util.List;
 
-import org.tdc.config.XMLConfigWrapper;
+import org.tdc.config.util.Config;
 
 /**
  * Interface defining factory for creating {@link InitializerConfig} instances based
@@ -11,7 +11,7 @@ import org.tdc.config.XMLConfigWrapper;
  */
 public interface InitializerConfigFactory {
 	InitializerConfig createInitializerConfig(
-			XMLConfigWrapper config, String initConfigKey, Path systemConfigRoot);
+			Config config, String initConfigKey, Path systemConfigRoot);
 	List<InitializerConfig> createInitializerConfigs(
-			XMLConfigWrapper config, String initConfigsKey, Path systemConfigRoot);
+			Config config, String initConfigsKey, Path systemConfigRoot);
 }

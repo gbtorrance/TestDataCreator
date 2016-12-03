@@ -1,6 +1,6 @@
 package org.tdc.evaluator.factory;
 
-import org.tdc.config.XMLConfigWrapper;
+import org.tdc.config.util.Config;
 import org.tdc.evaluator.Evaluator;
 import org.tdc.evaluator.PropertyEvaluator;
 import org.tdc.evaluator.Source;
@@ -14,7 +14,7 @@ public class PropertyEvaluatorFactory implements TypeEvaluatorFactory {
 	private static final String TYPE = "property"; 
 	
 	@Override
-	public Evaluator createEvaluator(XMLConfigWrapper config, String configKey, CellStyle defaultStyle) {
+	public Evaluator createEvaluator(Config config, String configKey, CellStyle defaultStyle) {
 		EvaluatorFactoryUtil.ensureCorrectEvalatorType(config, configKey, TYPE);
 		String sourceStr = config.getString(configKey + "[@source]", null, true);
 		Source source = null;

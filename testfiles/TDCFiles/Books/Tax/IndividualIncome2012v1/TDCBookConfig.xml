@@ -102,12 +102,9 @@
 		<FontName>Calibri</FontName>
 		<FontHeight>11</FontHeight>
 	</DefaultStyle>
-	<DefaultHeaderStyle>
+	<NodeHeaderStyle>
 		<Bold>true</Bold>
-	</DefaultHeaderStyle>
-	<DefaultNodeDetailColumnStyle>
-		<ShrinkToFit>true</ShrinkToFit>
-	</DefaultNodeDetailColumnStyle>
+	</NodeHeaderStyle>
 	<DefaultNodeStyle/>
 	<ParentNodeStyle>
 		<ColorRGB>0 0 255</ColorRGB> <!-- blue -->
@@ -119,13 +116,17 @@
 		<ColorRGB>64 64 64</ColorRGB> <!-- dark gray -->
 		<Italic>true</Italic>
 	</CompositorNodeStyle>
-	<ChoiceMarkerStyle>
+	<ChoiceMarkerNodeStyle>
 		<ColorRGB>255 0 0</ColorRGB> <!-- red -->
-	</ChoiceMarkerStyle>
-	<OccurMarkerStyle>
+	</ChoiceMarkerNodeStyle>
+	<OccurMarkerNodeStyle>
 		<FontHeight>10</FontHeight>
 		<ColorRGB>107 36 12</ColorRGB> <!-- brown -->
-	</OccurMarkerStyle>
+	</OccurMarkerNodeStyle>
+	<NodeDetailHeaderStyle>
+		<Bold>true</Bold>
+	</NodeDetailHeaderStyle>
+	<DefaultNodeDetailStyle/>
 	<NodeColumnCount>25</NodeColumnCount>
 	<NodeColumnWidth>500</NodeColumnWidth>
 	<HeaderRowCount>2</HeaderRowCount>
@@ -136,7 +137,6 @@
 	<Tasks>
 		<Task id="export" type="default-export">
 			<ExportRoot>../../../../Temp/ExportRoot</ExportRoot>
-			<BatchDirPrefix>TestBatch</BatchDirPrefix>
 		</Task>
 	</Tasks>
 	

@@ -15,7 +15,7 @@ import org.apache.xerces.xs.XSTypeDefinition;
 import org.apache.xerces.xs.XSValue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.tdc.config.XMLConfigWrapper;
+import org.tdc.config.util.Config;
 import org.tdc.modeldef.NodeDef;
 
 /**
@@ -433,11 +433,11 @@ public class DefaultSchemaDataTypeExtractor implements SchemaDataTypeExtractor {
 	/**
 	 * Static builder method to create an instance of this class based on XML configuration settings.
 	 * 
-	 * @param config XMLConfigWrapper class.
+	 * @param config Config class.
 	 * @param key Configuration key pointing to location of information to read.
 	 * @return Instance of this class.
 	 */
-	public static DefaultSchemaDataTypeExtractor build(XMLConfigWrapper config, String key) {
+	public static DefaultSchemaDataTypeExtractor build(Config config, String key) {
 		String variableName = config.getString(key + ".VariableName", null, true);
 		boolean verbose = config.getBoolean(key + ".Verbose", false, false);
 		return new DefaultSchemaDataTypeExtractor(variableName, verbose);

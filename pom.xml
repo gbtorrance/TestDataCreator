@@ -10,6 +10,11 @@
 	<name>testdatacreator</name>
 	<url>http://maven.apache.org</url>
 	
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<org.mapstruct.version>1.1.0.Beta2</org.mapstruct.version>
+	</properties>
+
 	<build>
 		<plugins>
 			<plugin>
@@ -61,26 +66,20 @@
 		</plugins>
 	</build>
 
-	<properties>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<org.mapstruct.version>1.1.0.Beta2</org.mapstruct.version>
-	</properties>
-
 	<dependencies>
 
 		<dependency>
-			<groupId>commons-configuration</groupId>
-			<artifactId>commons-configuration</artifactId>
-			<version>1.10</version>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-configuration2</artifactId>
+			<version>2.1</version>
 		</dependency>
-
-		<!-- optional dependency used by commons-configuration; needed by this project -->
+		
 		<dependency>
-			<groupId>commons-collections</groupId>
-			<artifactId>commons-collections</artifactId>
-			<version>3.2.2</version>
+			<groupId>commons-beanutils</groupId>
+			<artifactId>commons-beanutils</artifactId>
+			<version>1.9.3</version>
 		</dependency>
-
+		
 		<dependency>
 			<groupId>xerces</groupId>
 			<artifactId>xercesImpl</artifactId>

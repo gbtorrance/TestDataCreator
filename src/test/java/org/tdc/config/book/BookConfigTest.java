@@ -191,7 +191,7 @@ public class BookConfigTest {
 	public void testConfigXmlDoesNotExist() {
 		Addr bookAddrConfigXMLMissing = new Addr("/ConfigTest/BookConfigTest_ConfigXMLMissing");
 		exception.expect(IllegalStateException.class);
-		exception.expectMessage("Configuration file does not exist:");
+		exception.expectMessage("Unable to locate config file:");
 		bookConfigFactory.getBookConfig(bookAddrConfigXMLMissing);
 	}
 }

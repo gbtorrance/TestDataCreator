@@ -3,7 +3,7 @@ package org.tdc.config.book;
 import java.nio.file.Path;
 import java.util.List;
 
-import org.tdc.config.XMLConfigWrapper;
+import org.tdc.config.util.Config;
 import org.tdc.util.Addr;
 
 /**
@@ -12,9 +12,9 @@ import org.tdc.util.Addr;
  */
 public interface FilterConfigFactory {
 	FilterConfig createFilterConfig(
-			XMLConfigWrapper config, String taskConfigKey, 
+			Config config, String taskConfigKey, 
 			Path bookConfigRoot, Addr bookAddr, String bookName);
 	List<FilterConfig> createFilterConfigs(
-			XMLConfigWrapper config, String filterConfigsKey, 
+			Config config, String filterConfigsKey, 
 			Path bookConfigRoot, Addr bookAddr, String bookName);
 }

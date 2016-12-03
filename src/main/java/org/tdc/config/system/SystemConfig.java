@@ -8,6 +8,7 @@ import java.util.List;
  */
 public interface SystemConfig {
 	Path getSystemConfigRoot();
+	String getSystemConfigRootPropKey();
 	Path getSchemasConfigRoot();
 	Path getBooksConfigRoot();
 	List<InitializerConfig> getInitializerConfigs();

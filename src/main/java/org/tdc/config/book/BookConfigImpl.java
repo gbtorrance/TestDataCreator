@@ -8,10 +8,13 @@ import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.tdc.config.XMLConfigWrapper;
 import org.tdc.config.model.ModelConfigFactory;
+import org.tdc.config.util.Config;
+import org.tdc.config.util.ConfigImpl;
 import org.tdc.spreadsheet.CellStyle;
+import org.tdc.spreadsheet.CellStyleImpl;
 import org.tdc.util.Addr;
+import org.tdc.util.Util;
 
 /**
  * A {@link BookConfig} implementation.
@@ -23,6 +26,8 @@ public class BookConfigImpl implements BookConfig {
 	public static final String CONFIG_FILE = "TDCBookConfig.xml";
 	
 	private static final Logger log = LoggerFactory.getLogger(BookConfigImpl.class);
+	private static final String BOOKS_CONFIG_ROOT_PROP_KEY = "booksConfigRoot";
+	private static final String BOOK_CONFIG_ROOT_PROP_KEY = "bookConfigRoot";
 
 	private final Path booksConfigRoot;
 	private final Addr addr;
@@ -94,6 +99,11 @@ public class BookConfigImpl implements BookConfig {
 	}
 
 	@Override
+	public String getBooksConfigRootPropKey() {
+		return BOOKS_CONFIG_ROOT_PROP_KEY;
+	}
+
+	@Override
 	public Addr getAddr() {
 		return addr;
 	}
@@ -103,6 +113,11 @@ public class BookConfigImpl implements BookConfig {
 		return bookConfigRoot;
 	}
 	
+	@Override
+	public String getBookConfigRootPropKey() {
+		return BOOK_CONFIG_ROOT_PROP_KEY;
+	}
+
 	@Override
 	public String getBookName() {
 		return bookName;
@@ -248,13 +263,13 @@ public class BookConfigImpl implements BookConfig {
 	}
 
 	public static class Builder {
-		private final XMLConfigWrapper config;
-		private final ModelConfigFactory modelConfigFactory;
-		private final FilterConfigFactory filterConfigFactory;
-		private final TaskConfigFactory taskConfigFactory;
 		private final Path booksConfigRoot;
 		private final Addr addr;
 		private final Path bookConfigRoot;
+		private final Config config;
+		private final ModelConfigFactory modelConfigFactory;
+		private final FilterConfigFactory filterConfigFactory;
+		private final TaskConfigFactory taskConfigFactory;
 		
 		private String bookName;
 		private String bookDescription;
@@ -297,10 +312,14 @@ public class BookConfigImpl implements BookConfig {
 				throw new IllegalStateException("BookConfig root dir does not exist: " + bookConfigRoot.toString());
 			}
 			Path bookConfigFile = bookConfigRoot.resolve(CONFIG_FILE);
-			this.config = new XMLConfigWrapper(bookConfigFile);
 			this.modelConfigFactory = modelConfigFactory;
 			this.filterConfigFactory = filterConfigFactory;
 			this.taskConfigFactory = taskConfigFactory;
+			this.config = new ConfigImpl
+					.Builder(bookConfigFile)
+					.addLookup(BOOKS_CONFIG_ROOT_PROP_KEY, booksConfigRoot.toString())
+					.addLookup(BOOK_CONFIG_ROOT_PROP_KEY, bookConfigRoot.toString())
+					.build();
 		}
 
 		public BookConfig build() {
@@ -312,33 +331,50 @@ public class BookConfigImpl implements BookConfig {
 				throw new IllegalStateException("BookTemplateFile does not exist: " + bookTemplateFile.toString());
 			}
 			docTypeConfigs = new DocTypeConfigImpl.Builder(config).buildAll();
-			defaultStyle = config.getCellStyle("DefaultStyle", null, true);
-			nodeHeaderStyle = config.getCellStyle("NodeHeaderStyle", defaultStyle, false);
-			defaultNodeStyle = config.getCellStyle("DefaultNodeStyle", defaultStyle, false);
-			parentNodeStyle = config.getCellStyle("ParentNodeStyle", defaultNodeStyle, false);
-			attribNodeStyle = config.getCellStyle("AttribNodeStyle", defaultNodeStyle, false);
-			compositorNodeStyle = config.getCellStyle("CompositorNodeStyle", defaultNodeStyle, false);
-			choiceMarkerNodeStyle = config.getCellStyle("ChoiceMarkerNodeStyle", defaultNodeStyle, false);
-			occurMarkerNodeStyle = config.getCellStyle("OccurMarkerNodeStyle", defaultNodeStyle, false);
-			nodeDetailHeaderStyle = config.getCellStyle("NodeDetailHeaderStyle", defaultStyle, false);
-			defaultNodeDetailStyle = config.getCellStyle("DefaultNodeDetailStyle", defaultStyle, false);
-			docIDRowLabelStyle = config.getCellStyle("DocIDRowLabelStyle", defaultStyle, false); 
-			conversionNewRowStyle = config.getCellStyle("ConversionNewRowStyle", defaultStyle, false); 
-			conversionPrevNewRowStyle = config.getCellStyle("ConversionPrevNewRowStyle", defaultStyle, false); 
-			defaultLogStyle = config.getCellStyle("DefaultLogStyle", defaultStyle, false); 
-			headerLogStyle = config.getCellStyle("HeaderLogStyle", defaultLogStyle, false); 
-			errorLogStyle = config.getCellStyle("ErrorLogStyle", defaultLogStyle, false); 
+			defaultStyle = new CellStyleImpl.Builder().setFromConfig(
+					config, "DefaultStyle", null, true).build();
+			nodeHeaderStyle = new CellStyleImpl.Builder().setFromConfig(
+					config, "NodeHeaderStyle", defaultStyle, false).build();
+			defaultNodeStyle = new CellStyleImpl.Builder().setFromConfig(
+					config, "DefaultNodeStyle", defaultStyle, false).build();
+			parentNodeStyle = new CellStyleImpl.Builder().setFromConfig(
+					config, "ParentNodeStyle", defaultNodeStyle, false).build();
+			attribNodeStyle = new CellStyleImpl.Builder().setFromConfig(
+					config, "AttribNodeStyle", defaultNodeStyle, false).build();
+			compositorNodeStyle = new CellStyleImpl.Builder().setFromConfig(
+					config, "CompositorNodeStyle", defaultNodeStyle, false).build();
+			choiceMarkerNodeStyle = new CellStyleImpl.Builder().setFromConfig(
+					config, "ChoiceMarkerNodeStyle", defaultNodeStyle, false).build();
+			occurMarkerNodeStyle = new CellStyleImpl.Builder().setFromConfig(
+					config, "OccurMarkerNodeStyle", defaultNodeStyle, false).build();
+			nodeDetailHeaderStyle = new CellStyleImpl.Builder().setFromConfig(
+					config, "NodeDetailHeaderStyle", defaultStyle, false).build();
+			defaultNodeDetailStyle = new CellStyleImpl.Builder().setFromConfig(
+					config, "DefaultNodeDetailStyle", defaultStyle, false).build();
+			docIDRowLabelStyle = new CellStyleImpl.Builder().setFromConfig(
+					config, "DocIDRowLabelStyle", defaultStyle, false).build();
+			conversionNewRowStyle = new CellStyleImpl.Builder().setFromConfig(
+					config, "ConversionNewRowStyle", defaultStyle, false).build();
+			conversionPrevNewRowStyle = new CellStyleImpl.Builder().setFromConfig(
+					config, "ConversionPrevNewRowStyle", defaultStyle, false).build();
+			defaultLogStyle = new CellStyleImpl.Builder().setFromConfig(
+					config, "DefaultLogStyle", defaultStyle, false).build();
+			headerLogStyle = new CellStyleImpl.Builder().setFromConfig(
+					config, "HeaderLogStyle", defaultLogStyle, false).build();
+			errorLogStyle = new CellStyleImpl.Builder().setFromConfig(
+					config, "ErrorLogStyle", defaultLogStyle, false).build();
 			nodeColumnCount = config.getInt("NodeColumnCount", 0, true);
 			nodeColumnWidth = config.getInt("NodeColumnWidth", 0, true);
 			headerRowCount = config.getInt("HeaderRowCount", 1, false);
-			nodeHeaderLabels = config.getHeaderLabels(
-					"NodeHeaderLabels", headerRowCount);
+			nodeHeaderLabels = Util.getHeaderLabels(
+					config, "NodeHeaderLabels", headerRowCount);
 			pageConfigs = new PageConfigImpl.Builder(config, docTypeConfigs, modelConfigFactory, 
 					nodeColumnCount, headerRowCount, defaultNodeDetailStyle).buildAll();
 			filterConfigs = filterConfigFactory.createFilterConfigs(
 					config, "Filters", bookConfigRoot, addr, bookName);
 			taskConfigs = taskConfigFactory.createTaskConfigs(
 					config, "Tasks", bookConfigRoot, addr, bookName);
+			config.ensureNoUnprocessedKeys();
 			return new BookConfigImpl(this);
 		}
 	}

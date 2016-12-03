@@ -3,7 +3,7 @@ package org.tdc.config.book;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import org.tdc.config.XMLConfigWrapper;
+import org.tdc.config.util.Config;
 
 /**
  * A {@link DocTypeConfig} implementation.
@@ -40,13 +40,13 @@ public class DocTypeConfigImpl implements DocTypeConfig {
 	public static class Builder {
 		private static final String CONFIG_PREFIX = "DocTypes.DocType";
 
-		private final XMLConfigWrapper config;
+		private final Config config;
 
 		private String docTypeName;
 		private int minPerTestCase;
 		private int maxPerTestCase;
 		
-		public Builder(XMLConfigWrapper config) {
+		public Builder(Config config) {
 			this.config = config;
 		}
 		

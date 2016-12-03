@@ -5,8 +5,8 @@ import java.nio.file.Path;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.tdc.config.XMLConfigWrapper;
 import org.tdc.config.book.TaskConfig;
+import org.tdc.config.util.Config;
 import org.tdc.util.Addr;
 
 /**
@@ -65,7 +65,7 @@ public class MeFExportTaskConfig implements TaskConfig {
 	}
 	
 	public static TaskConfig build(
-			XMLConfigWrapper config, String key,
+			Config config, String key,
 			Path bookConfigRoot, Addr bookAddr, String bookName) {
 		
 		String taskID = config.getString(key + "[@id]", "export", false);

@@ -3,6 +3,7 @@ package org.tdc.spreadsheet;
 import java.awt.Color;
 import java.util.Objects;
 
+import org.tdc.config.util.Config;
 import org.tdc.util.Util;
 
 /**
@@ -10,6 +11,16 @@ import org.tdc.util.Util;
  */
 public class CellStyleImpl implements CellStyle {
 
+	private static final String ITEM_STYLE_FONT_NAME = "FontName"; 
+	private static final String ITEM_STYLE_FONT_HEIGHT = "FontHeight"; 
+	private static final String ITEM_STYLE_COLOR_RGB = "ColorRGB";
+	private static final String ITEM_STYLE_FILL_COLOR_RGB = "FillColorRGB";
+	private static final String ITEM_STYLE_ITALIC = "Italic";
+	private static final String ITEM_STYLE_BOLD = "Bold";
+	private static final String ITEM_STYLE_SHRINK_TO_FIT = "ShrinkToFit";
+	private static final String ITEM_STYLE_ALIGNMENT = "Alignment";
+	private static final String ITEM_STYLE_FORMAT = "Format";
+	
 	private final String fontName;
 	private final Double fontHeight;
 	private final Color color;
@@ -214,6 +225,32 @@ public class CellStyleImpl implements CellStyle {
 				setAlignmentIfProvided(style.getAlignment());
 				setFormatIfProvided(style.getFormat());
 			}
+			return this;
+		}
+		
+		public Builder setFromConfig(
+				Config config, String key, CellStyle defaultValue, boolean required) {
+			
+			if (required && !config.hasNode(key)) {
+				config.throwConfigItemNotFoundException(key);
+			}
+			// the following statement is necessary to make sure that, even if there are 
+			// no child elements, that the parent key will be marked as having been
+			// visited/recognized by the system
+			config.hasNode(key);
+			String alignmentStr = config.getString(key + "." + ITEM_STYLE_ALIGNMENT, null, false);
+			CellAlignment alignment = alignmentStr == null ? 
+					null : CellAlignment.getCellAlignmentByConfigType(alignmentStr);
+			setFrom(defaultValue);
+			setFontNameIfProvided(config.getString(key + "." + ITEM_STYLE_FONT_NAME, null, false));
+			setFontHeightIfProvided(config.getDouble(key + "." + ITEM_STYLE_FONT_HEIGHT, null, false));
+			setColorIfProvided(config.getString(key + "." + ITEM_STYLE_COLOR_RGB, null, false));
+			setFillColorIfProvided(config.getString(key + "." + ITEM_STYLE_FILL_COLOR_RGB, null, false));
+			setItalicIfProvided(config.getBoolean(key + "." + ITEM_STYLE_ITALIC, null, false));
+			setBoldIfProvided(config.getBoolean(key + "." + ITEM_STYLE_BOLD, null, false));
+			setShrinkToFitIfProvided(config.getBoolean(key + "." + ITEM_STYLE_SHRINK_TO_FIT, null, false));
+			setAlignmentIfProvided(alignment);
+			setFormatIfProvided(config.getString(key + "." + ITEM_STYLE_FORMAT, null, false));
 			return this;
 		}
 		

@@ -3,7 +3,7 @@ package org.tdc.evaluator.factory;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.tdc.config.XMLConfigWrapper;
+import org.tdc.config.util.Config;
 import org.tdc.evaluator.CoalesceEvaluator;
 import org.tdc.evaluator.Evaluator;
 import org.tdc.spreadsheet.CellStyle;
@@ -22,7 +22,7 @@ public class CoalesceEvaluatorFactory implements TypeEvaluatorFactory {
 	}
 
 	@Override
-	public Evaluator createEvaluator(XMLConfigWrapper config, String configKey, CellStyle defaultStyle) {
+	public Evaluator createEvaluator(Config config, String configKey, CellStyle defaultStyle) {
 		EvaluatorFactoryUtil.ensureCorrectEvalatorType(config, configKey, TYPE);
 		String subKey = configKey + ".Evaluator";
 		List<Evaluator> evaluators = new ArrayList<>();

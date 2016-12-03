@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.xerces.xs.XSElementDeclaration;
-import org.tdc.config.XMLConfigWrapper;
+import org.tdc.config.util.Config;
 
 /**
  * A {@link SchemaFilter} implementation.
@@ -97,7 +97,7 @@ public class SchemaFilterImpl implements SchemaFilter {
 		private List<String> excludePathList;
 		public Map<String, SchemaFilterAction> includeExcludePathMap;
 
-		public SchemaFilter buildFromConfig(XMLConfigWrapper config, String key) {
+		public SchemaFilter buildFromConfig(Config config, String key) {
 			includePathList = createPathListFromConfig(config, key + ".IncludePaths.IncludePath");
 			excludePathList = createPathListFromConfig(config, key + ".ExcludePaths.ExcludePath");
 			return build();
@@ -183,7 +183,7 @@ public class SchemaFilterImpl implements SchemaFilter {
 			return concatPath.toString();
 		}
 		
-		private List<String> createPathListFromConfig(XMLConfigWrapper config, String key) {
+		private List<String> createPathListFromConfig(Config config, String key) {
 			List<String> pathList = null;;
 			int numPaths = config.getCount(key);
 			if (numPaths > 0) {

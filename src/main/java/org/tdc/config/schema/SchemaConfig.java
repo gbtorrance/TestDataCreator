@@ -9,7 +9,9 @@ import org.tdc.util.Addr;
  */
 public interface SchemaConfig {
 	Path getSchemasConfigRoot();
+	String getSchemasConfigRootPropKey();
 	Addr getAddr();
 	Path getSchemaConfigRoot();
+	String getSchemaConfigRootPropKey();
 	Path getSchemaFilesRoot();
 }

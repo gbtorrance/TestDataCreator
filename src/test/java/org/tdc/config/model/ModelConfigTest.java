@@ -92,7 +92,7 @@ public class ModelConfigTest {
 	public void testConfigXmlDoesNotExist() {
 		Addr modelAddrConfigXMLMissing = new Addr("/ConfigTest/SchemaConfigTest/ModelConfigTest_ConfigXMLMissing");
 		exception.expect(IllegalStateException.class);
-		exception.expectMessage("Configuration file does not exist:");
+		exception.expectMessage("Unable to locate config file:");
 		modelConfigFactory.getModelConfig(modelAddrConfigXMLMissing);
 	}
 }

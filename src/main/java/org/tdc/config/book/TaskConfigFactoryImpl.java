@@ -9,7 +9,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.tdc.config.XMLConfigWrapper;
+import org.tdc.config.util.Config;
 import org.tdc.util.Addr;
 
 /**
@@ -19,7 +19,7 @@ public class TaskConfigFactoryImpl implements TaskConfigFactory {
 
 	@Override
 	public TaskConfig createTaskConfig(
-			XMLConfigWrapper config, String taskConfigKey, 
+			Config config, String taskConfigKey, 
 			Path bookConfigRoot, Addr bookAddr, String bookName) {
 		
 		String className = getClassName(config, taskConfigKey);
@@ -33,7 +33,7 @@ public class TaskConfigFactoryImpl implements TaskConfigFactory {
 
 	@Override
 	public List<TaskConfig> createTaskConfigs(
-			XMLConfigWrapper config, String taskConfigsKey, 
+			Config config, String taskConfigsKey, 
 			Path bookConfigRoot, Addr bookAddr, String bookName) {
 		
 		String taskConfigKey = taskConfigsKey + ".Task"; 
@@ -60,7 +60,7 @@ public class TaskConfigFactoryImpl implements TaskConfigFactory {
 		}
 	}
 
-	private String getClassName(XMLConfigWrapper config, String taskConfigKey) {
+	private String getClassName(Config config, String taskConfigKey) {
 		// both are optional; but at least one of type or class is required
 		String type = config.getString(taskConfigKey + "[@type]", null, false); 
 		String className = config.getString(taskConfigKey + "[@class]", null, false);
@@ -99,7 +99,7 @@ public class TaskConfigFactoryImpl implements TaskConfigFactory {
 		Method buildMethod = null;
 		try {
 			buildMethod = classy.getMethod("build", 
-					XMLConfigWrapper.class, String.class,
+					Config.class, String.class,
 					Path.class, Addr.class, String.class);
 		} 
 		catch (NoSuchMethodException | SecurityException ex) {
@@ -114,13 +114,13 @@ public class TaskConfigFactoryImpl implements TaskConfigFactory {
 	private void throwBuildMethodNotFoundException(Class<?> classy, Exception ex) {
 		String message =
 				"Class '" + classy.getName() + 
-				"' must have a static build(XMLConfigWrapper config, String key, " + 
+				"' must have a static build(Config config, String key, " + 
 				"Path bookConfigRoot, Addr bookAddr, String bookName) method";
 		throw new RuntimeException(message, ex);
 	}
 
 	private TaskConfig buildTaskConfig(
-			Method buildMethod, XMLConfigWrapper config, String taskConfigKey, 
+			Method buildMethod, Config config, String taskConfigKey, 
 			Path bookConfigRoot, Addr bookAddr, String bookName) {
 		
 		Object taskConfig = null;

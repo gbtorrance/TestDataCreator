@@ -3,7 +3,7 @@ package org.tdc.evaluator.factory;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.tdc.config.XMLConfigWrapper;
+import org.tdc.config.util.Config;
 import org.tdc.evaluator.Evaluator;
 import org.tdc.spreadsheet.CellStyle;
 
@@ -15,7 +15,7 @@ public class GeneralEvaluatorFactoryImpl implements GeneralEvaluatorFactory {
 	private final Map<String, TypeEvaluatorFactory> typeFactoryMap = new HashMap<>();
 	
 	@Override
-	public synchronized Evaluator createEvaluator(XMLConfigWrapper config, String configKey, CellStyle defaultStyle) {
+	public synchronized Evaluator createEvaluator(Config config, String configKey, CellStyle defaultStyle) {
 		String type = EvaluatorFactoryUtil.getEvaluatorType(config, configKey);
 		TypeEvaluatorFactory factory = typeFactoryMap.get(type);
 		if (factory == null) {

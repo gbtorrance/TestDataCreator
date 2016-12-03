@@ -11,6 +11,8 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
+import org.tdc.config.util.Config;
+
 /**
  * Static helper members and methods.
  */
@@ -166,5 +168,34 @@ public class Util {
 		Path batchDir = root.resolve(batchDirName);
 		Util.createDirectory(batchDir);
 		return batchDir;
+	}
+	
+	/**
+	 * Get an array of label strings from a configuration key.
+	 * Also ensures that the maximum number of labels is not exceeded.
+	 * 
+	 * @param config Config from which to read the label strings.
+	 * @param key Key pointing to the location of the label strings.
+	 * @param rowCount Maximum number of header rows.
+	 * @return Array of rowCount label strings, with blank strings for padding.
+	 */
+	public static String[] getHeaderLabels(Config config, String key, int rowCount) {
+		// the following statement is necessary to make sure that, even if there are 
+		// no child elements, that the parent key will be marked as having been
+		// visited/recognized by the system
+		config.hasNode(key);
+		final String labelKey = key + ".Label";
+		String[] labels = new String[rowCount];
+		int labelCount = config.getCount(labelKey);
+		if (labelCount > rowCount) {
+			throw new IllegalStateException("Number of " + labelKey + " entries (" + labelCount + 
+					") exceeds maximum of (" + rowCount + ")");
+		}
+		for (int i = 0; i < rowCount; i++) {
+			labels[i] = rowCount - labelCount > i ? 
+					"" :  
+					config.getString(labelKey + "(" + (i - rowCount + labelCount) + ")", null, true);
+		}
+		return labels;
 	}
 }

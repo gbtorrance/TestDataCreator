@@ -3,8 +3,10 @@ package org.tdc.config.book;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.tdc.config.XMLConfigWrapper;
+import org.tdc.config.util.Config;
 import org.tdc.spreadsheet.CellStyle;
+import org.tdc.spreadsheet.CellStyleImpl;
+import org.tdc.util.Util;
 
 /**
  * A {@link PageNodeDetailColumnConfigImpl} implementation.
@@ -66,7 +68,7 @@ public class PageNodeDetailColumnConfigImpl implements PageNodeDetailColumnConfi
 	public static class Builder {
 		private static final String CONFIG_PREFIX = ".NodeDetailColumns.Column";
 
-		private final XMLConfigWrapper config;
+		private final Config config;
 		private final String pageKey;
 		private final int headerRowCount;
 		private final CellStyle defaultNodeDetailColumnStyle;
@@ -79,7 +81,7 @@ public class PageNodeDetailColumnConfigImpl implements PageNodeDetailColumnConfi
 		private String readFromProperty;
 		private int index;
 		
-		public Builder(XMLConfigWrapper config, String pageKey, 
+		public Builder(Config config, String pageKey, 
 				int headerRowCount, CellStyle defaultNodeDetailColumnStyle, int nodeDetailColStart) {
 			this.config = config;
 			this.pageKey = pageKey;
@@ -100,10 +102,11 @@ public class PageNodeDetailColumnConfigImpl implements PageNodeDetailColumnConfi
 	
 		private PageNodeDetailColumnConfig build() {
 			String indexPrefix = pageKey + CONFIG_PREFIX + "(" + index + ").";
-			headerLabels = config.getHeaderLabels(
-					indexPrefix + "HeaderLabels", headerRowCount);
+			headerLabels = Util.getHeaderLabels(
+					config, indexPrefix + "HeaderLabels", headerRowCount);
 			width = config.getInt(indexPrefix + "Width", 0, true);
-			style = config.getCellStyle(indexPrefix + "Style", defaultNodeDetailColumnStyle, false);
+			style = new CellStyleImpl.Builder().setFromConfig(
+					config, indexPrefix + "Style", defaultNodeDetailColumnStyle, false).build();
 			readFromVariable = config.getString(
 					indexPrefix + "ReadFromVariable", null, false);
 			readFromProperty = config.getString(
