@@ -12,7 +12,7 @@ import org.tdc.spreadsheet.CellStyle;
  * <p>Such columns can be used for providing the user with information like node description, 
  * node data type, form line number, notes, etc.
  */
-public interface PageNodeDetailColumnConfig {
+public interface NodeDetailColumnConfig {
 	String getHeaderLabel(int headerRowNum);
 	int getWidth();
 	CellStyle getStyle(); 

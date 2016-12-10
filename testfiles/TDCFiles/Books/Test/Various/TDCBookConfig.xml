@@ -12,11 +12,9 @@
 		</DocType>
 	</DocTypes>
 	
-	<Pages>
-		<Page>
-			<PageName>Various</PageName>
-			<ModelAddress>/Test/TestSchemaV1.0/Model_TestVarious</ModelAddress>
-			<DocTypeName>Various</DocTypeName>
+	<PageStructs>
+		<PageStruct>
+			<PageStructName>Primary</PageStructName>
 			<DocIDRows>
 				<Row type="case-num">
 					<Label>Test Case Number</Label>
@@ -41,6 +39,21 @@
 					<ReadFromProperty>DispOccurs</ReadFromProperty>
 				</Column>
 			</NodeDetailColumns>
+			<NodeColumnCount>25</NodeColumnCount>
+			<NodeColumnWidth>500</NodeColumnWidth>
+			<HeaderRowCount>2</HeaderRowCount>
+			<NodeHeaderLabels>
+				<Label>Document Structure</Label>
+			</NodeHeaderLabels>
+		</PageStruct>
+	</PageStructs>
+	
+	<Pages>
+		<Page>
+			<PageName>Various</PageName>
+			<ModelAddress>/Test/TestSchemaV1.0/Model_TestVarious</ModelAddress>
+			<DocTypeName>Various</DocTypeName>
+			<PageStructName>Primary</PageStructName>
 		</Page>	
 	</Pages>
 	
@@ -73,12 +86,6 @@
 		<Bold>true</Bold>
 	</NodeDetailHeaderStyle>
 	<DefaultNodeDetailStyle/>
-	<NodeColumnCount>25</NodeColumnCount>
-	<NodeColumnWidth>500</NodeColumnWidth>
-	<HeaderRowCount>2</HeaderRowCount>
-	<NodeHeaderLabels>
-		<Label>Document Structure</Label>
-	</NodeHeaderLabels>
 	
 	<Tasks>
 		<Task id="export" type="default-export">

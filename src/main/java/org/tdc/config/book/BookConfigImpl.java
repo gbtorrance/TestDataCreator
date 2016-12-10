@@ -14,7 +14,6 @@ import org.tdc.config.util.ConfigImpl;
 import org.tdc.spreadsheet.CellStyle;
 import org.tdc.spreadsheet.CellStyleImpl;
 import org.tdc.util.Addr;
-import org.tdc.util.Util;
 
 /**
  * A {@link BookConfig} implementation.
@@ -36,6 +35,7 @@ public class BookConfigImpl implements BookConfig {
 	private final String bookDescription;
 	private final Path bookTemplateFile;
 	private final Map<String, DocTypeConfig> docTypeConfigs;
+	private final Map<String, PageStructConfig> pageStructConfigs;
 	private final Map<String, PageConfig> pageConfigs;
 	private final List<FilterConfig> filterConfigs;
 	private final List<TaskConfig> taskConfigs;
@@ -55,10 +55,6 @@ public class BookConfigImpl implements BookConfig {
 	private final CellStyle defaultLogStyle;			// based on defaultStyle
 	private final CellStyle headerLogStyle;				// based on defaultLogStyle
 	private final CellStyle errorLogStyle;				// based on defaultLogStyle
-	private final int nodeColumnCount;
-	private final int nodeColumnWidth;
-	private final int headerRowCount;
-	private final String[] nodeHeaderLabels;
 
 	private BookConfigImpl(Builder builder) {
 		this.booksConfigRoot = builder.booksConfigRoot;
@@ -68,6 +64,7 @@ public class BookConfigImpl implements BookConfig {
 		this.bookDescription = builder.bookDescription;
 		this.bookTemplateFile = builder.bookTemplateFile;
 		this.docTypeConfigs = Collections.unmodifiableMap(builder.docTypeConfigs); // unmodifiable
+		this.pageStructConfigs = Collections.unmodifiableMap(builder.pageStructConfigs); // unmodifiable
 		this.pageConfigs = Collections.unmodifiableMap(builder.pageConfigs); // unmodifiable
 		this.filterConfigs = Collections.unmodifiableList(builder.filterConfigs); // unmodifiable
 		this.taskConfigs = Collections.unmodifiableList(builder.taskConfigs); // unmodifiable
@@ -87,10 +84,6 @@ public class BookConfigImpl implements BookConfig {
 		this.defaultLogStyle = builder.defaultLogStyle;
 		this.headerLogStyle = builder.headerLogStyle;
 		this.errorLogStyle = builder.errorLogStyle;
-		this.nodeColumnCount = builder.nodeColumnCount;
-		this.nodeColumnWidth = builder.nodeColumnWidth;
-		this.headerRowCount = builder.headerRowCount;
-		this.nodeHeaderLabels = builder.nodeHeaderLabels;
 	}
 	
 	@Override
@@ -145,6 +138,11 @@ public class BookConfigImpl implements BookConfig {
 	@Override
 	public Map<String, DocTypeConfig> getDocTypeConfigs() {
 		return docTypeConfigs;
+	}
+
+	@Override
+	public Map<String, PageStructConfig> getPageStructConfigs() {
+		return pageStructConfigs;
 	}
 
 	@Override
@@ -242,26 +240,6 @@ public class BookConfigImpl implements BookConfig {
 		return errorLogStyle;
 	}
 
-	@Override
-	public int getNodeColumnCount() {
-		return nodeColumnCount;
-	}
-
-	@Override
-	public int getNodeColumnWidth() {
-		return nodeColumnWidth;
-	}
-
-	@Override
-	public int getHeaderRowCount() {
-		return headerRowCount;
-	}
-	
-	@Override
-	public String getNodeHeaderLabel(int headerRowNum) {
-		return nodeHeaderLabels[headerRowNum-1];
-	}
-
 	public static class Builder {
 		private final Path booksConfigRoot;
 		private final Addr addr;
@@ -275,6 +253,7 @@ public class BookConfigImpl implements BookConfig {
 		private String bookDescription;
 		private Path bookTemplateFile;
 		private Map<String, DocTypeConfig> docTypeConfigs;
+		private Map<String, PageStructConfig> pageStructConfigs;
 		private Map<String, PageConfig> pageConfigs;
 		private List<FilterConfig> filterConfigs;
 		private List<TaskConfig> taskConfigs;
@@ -294,10 +273,6 @@ public class BookConfigImpl implements BookConfig {
 		private CellStyle defaultLogStyle;
 		private CellStyle headerLogStyle;
 		private CellStyle errorLogStyle;
-		private int nodeColumnCount;
-		private int nodeColumnWidth;
-		private int headerRowCount;
-		private String[] nodeHeaderLabels;
 		
 		public Builder(Path booksConfigRoot, Addr addr, 
 				ModelConfigFactory modelConfigFactory, 
@@ -330,7 +305,6 @@ public class BookConfigImpl implements BookConfig {
 			if (bookTemplateFile != null && Files.notExists(bookTemplateFile)) {
 				throw new IllegalStateException("BookTemplateFile does not exist: " + bookTemplateFile.toString());
 			}
-			docTypeConfigs = new DocTypeConfigImpl.Builder(config).buildAll();
 			defaultStyle = new CellStyleImpl.Builder().setFromConfig(
 					config, "DefaultStyle", null, true).build();
 			nodeHeaderStyle = new CellStyleImpl.Builder().setFromConfig(
@@ -363,13 +337,11 @@ public class BookConfigImpl implements BookConfig {
 					config, "HeaderLogStyle", defaultLogStyle, false).build();
 			errorLogStyle = new CellStyleImpl.Builder().setFromConfig(
 					config, "ErrorLogStyle", defaultLogStyle, false).build();
-			nodeColumnCount = config.getInt("NodeColumnCount", 0, true);
-			nodeColumnWidth = config.getInt("NodeColumnWidth", 0, true);
-			headerRowCount = config.getInt("HeaderRowCount", 1, false);
-			nodeHeaderLabels = Util.getHeaderLabels(
-					config, "NodeHeaderLabels", headerRowCount);
-			pageConfigs = new PageConfigImpl.Builder(config, docTypeConfigs, modelConfigFactory, 
-					nodeColumnCount, headerRowCount, defaultNodeDetailStyle).buildAll();
+			docTypeConfigs = new DocTypeConfigImpl.Builder(config).buildAll();
+			pageStructConfigs = new PageStructConfigImpl.Builder(
+					config, defaultNodeDetailStyle).buildAll();
+			pageConfigs = new PageConfigImpl.Builder(
+					config, docTypeConfigs, pageStructConfigs, modelConfigFactory).buildAll();
 			filterConfigs = filterConfigFactory.createFilterConfigs(
 					config, "Filters", bookConfigRoot, addr, bookName);
 			taskConfigs = taskConfigFactory.createTaskConfigs(

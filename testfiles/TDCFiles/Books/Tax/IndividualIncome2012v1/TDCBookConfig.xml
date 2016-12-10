@@ -18,11 +18,9 @@
 		</DocType>
 	</DocTypes>
 	
-	<Pages>
-		<Page>
-			<PageName>1040A</PageName>
-			<ModelAddress>/Tax/efile1040x_2012v3.0/Model_1040A</ModelAddress>
-			<DocTypeName>TaxReturn</DocTypeName>
+	<PageStructs>
+		<PageStruct>
+			<PageStructName>Primary</PageStructName>
 			<DocIDRows>
 				<Row type="case-num">
 					<Label>Test Case Number</Label>
@@ -69,32 +67,50 @@
 					<ReadFromProperty>DispOccurs</ReadFromProperty>
 				</Column>
 			</NodeDetailColumns>
+			<NodeColumnCount>25</NodeColumnCount>
+			<NodeColumnWidth>500</NodeColumnWidth>
+			<HeaderRowCount>2</HeaderRowCount>
+			<NodeHeaderLabels>
+				<Label>Document Structure</Label>
+			</NodeHeaderLabels>
+		</PageStruct>
+		<PageStruct>
+			<PageStructName>Minimal</PageStructName>
+			<DocIDRows>
+				<Row type="case-num">
+					<Label>Test Case Number</Label>
+				</Row>
+				<Row type="set-name">
+					<Label>Test Set Name (optional)</Label>
+				</Row>
+			</DocIDRows>
+			<NodeColumnCount>25</NodeColumnCount>
+			<NodeColumnWidth>500</NodeColumnWidth>
+			<HeaderRowCount>2</HeaderRowCount>
+			<NodeHeaderLabels>
+				<Label>Document Structure</Label>
+			</NodeHeaderLabels>
+		</PageStruct>
+	</PageStructs>
+	
+	<Pages>
+		<Page>
+			<PageName>1040A</PageName>
+			<ModelAddress>/Tax/efile1040x_2012v3.0/Model_1040A</ModelAddress>
+			<DocTypeName>TaxReturn</DocTypeName>
+			<PageStructName>Primary</PageStructName>
 		</Page>	
 		<Page>
 			<PageName>1040EZ</PageName>
 			<ModelAddress>/Tax/efile1040x_2012v3.0/Model_1040EZ</ModelAddress>
 			<DocTypeName>TaxReturn</DocTypeName>
-			<DocIDRows>
-				<Row type="case-num">
-					<Label>Test Case Number</Label>
-				</Row>
-				<Row type="set-name">
-					<Label>Test Set Name (optional)</Label>
-				</Row>
-			</DocIDRows>
+			<PageStructName>Minimal</PageStructName>
 		</Page>
 		<Page>
 			<PageName>Manifest</PageName>
 			<ModelAddress>/Tax/efile1040x_2012v3.0/Model_Manifest</ModelAddress>
 			<DocTypeName>Manifest</DocTypeName>
-			<DocIDRows>
-				<Row type="case-num">
-					<Label>Test Case Number</Label>
-				</Row>
-				<Row type="set-name">
-					<Label>Test Set Name (optional)</Label>
-				</Row>
-			</DocIDRows>
+			<PageStructName>Minimal</PageStructName>
 		</Page>
 	</Pages>
 	
@@ -127,12 +143,6 @@
 		<Bold>true</Bold>
 	</NodeDetailHeaderStyle>
 	<DefaultNodeDetailStyle/>
-	<NodeColumnCount>25</NodeColumnCount>
-	<NodeColumnWidth>500</NodeColumnWidth>
-	<HeaderRowCount>2</HeaderRowCount>
-	<NodeHeaderLabels>
-		<Label>Document Structure</Label>
-	</NodeHeaderLabels>
 	
 	<Tasks>
 		<Task id="export" type="default-export">

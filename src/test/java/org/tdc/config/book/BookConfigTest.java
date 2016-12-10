@@ -135,9 +135,6 @@ public class BookConfigTest {
 		assertThat(style.getFillColor()).isEqualTo(null);
 		assertThat(style.getShrinkToFit()).isNull();
 
-		assertThat(bookConfig.getNodeColumnCount()).isEqualTo(12);
-		assertThat(bookConfig.getNodeColumnWidth()).isEqualTo(500);
-
 		Map<String, DocTypeConfig> docTypeConfigs = bookConfig.getDocTypeConfigs();
 		DocTypeConfig dtConfig1 = docTypeConfigs.get("DocType1");
 		assertThat(dtConfig1.getDocTypeName()).isEqualTo("DocType1");

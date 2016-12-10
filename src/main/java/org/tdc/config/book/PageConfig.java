@@ -1,7 +1,5 @@
 package org.tdc.config.book;
 
-import java.util.List;
-
 import org.tdc.config.model.ModelConfig;
 
 /**
@@ -11,16 +9,5 @@ public interface PageConfig {
 	String getPageName();
 	ModelConfig getModelConfig();
 	DocTypeConfig getDocTypeConfig();
-	List<PageNodeDetailColumnConfig> getNodeDetailColumnConfigs();
-	List<DocIDRowConfig> getDocIDRowConfigs();
-	DocIDRowConfig getCaseNumDocIDRowConfig();
-	DocIDRowConfig getSetNameDocIDRowConfig();
-	List<DocIDRowConfig> getVarDocIDRowConfigs();
-	int getDocIDRowStart();
-	int getDocIDRowLabelCol();
-	int getHeaderRowStart();
-	int getNodeRowStart();
-	int getNodeColStart();
-	int getNodeDetailColStart();
-	int getTestDocColStart();
+	PageStructConfig getPageStructConfig();
 }

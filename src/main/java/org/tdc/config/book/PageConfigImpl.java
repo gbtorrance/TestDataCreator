@@ -1,15 +1,11 @@
 package org.tdc.config.book;
 
-import java.util.Collections;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import org.tdc.config.model.ModelConfig;
 import org.tdc.config.model.ModelConfigFactory;
 import org.tdc.config.util.Config;
-import org.tdc.spreadsheet.CellStyle;
 import org.tdc.util.Addr;
 
 /**
@@ -22,35 +18,13 @@ public class PageConfigImpl implements PageConfig {
 	private final String pageName;
 	private final ModelConfig modelConfig;
 	private final DocTypeConfig docTypeConfig;
-	private final List<PageNodeDetailColumnConfig> nodeDetailColumnConfigs;
-	private final List<DocIDRowConfig> docIDRowConfigs;
-	private final DocIDRowConfig caseNumDocIDRowConfig;
-	private final DocIDRowConfig setNameDocIDRowConfig;
-	private final List<DocIDRowConfig> varDocIDRowConfigs;
-	private final int docIDRowStart;
-	private final int docIDRowLabelCol;
-	private final int headerRowStart;
-	private final int nodeRowStart;
-	private final int nodeColStart;
-	private final int nodeDetailColStart;
-	private final int testDocColStart;
+	private final PageStructConfig pageStructConfig;
 	
 	private PageConfigImpl(Builder builder) {
 		this.pageName = builder.pageName;
 		this.modelConfig = builder.modelConfig;
 		this.docTypeConfig = builder.docTypeConfig;
-		this.nodeDetailColumnConfigs = Collections.unmodifiableList(builder.nodeDetailColumnConfigs); // unmodifiable
-		this.docIDRowConfigs = Collections.unmodifiableList(builder.docIDRowConfigs); // unmodifiable
-		this.caseNumDocIDRowConfig = builder.caseNumDocIDRowConfig;
-		this.setNameDocIDRowConfig = builder.setNameDocIDRowConfig;
-		this.varDocIDRowConfigs = Collections.unmodifiableList(builder.varDocIDRowConfigs); // unmodifiable
-		this.docIDRowStart = builder.docIDRowStart;
-		this.docIDRowLabelCol = builder.docIDRowLabelCol;
-		this.headerRowStart = builder.headerRowStart;
-		this.nodeRowStart = builder.nodeRowStart;
-		this.nodeColStart = builder.nodeColStart;
-		this.nodeDetailColStart = builder.nodeDetailColStart;
-		this.testDocColStart = builder.testDocColStart;
+		this.pageStructConfig = builder.pageStructConfig;
 	}
 
 	@Override
@@ -69,102 +43,31 @@ public class PageConfigImpl implements PageConfig {
 	}
 	
 	@Override
-	public List<PageNodeDetailColumnConfig> getNodeDetailColumnConfigs() {
-		return nodeDetailColumnConfigs;
+	public PageStructConfig getPageStructConfig() {
+		return pageStructConfig;
 	}
-	
-	@Override
-	public List<DocIDRowConfig> getDocIDRowConfigs() {
-		return docIDRowConfigs;
-	}
-	
-	@Override
-	public DocIDRowConfig getCaseNumDocIDRowConfig() {
-		return caseNumDocIDRowConfig; 
-	}
-	
-	@Override
-	public DocIDRowConfig getSetNameDocIDRowConfig() {
-		return setNameDocIDRowConfig; 
-	}
-	
-	@Override
-	public List<DocIDRowConfig> getVarDocIDRowConfigs() {
-		return varDocIDRowConfigs; 
-	}
-	
-	@Override
-	public int getDocIDRowStart() {
-		return docIDRowStart;
-	}
-	
-	@Override
-	public int getDocIDRowLabelCol() {
-		return docIDRowLabelCol;
-	}
-
-	@Override
-	public int getHeaderRowStart() {
-		return headerRowStart;
-	}
-
-	@Override
-	public int getNodeRowStart() {
-		return nodeRowStart;
-	}
-
-	@Override
-	public int getNodeColStart() {
-		return nodeColStart;
-	}
-
-	@Override
-	public int getNodeDetailColStart() {
-		return nodeDetailColStart;
-	}
-
-	@Override
-	public int getTestDocColStart() {
-		return testDocColStart;
-	}
-	
 	public static class Builder {
 		private static final String CONFIG_PREFIX = "Pages.Page";
 
 		private final Config config;
 		private final Map<String, DocTypeConfig> docTypeConfigs;
+		private final Map<String, PageStructConfig> pageStructConfigs;
 		private final ModelConfigFactory modelConfigFactory;
-		private final int headerRowCount;
-		private final CellStyle defaultNodeDetailColumnStyle;
-		private final int docIDRowStart;
-		private final int docIDRowLabelCol;
-		private final int nodeColStart;
-		private final int nodeDetailColStart;
 
 		private String pageName;
 		private ModelConfig modelConfig;
 		private DocTypeConfig docTypeConfig;
-		private List<PageNodeDetailColumnConfig> nodeDetailColumnConfigs;
-		private List<DocIDRowConfig> docIDRowConfigs;
-		private DocIDRowConfig caseNumDocIDRowConfig;
-		private DocIDRowConfig setNameDocIDRowConfig;
-		private List<DocIDRowConfig> varDocIDRowConfigs;
-		private int headerRowStart;
-		private int nodeRowStart;
-		private int testDocColStart;
+		private PageStructConfig pageStructConfig;
 		
 		public Builder(Config config, 
-				Map<String, DocTypeConfig> docTypeConfigs, ModelConfigFactory modelConfigFactory,
-				int nodeColumnCount, int headerRowCount, CellStyle defaultNodeDetailColumnStyle) {
+				Map<String, DocTypeConfig> docTypeConfigs, 
+				Map<String, PageStructConfig> pageStructConfigs, 
+				ModelConfigFactory modelConfigFactory) {
+			
 			this.config = config;
 			this.docTypeConfigs = docTypeConfigs;
+			this.pageStructConfigs = pageStructConfigs;
 			this.modelConfigFactory = modelConfigFactory;
-			this.headerRowCount = headerRowCount;
-			this.defaultNodeDetailColumnStyle = defaultNodeDetailColumnStyle;
-			this.docIDRowStart = 1;
-			this.docIDRowLabelCol = 1;
-			this.nodeColStart = 1;
-			this.nodeDetailColStart = nodeColStart + nodeColumnCount;
 		}
 		
 		public Map<String, PageConfig> buildAll() {
@@ -201,30 +104,14 @@ public class PageConfigImpl implements PageConfig {
 						"' for Page '" + pageName + "'");
 			}
 
-			nodeDetailColumnConfigs = new PageNodeDetailColumnConfigImpl.Builder(
-					config, indexPrefix, headerRowCount, 
-					defaultNodeDetailColumnStyle, nodeDetailColStart).buildAll();
-
-			docIDRowConfigs = new DocIDRowConfigImpl.Builder(config, indexPrefix, docIDRowStart).buildAll();
-			processDocIDRowConfigs();
-
-			headerRowStart = docIDRowStart + docIDRowConfigs.size();
-			nodeRowStart = headerRowStart + headerRowCount;
-			testDocColStart = nodeDetailColStart + nodeDetailColumnConfigs.size();
+			String pageStructName = config.getString(indexPrefix + ".PageStructName", null, true);
+			pageStructConfig = pageStructConfigs.get(pageStructName);
+			if (pageStructConfig == null) {
+				throw new IllegalStateException("Unable to locate PageStruct '" + pageStructName + 
+						"' for Page '" + pageName + "'");
+			}
 			
 			return new PageConfigImpl(this);
-		}
-
-		private void processDocIDRowConfigs() {
-			caseNumDocIDRowConfig = docIDRowConfigs.stream()
-					.filter(docIDRowConfig -> docIDRowConfig.getType() == DocIDType.CASE_NUM)
-					.findFirst().get(); // guaranteed to have CASE_NUM row
-			setNameDocIDRowConfig = docIDRowConfigs.stream()
-					.filter(docIDRowConfig -> docIDRowConfig.getType() == DocIDType.SET_NAME)
-					.findFirst().orElse(null); // SET_NAME may not exist
-			varDocIDRowConfigs = docIDRowConfigs.stream()
-					.filter(docIDRowConfig -> docIDRowConfig.getType().isVariableType())
-					.collect(Collectors.toList()); // collect all variable rows
 		}
 	}
 }

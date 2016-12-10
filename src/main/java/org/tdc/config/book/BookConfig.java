@@ -21,6 +21,7 @@ public interface BookConfig {
 	Path getBookTemplateFile();
 	String getBookTemplateFileExtension();
 	Map<String, DocTypeConfig> getDocTypeConfigs();
+	Map<String, PageStructConfig> getPageStructConfigs();
 	Map<String, PageConfig> getPageConfigs();
 	List<FilterConfig> getFilterConfigs();
 	List<TaskConfig> getTaskConfigs();
@@ -40,8 +41,4 @@ public interface BookConfig {
 	CellStyle getDefaultLogStyle();
 	CellStyle getHeaderLogStyle();
 	CellStyle getErrorLogStyle();
-	int getNodeColumnCount();
-	int getNodeColumnWidth();
-	int getHeaderRowCount();
-	String getNodeHeaderLabel(int headerRowNum);
 }

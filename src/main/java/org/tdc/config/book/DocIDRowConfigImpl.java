@@ -62,7 +62,7 @@ public class DocIDRowConfigImpl implements DocIDRowConfig {
 		private static final String CONFIG_PREFIX = ".DocIDRows.Row";
 
 		private final Config config;
-		private final String pageKey;
+		private final String pageStructKey;
 		private final int docIDRowStart;
 		
 		private DocIDType docIDType;
@@ -70,15 +70,15 @@ public class DocIDRowConfigImpl implements DocIDRowConfig {
 		private String label;
 		private int index;
 		
-		public Builder(Config config, String pageKey, int docIDRowStart) {
+		public Builder(Config config, String pageStructKey, int docIDRowStart) {
 			this.config = config;
-			this.pageKey = pageKey;
+			this.pageStructKey = pageStructKey;
 			this.docIDRowStart = docIDRowStart;
 		}
 		
 		public List<DocIDRowConfig> buildAll() {
 			List<DocIDRowConfig> rows = new ArrayList<>();
-			int count = config.getCount(pageKey + CONFIG_PREFIX);
+			int count = config.getCount(pageStructKey + CONFIG_PREFIX);
 			int caseNumTypeCount = 0;
 			int setNameTypeCount = 0;
 			for (index = 0; index < count; index++) {
@@ -93,17 +93,17 @@ public class DocIDRowConfigImpl implements DocIDRowConfig {
 			}
 			if (caseNumTypeCount != 1) {
 				throw new IllegalStateException("Exactly one DocIDRow of type '" + 
-						DocIDType.CASE_NUM.getConfigType() + "' must be specified: " + pageKey);
+						DocIDType.CASE_NUM.getConfigType() + "' must be specified: " + pageStructKey);
 			}
 			if (setNameTypeCount > 1) {
 				throw new IllegalStateException("At most one DocIDRow of type '" + 
-						DocIDType.SET_NAME.getConfigType() + "' can be specified: " + pageKey);
+						DocIDType.SET_NAME.getConfigType() + "' can be specified: " + pageStructKey);
 			}
 			return rows;
 		}
 	
 		private DocIDRowConfig build() {
-			String indexPrefix = pageKey + CONFIG_PREFIX + "(" + index + ")";
+			String indexPrefix = pageStructKey + CONFIG_PREFIX + "(" + index + ")";
 			String type = config.getString(indexPrefix + "[@type]", null, true);
 			try {
 				docIDType = DocIDType.getDocIDTypeByConfigType(type);

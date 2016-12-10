@@ -14,7 +14,6 @@ import java.util.NoSuchElementException;
 import java.util.Set;
 
 import org.apache.commons.configuration2.CombinedConfiguration;
-import org.apache.commons.configuration2.Configuration;
 import org.apache.commons.configuration2.XMLConfiguration;
 import org.apache.commons.configuration2.builder.FileBasedConfigurationBuilder;
 import org.apache.commons.configuration2.builder.fluent.Parameters;
@@ -57,7 +56,7 @@ import org.slf4j.LoggerFactory;
  * in the configuration file (or included files). (See below for how this can 
  * be used with "user defined" properties.)
  * In addition to the above -- through the use of the {@link TDCLookup} class and
- * the {@link Builder.addLookup} method -- this class supports the ability to add other
+ * the {@link ConfigImpl.Builder.addLookup} method -- this class supports the ability to add other
  * prefixes, so that custom variables can be added. All of the main configuration
  * classes make use of this (with the "tdc" prefix) to provide application specific
  * variables (such as the location of various configuration directories).
@@ -82,7 +81,7 @@ public class ConfigImpl implements Config {
 	
 	private static final Logger log = LoggerFactory.getLogger(ConfigImpl.class);
 	private static final String INCLUDE_FILE_KEY = "IncludeFile";
-	private static final String USER_DEFINED_KEY = "UserDefined";
+	private static final String USER_DEFINED_KEY = "UserProp";
 	
 	private final Path primaryConfigPath;
 	private final CombinedConfiguration combinedConfig;
@@ -282,6 +281,7 @@ public class ConfigImpl implements Config {
 		private Set<String> keySet;
 		private Map<String, String> lookupMap;
 		private TDCLookup lookup;
+		private List<ResolvablePath> childResolvables;
 		
 		public Builder(Path primaryConfigPath) {
 			this.primaryConfigPath = primaryConfigPath.toAbsolutePath().normalize();
@@ -305,57 +305,76 @@ public class ConfigImpl implements Config {
 		private void buildCombinedConfig() {
 			NodeCombiner combiner = new MergeCombiner();
 			combinedConfig = new CombinedConfiguration(combiner);
-			registerLookup(combinedConfig);
-			List<Path> childConfigPaths = new ArrayList<>();
-			childConfigPaths.add(primaryConfigPath);
+			combinedConfig.getInterpolator().registerLookup("tdc", lookup);
+			buildAllChildConfigs();
+		}
+
+		private void buildAllChildConfigs() {
+			Path childConfigPath = null;
+			XMLConfiguration childConfig = null;
 			int pathPos = 0;
-			while (pathPos < childConfigPaths.size()) {
-				Path childConfigPath = childConfigPaths.get(pathPos++);
-				XMLConfiguration childConfig = buildChildConfig(childConfigPath);
+			childResolvables = new ArrayList<>();
+			childResolvables.add(new ResolvablePath(primaryConfigPath));
+			while (pathPos < childResolvables.size()) {
+				childConfigPath = resolvePathToProcess(pathPos);
+				log.debug("Processing config path at pos {}: {}", pathPos, childConfigPath);
+				if (isAlreadyProcessed(childConfigPath, pathPos)) {
+					log.debug("Config path already processed; skipping: {}", childConfigPath);
+					break;
+				}
+				pathPos++;
+				if (Files.notExists(childConfigPath)) {
+					throw new IllegalStateException(
+							"Unable to locate config file: " + childConfigPath);
+				}
+				try {
+					Parameters params = new Parameters();
+					childConfig = 
+							new FileBasedConfigurationBuilder<XMLConfiguration>(XMLConfiguration.class)
+									.configure(params.xml().setFileName(childConfigPath.toString()))
+									.getConfiguration();
+				}
+				catch (ConfigurationException e) {
+					throw new IllegalStateException(
+							"Unable to load config file: " + childConfigPath, e);
+				}
+				extractIncludePaths(childConfig, childConfigPath, pathPos);
 				combinedConfig.addConfiguration(childConfig);
-				extractIncludeFiles(childConfig, childConfigPath, childConfigPaths);
 			}
 		}
 
-		private void registerLookup(Configuration config) {
-			config.getInterpolator().registerLookup("tdc", lookup);
+		private Path resolvePathToProcess(int pathPos) {
+			ResolvablePath r = childResolvables.get(pathPos);
+			if (r.resolvedPath == null) {
+				r.other = (String)combinedConfig.getInterpolator().interpolate(r.other);
+				r.resolvedPath =  r.parentPath.resolve(r.other).normalize();
+			}
+			return r.resolvedPath;
 		}
 
-		private XMLConfiguration buildChildConfig(Path childConfigPath) {
-			if (Files.notExists(childConfigPath)) {
-				throw new IllegalStateException(
-						"Unable to locate config file: " + childConfigPath.toString());
+		private boolean isAlreadyProcessed(Path childConfigPath, int pathPos) {
+			for (int i = 0; i < pathPos; i++) {
+				if (childResolvables.get(i).equals(childConfigPath)) {
+					return true;
+				}
 			}
-			try {
-				Parameters params = new Parameters();
-				XMLConfiguration childConfig = 
-						new FileBasedConfigurationBuilder<XMLConfiguration>(XMLConfiguration.class)
-								.configure(params.xml().setFileName(childConfigPath.toString()))
-								.getConfiguration();
-				registerLookup(childConfig);
-				return childConfig;
-			}
-			catch (ConfigurationException e) {
-				throw new IllegalStateException("Unable to load config file: " + 
-						childConfigPath.toString(), e);
-			}
+			return false;
 		}
 
-		private void extractIncludeFiles(
-				XMLConfiguration childConfig, Path childConfigPath, List<Path> childConfigPaths) {
+		private void extractIncludePaths(
+				XMLConfiguration childConfig, Path childConfigPath, int pathPos) {
 			
-			Path parentPath = childConfigPath.getParent();
 			List<String> includes = childConfig.getList(
 					String.class, INCLUDE_FILE_KEY, new ArrayList<>());
+			childConfig.clearTree(INCLUDE_FILE_KEY);
+			Path parentPath = childConfigPath.getParent();
+			List<ResolvablePath> includeResolvables = new ArrayList<>();
 			for (String include : includes) {
-				Path includePath = parentPath.resolve(include).normalize();
-				if (childConfigPaths.contains(includePath)) {
-					throw new IllegalStateException(
-							"Including config file would create infinite loop: " + 
-									includePath.toString());
-				}
-				childConfigPaths.add(includePath);
+				ResolvablePath resolvable = new ResolvablePath(parentPath, include);
+				log.debug("Including config path at pos {}: {}: {}", pathPos, parentPath, include);
+				includeResolvables.add(resolvable);
 			}
+			childResolvables.addAll(pathPos, includeResolvables);
 		}
 		
 		private void extractKeySet() {
@@ -363,7 +382,6 @@ public class ConfigImpl implements Config {
 			String key = "";
 			ImmutableNode node = combinedConfig.getNodeModel().getRootNode();
 			extractKeySet(key, node, true);
-			
 		}
 
 		private void extractKeySet(String key, ImmutableNode node, boolean isRootNode) {
@@ -407,6 +425,21 @@ public class ConfigImpl implements Config {
 			String attribKey = nodeKey + "[@" + attribName + "]";
 			keySet.add(attribKey);
 			return attribKey;
+		}
+		
+		private static class ResolvablePath {
+			public Path parentPath;
+			public String other;
+			public Path resolvedPath;
+			
+			public ResolvablePath(Path parentPath, String other) {
+				this.parentPath = parentPath;
+				this.other = other;
+			}
+			
+			public ResolvablePath(Path resolvedPath) {
+				this.resolvedPath = resolvedPath;
+			}
 		}
 	}
 }

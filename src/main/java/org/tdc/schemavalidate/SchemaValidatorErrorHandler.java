@@ -25,7 +25,8 @@ public class SchemaValidatorErrorHandler implements ErrorHandler {
 	public static final String MESSAGE_TYPE_SCHEMA_FATAL_ERROR = "schema-fatal-error";
 	public static final String MESSAGE_TYPE_SCHEMA_WARNING = "schema-warning";
 
-	private static final String CURRENT_ELEMENT_PROPERTY = "http://apache.org/xml/properties/dom/current-element-node";
+	private static final String CURRENT_ELEMENT_PROPERTY = 
+			"http://apache.org/xml/properties/dom/current-element-node";
 	
 	private final Validator validator;
 	private final TestDoc testDoc;
@@ -58,8 +59,10 @@ public class SchemaValidatorErrorHandler implements ErrorHandler {
 	private void logParseException(SAXParseException ex, String type) {
 		try {
 			Element currentElement = (Element)validator.getProperty(CURRENT_ELEMENT_PROPERTY);
-			NodeInst currentNodeInst = (NodeInst)currentElement.getUserData(DOMUtil.DOM_USER_DATA_RELATED_TDC_NODE);
-			int rowNum = testDoc.getPageConfig().getNodeRowStart() + currentNodeInst.getRowOffset();
+			NodeInst currentNodeInst = 
+					(NodeInst)currentElement.getUserData(DOMUtil.DOM_USER_DATA_RELATED_TDC_NODE);
+			int rowNum = testDoc.getPageConfig().getPageStructConfig().getNodeRowStart() + 
+					currentNodeInst.getRowOffset();
 			int colNum = testDoc.getColNum();
 			String pageName = testDoc.getPageConfig().getPageName();
 			String cellRef = testDoc.getColLetter() + rowNum;

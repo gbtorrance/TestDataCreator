@@ -79,7 +79,7 @@ public class BookTestDataLoader {
 		ModelConfig modelConfig = modelInst.getModelConfig();
 		String namespace = modelConfig.getSchemaRootElementNamespace();
 		PageConfig pageConfig = page.getConfig();
-		int nodeRowStart = pageConfig.getNodeRowStart();
+		int nodeRowStart = pageConfig.getPageStructConfig().getNodeRowStart();
 		int testLoadMaxMessages = modelConfig.getTestLoadMaxMessages();
 		testDocDOMBuilder.setModelInst(modelInst);
 		testDocDOMBuilder.setSpreadsheet(sheet);
@@ -152,8 +152,8 @@ public class BookTestDataLoader {
 		}
 		
 		private void validateNodeName(TDCNode node) {
-			int row = pageConfig.getNodeRowStart() +  node.getRowOffset();
-			int col = pageConfig.getNodeColStart() + node.getColOffset();
+			int row = pageConfig.getPageStructConfig().getNodeRowStart() +  node.getRowOffset();
+			int col = pageConfig.getPageStructConfig().getNodeColStart() + node.getColOffset();
 			String expectedValue = node.getDispName();
 			String actualValue = sheet.getCellValue(row, col);
 			if (!actualValue.equals(expectedValue)) {

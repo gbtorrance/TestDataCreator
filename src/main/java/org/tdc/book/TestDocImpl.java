@@ -115,10 +115,11 @@ public class TestDocImpl implements TestDoc {
 		
 		public List<TestDoc> buildAll() {
 			List<TestDoc> testDocs = new ArrayList<>();
-			Spreadsheet sheet = spreadsheetFile.getSpreadsheet(pageConfig.getPageName());
+			Spreadsheet sheet = 
+					spreadsheetFile.getSpreadsheet(pageConfig.getPageName());
 			if (sheet != null) {
-				int caseNumRowNum = pageConfig.getCaseNumDocIDRowConfig().getRowNum();
-				int startCol = pageConfig.getTestDocColStart();
+				int caseNumRowNum = pageConfig.getPageStructConfig().getCaseNumDocIDRowConfig().getRowNum();
+				int startCol = pageConfig.getPageStructConfig().getTestDocColStart();
 				int endCol = sheet.getLastColNum(caseNumRowNum);
 				for (int colNum = startCol; colNum <= endCol; colNum++) {
 					String caseNum = sheet.getCellValue(caseNumRowNum, colNum);
@@ -135,7 +136,8 @@ public class TestDocImpl implements TestDoc {
 		private TestDoc build(Spreadsheet sheet, int colNum) {
 			this.colNum = colNum;
 			this.colLetter = sheet.getColLetter(colNum);
-			String caseNumStr = sheet.getCellValue(pageConfig.getCaseNumDocIDRowConfig().getRowNum(), colNum);
+			String caseNumStr = sheet.getCellValue(
+					pageConfig.getPageStructConfig().getCaseNumDocIDRowConfig().getRowNum(), colNum);
 			try {
 				caseNum = Integer.parseUnsignedInt(caseNumStr);
 			}
@@ -143,8 +145,10 @@ public class TestDocImpl implements TestDoc {
 				throw new RuntimeException("Case Num must be a positive number for page '" + 
 						sheet.getName() + "' column " + colNum, ex);
 			}
-			DocIDRowConfig setNameConfig = pageConfig.getSetNameDocIDRowConfig();
-			setName = setNameConfig == null ? "" : sheet.getCellValue(setNameConfig.getRowNum(), colNum);
+			DocIDRowConfig setNameConfig = 
+					pageConfig.getPageStructConfig().getSetNameDocIDRowConfig();
+			setName = setNameConfig == null ? 
+					"" : sheet.getCellValue(setNameConfig.getRowNum(), colNum);
 			buildVariables(sheet);
 			results = new Results();
 			return new TestDocImpl(this);
@@ -153,7 +157,8 @@ public class TestDocImpl implements TestDoc {
 		private void buildVariables(Spreadsheet sheet) {
 			docVariables = new HashMap<>();
 			caseVariables = new HashMap<>();
-			List<DocIDRowConfig> varConfigs = pageConfig.getVarDocIDRowConfigs();
+			List<DocIDRowConfig> varConfigs = 
+					pageConfig.getPageStructConfig().getVarDocIDRowConfigs();
 			for (DocIDRowConfig var : varConfigs) {
 				String varName = var.getVariableName();
 				String value = sheet.getCellValue(var.getRowNum(), colNum).trim();
