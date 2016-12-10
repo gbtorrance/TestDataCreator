@@ -69,7 +69,9 @@ public class PageImpl implements Page {
 			Map<String, Page> pages = new LinkedHashMap<>();
 			Collection<PageConfig> pageConfigs = configs.values(); 
 			for (PageConfig pageConfig : pageConfigs) {
-				pages.put(pageConfig.getPageName(), build(pageConfig));
+				if (spreadsheetFile.getSpreadsheet(pageConfig.getPageName()) != null) {
+					pages.put(pageConfig.getPageName(), build(pageConfig));
+				}
 			}
 			return pages;
 		}
