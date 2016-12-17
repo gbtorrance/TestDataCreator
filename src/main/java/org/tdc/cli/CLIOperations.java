@@ -17,8 +17,12 @@ import org.tdc.config.book.BookConfig;
 import org.tdc.config.model.ModelConfig;
 import org.tdc.config.model.ModelCustomizerConfig;
 import org.tdc.config.schema.SchemaConfig;
-import org.tdc.process.Processor;
-import org.tdc.process.ProcessorImpl;
+import org.tdc.process.BookProcessor;
+import org.tdc.process.BookProcessorImpl;
+import org.tdc.process.ModelProcessor;
+import org.tdc.process.ModelProcessorImpl;
+import org.tdc.process.SystemInitializer;
+import org.tdc.process.SystemInitializerImpl;
 import org.tdc.util.Addr;
 import org.tdc.util.Util;
 
@@ -81,7 +85,9 @@ public class CLIOperations {
 	private OptionSpec<Path> opTarget;
 
 	private Path systemConfigRoot;
-	private Processor processor;
+	private SystemInitializer init;
+	private ModelProcessor modelProcessor;
+	private BookProcessor bookProcessor;
 
 	public CLIOperations(boolean admin) {
 		this.admin = admin;
@@ -198,8 +204,8 @@ public class CLIOperations {
 		}
 
 		initConfigDir(options);
-		initProcessor();
-		
+		initProcessors();
+
 		if (options.has(opList)) {
 			CLIArgsConfigType configType = (CLIArgsConfigType)options.valueOf(OP_LIST);
 			executeListConfig(configType);
@@ -241,19 +247,33 @@ public class CLIOperations {
 		}
 	}
 
-	private void initProcessor() {
-		processor = new ProcessorImpl
-				.Builder()
-				.defaultFactories(systemConfigRoot)
-				.build();
-	}
-
 	private void initConfigDir(OptionSet options) {
 		systemConfigRoot = options.valueOf(opSystemConfigRoot);
 		if (systemConfigRoot == null || !Files.isDirectory(systemConfigRoot)) {
 			outputAndEnd("A valid System Config Root dir must be specified with option -" + 
 					OP_S + " or --" + OP_SYSTEM_CONFIG_ROOT);
 		}
+	}
+
+	private void initProcessors() {
+		init = new SystemInitializerImpl
+				.Builder()
+				.defaultFactories(systemConfigRoot)
+				.build();
+		modelProcessor = 
+				new ModelProcessorImpl(
+						init.getModelConfigFactory(), 
+						init.getModelDefFactory(), 
+						init.getSpreadsheetFileFactory());
+		bookProcessor = 
+				new BookProcessorImpl(
+						init.getBookConfigFactory(),
+						init.getModelInstFactory(),
+						init.getBookFactory(),
+						init.getSpreadsheetFileFactory(),
+						init.getFilterFactory(),
+						init.getTaskFactory(),
+						init.getSchemaValidatorFactory());
 	}
 
 	private void executeHelp() {
@@ -280,7 +300,8 @@ public class CLIOperations {
 
 	private void outputSchemaConfigsList() {
 		Map<Addr, Exception> errors = new HashMap<>();
-		List<SchemaConfig> schemaConfigs = processor.getAllSchemaConfigs(errors);
+		List<SchemaConfig> schemaConfigs = 
+				init.getSchemaConfigFactory().getAllSchemaConfigs(errors);
 		output("Schema Config addresses:");
 		for (SchemaConfig schemaConfig : schemaConfigs) {
 			String addr = schemaConfig.getAddr().toString();
@@ -291,7 +312,8 @@ public class CLIOperations {
 
 	private void outputModelConfigsList() {
 		Map<Addr, Exception> errors = new HashMap<>();
-		List<ModelConfig> modelConfigs = processor.getAllModelConfigs(errors);
+		List<ModelConfig> modelConfigs = 
+				init.getModelConfigFactory().getAllModelConfigs(errors);
 		output("Model Config addresses:");
 		for (ModelConfig modelConfig : modelConfigs) {
 			String addr = modelConfig.getAddr().toString();
@@ -305,7 +327,8 @@ public class CLIOperations {
 
 	private void outputBookConfigsList() {
 		Map<Addr, Exception> errors = new HashMap<>();
-		List<BookConfig> bookConfigs = processor.getAllBookConfigs(errors);
+		List<BookConfig> bookConfigs = 
+				init.getBookConfigFactory().getAllBookConfigs(errors);
 		output("Book Config addresses:");
 		for (BookConfig bookConfig : bookConfigs) {
 			String addr = bookConfig.getAddr().toString();
@@ -319,12 +342,13 @@ public class CLIOperations {
 
 	private void executeCreateCustomizer(Addr modelAddr, Path targetPath, Addr basedOnModelAddr) {
 		verifyModelAddr(modelAddr);
-		ModelConfig config = processor.getModelConfig(modelAddr); 
+		ModelConfig config = 
+				init.getModelConfigFactory().getModelConfig(modelAddr); 
 		verifyModelCustomizerConfigured(config);
 		String customizerName = getCustomizerName(config);
 		targetPath = verifyTargetOrProvideDefault(targetPath, customizerName, "xlsx");
 		verifyBasedOnModelIfExists(basedOnModelAddr);
-		processor.createCustomizer(modelAddr, targetPath, basedOnModelAddr, false);
+		modelProcessor.createCustomizer(modelAddr, targetPath, basedOnModelAddr, false);
 	}
 
 	private String getCustomizerName(ModelConfig config) {
@@ -341,28 +365,29 @@ public class CLIOperations {
 	}
 
 	private void verifyModelAddr(Addr modelAddr) {
-		if (!processor.isModelConfig(modelAddr)) {
+		if (!init.getModelConfigFactory().isModelConfig(modelAddr)) {
 			outputAndEnd(modelAddr + " does not represent a Model Config address");
 		}
 	}
 
 	private void verifyBasedOnModelIfExists(Addr basedOnModelAddr) {
-		if (basedOnModelAddr != null && !processor.isModelConfig(basedOnModelAddr)) {
+		if (basedOnModelAddr != null && 
+				!init.getModelConfigFactory().isModelConfig(basedOnModelAddr)) {
 			outputAndEnd(basedOnModelAddr + " does not represent a Model Config address");
 		}
 	}
 	
 	private void executeCreateBook(Addr bookAddr, Path targetPath, Path basedOnBookPath) {
 		verifyBookAddr(bookAddr);
-		String bookName = processor.getBookConfig(bookAddr).getBookName();
-		String targetExtension = processor.getTargetBookFileExtension(bookAddr);
+		String bookName = init.getBookConfigFactory().getBookConfig(bookAddr).getBookName();
+		String targetExtension = bookProcessor.getTargetBookFileExtension(bookAddr);
 		targetPath = verifyTargetOrProvideDefault(targetPath, bookName, targetExtension);
 		verifyBasedOnBookIfExists(basedOnBookPath);
-		processor.createBook(bookAddr, targetPath, basedOnBookPath, false);
+		bookProcessor.createBook(bookAddr, targetPath, basedOnBookPath, false);
 	}
 
 	private void verifyBookAddr(Addr bookAddr) {
-		if (!processor.isBookConfig(bookAddr)) {
+		if (!init.getBookConfigFactory().isBookConfig(bookAddr)) {
 			outputAndEnd(bookAddr + " does not represent a Book Config address");
 		}
 	}
@@ -398,22 +423,22 @@ public class CLIOperations {
 			Path targetPath, boolean noLog) {
 		
 		if (noLog) {
-			processor.loadAndProcessBook(
+			bookProcessor.loadAndProcessBook(
 					bookPath, schemaValidate, processTasks, 
-					taskIDsToProcess, taskParams);
+					taskIDsToProcess, taskParams, null, false);
 		}
 		else {
 			if (targetPath != null) {
 				String bookExtension = Util.getExtension(bookPath);
 				verifyTargetOrProvideDefault(targetPath, null, bookExtension);
-				processor.loadAndProcessBookWithLogOutput(
+				bookProcessor.loadAndProcessBook(
 						bookPath, schemaValidate, processTasks, 
 						taskIDsToProcess, taskParams, targetPath, false);
 			}
 			else {
 				ensureFileNotCurrentlyInUse(bookPath);
 				Path tempPath = createTempCopy(bookPath);
-				processor.loadAndProcessBookWithLogOutput(
+				bookProcessor.loadAndProcessBook(
 						tempPath, schemaValidate, processTasks, 
 						taskIDsToProcess, taskParams, tempPath, true);
 				backupAndRenameFiles(bookPath, tempPath);

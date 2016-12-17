@@ -9,8 +9,10 @@ import java.nio.file.Paths;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.tdc.process.Processor;
-import org.tdc.process.ProcessorImpl;
+import org.tdc.process.BookProcessor;
+import org.tdc.process.BookProcessorImpl;
+import org.tdc.process.SystemInitializer;
+import org.tdc.process.SystemInitializerImpl;
 import org.tdc.util.Util;
 
 /**
@@ -20,15 +22,23 @@ import org.tdc.util.Util;
  */
 public class BookReaderTest {
 
-	private static Processor processor;
+	private static BookProcessor bookProcessor;
 
 	@BeforeClass
 	public static void setup() {
 		Path systemConfigRoot = Paths.get("testfiles/TDCFiles");
-		processor = new ProcessorImpl
+		SystemInitializer init = new SystemInitializerImpl
 				.Builder()
 				.defaultFactories(systemConfigRoot)
 				.build();
+		bookProcessor = new BookProcessorImpl(
+				init.getBookConfigFactory(), 
+				init.getModelInstFactory(), 
+				init.getBookFactory(), 
+				init.getSpreadsheetFileFactory(), 
+				init.getFilterFactory(), 
+				init.getTaskFactory(), 
+				init.getSchemaValidatorFactory());
 	}
 	
 	@Test
@@ -38,7 +48,7 @@ public class BookReaderTest {
 		Util.purgeDirectory(Paths.get("testfiles/Temp/ExportRoot"));
 		Files.deleteIfExists(targetPath);
 		
-		processor.loadAndProcessBookWithLogOutput(
+		bookProcessor.loadAndProcessBook(
 				bookPath, true, true, null, null, targetPath, true);
 
 		assertThat(Files.exists(targetPath)).isEqualTo(true);

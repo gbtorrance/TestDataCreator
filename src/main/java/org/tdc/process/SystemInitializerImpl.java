@@ -1,23 +1,17 @@
 package org.tdc.process;
 
 import java.nio.file.Path;
-import java.util.List;
-import java.util.Map;
 
-import org.tdc.book.Book;
 import org.tdc.book.BookFactory;
 import org.tdc.book.BookFactoryImpl;
-import org.tdc.config.book.BookConfig;
 import org.tdc.config.book.BookConfigFactory;
 import org.tdc.config.book.BookConfigFactoryImpl;
 import org.tdc.config.book.FilterConfigFactory;
 import org.tdc.config.book.FilterConfigFactoryImpl;
 import org.tdc.config.book.TaskConfigFactory;
 import org.tdc.config.book.TaskConfigFactoryImpl;
-import org.tdc.config.model.ModelConfig;
 import org.tdc.config.model.ModelConfigFactory;
 import org.tdc.config.model.ModelConfigFactoryImpl;
-import org.tdc.config.schema.SchemaConfig;
 import org.tdc.config.schema.SchemaConfigFactory;
 import org.tdc.config.schema.SchemaConfigFactoryImpl;
 import org.tdc.config.system.InitializerConfigFactory;
@@ -41,12 +35,11 @@ import org.tdc.spreadsheet.SpreadsheetFileFactory;
 import org.tdc.spreadsheet.excel.ExcelSpreadsheetFileFactory;
 import org.tdc.task.TaskFactory;
 import org.tdc.task.TaskFactoryImpl;
-import org.tdc.util.Addr;
 
 /**
- * A {@link Processor} implementation.
+ * A {@link SystemInitializer} implementation. 
  */
-public class ProcessorImpl implements Processor {
+public class SystemInitializerImpl implements SystemInitializer {
 	private final SystemConfig systemConfig;
 	private final SchemaConfigFactory schemaConfigFactory;
 	private final ModelConfigFactory modelConfigFactory;
@@ -59,10 +52,8 @@ public class ProcessorImpl implements Processor {
 	private final FilterFactory filterFactory;
 	private final SchemaValidatorFactory schemaValidatorFactory;
 	private final TaskFactory taskFactory;
-	private final ModelProcessor modelProcessor;
-	private final BookProcessor bookProcessor;
 	
-	private ProcessorImpl(Builder builder) {
+	private SystemInitializerImpl(Builder builder) {
 		this.systemConfig = builder.systemConfig;
 		this.schemaConfigFactory = builder.schemaConfigFactory;
 		this.modelConfigFactory = builder.modelConfigFactory;
@@ -75,8 +66,6 @@ public class ProcessorImpl implements Processor {
 		this.filterFactory = builder.filterFactory;
 		this.schemaValidatorFactory = builder.schemaValidatorFactory;
 		this.taskFactory = builder.taskFactory;
-		this.modelProcessor = builder.modelProcessor;
-		this.bookProcessor = builder.bookProcessor;
 	}
 	
 	@Override
@@ -138,93 +127,7 @@ public class ProcessorImpl implements Processor {
 	public TaskFactory getTaskFactory() {
 		return taskFactory;
 	}
-
-	@Override
-	public SchemaConfig getSchemaConfig(Addr addr) {
-		return schemaConfigFactory.getSchemaConfig(addr);
-	}
-
-	@Override
-	public boolean isSchemaConfig(Addr addr) {
-		return schemaConfigFactory.isSchemaConfig(addr);
-	}
-
-	@Override
-	public List<SchemaConfig> getAllSchemaConfigs(Map<Addr, Exception> errors) {
-		return schemaConfigFactory.getAllSchemaConfigs(errors);
-	}
-
-	@Override
-	public ModelConfig getModelConfig(Addr addr) {
-		return modelConfigFactory.getModelConfig(addr);
-	}
-
-	@Override
-	public boolean isModelConfig(Addr addr) {
-		return modelConfigFactory.isModelConfig(addr);
-	}
-
-	@Override
-	public List<ModelConfig> getAllModelConfigs(Map<Addr, Exception> errors) {
-		return modelConfigFactory.getAllModelConfigs(errors);
-	}
-
-	@Override
-	public BookConfig getBookConfig(Addr addr) {
-		return bookConfigFactory.getBookConfig(addr);
-	}
-
-	@Override
-	public boolean isBookConfig(Addr addr) {
-		return bookConfigFactory.isBookConfig(addr);
-	}
-
-	@Override
-	public List<BookConfig> getAllBookConfigs(Map<Addr, Exception> errors) {
-		return bookConfigFactory.getAllBookConfigs(errors);
-	}
-
-	@Override
-	public void createCustomizer(Addr modelAddr, Path targetPath, 
-			Addr basedOnModelAddr, boolean overwriteExisting) {
-
-		modelProcessor.createCustomizer(modelAddr, targetPath, basedOnModelAddr, overwriteExisting);
-	}
 	
-	@Override
-	public String getTargetBookFileExtension(Addr bookAddr) {
-		return bookProcessor.getTargetBookFileExtension(bookAddr);
-	}
-	
-	@Override
-	public void createBook(Addr bookAddr, Path targetPath, 
-			Path basedOnBookPath, boolean overwriteExisting) {
-
-		bookProcessor.createBook(bookAddr, targetPath, basedOnBookPath, overwriteExisting);
-	}
-
-	@Override
-	public Book loadAndProcessBook(
-			Path bookPath, boolean schemaValidate, boolean processTasks,
-			List<String> taskIDsToProcess, Map<String, String> taskParams) {
-		
-		return bookProcessor.loadAndProcessBook(
-				bookPath, schemaValidate, processTasks, 
-				taskIDsToProcess, taskParams, null, false);
-	}
-
-	@Override
-	public Book loadAndProcessBookWithLogOutput(
-			Path bookPath, boolean schemaValidate, boolean processTasks,
-			List<String> taskIDsToProcess, Map<String, String> taskParams,
-			Path targetPath, boolean overwriteExisting) {
-
-		return bookProcessor.loadAndProcessBook(
-				bookPath, schemaValidate, processTasks, 
-				taskIDsToProcess, taskParams,
-				targetPath, overwriteExisting);
-	}
-
 	public static class Builder {
 		private InitializerConfigFactory initializerConfigFactory;
 		private SystemConfig systemConfig;
@@ -242,8 +145,6 @@ public class ProcessorImpl implements Processor {
 		private FilterFactory filterFactory;
 		private SchemaValidatorFactory schemaValidatorFactory; 
 		private TaskFactory taskFactory;
-		private ModelProcessor modelProcessor;
-		private BookProcessor bookProcessor;
 		
 		public Builder defaultFactories(Path systemConfigRoot) {
 			initializerConfigFactory = new InitializerConfigFactoryImpl();
@@ -348,14 +249,9 @@ public class ProcessorImpl implements Processor {
 			return this;
 		}
 
-		public Processor build() {
-			modelProcessor = new ModelProcessor();
-			bookProcessor = new BookProcessor();
-			Processor processor = new ProcessorImpl(this);
-			modelProcessor.setProcessor(processor);
-			bookProcessor.setProcessor(processor);
+		public SystemInitializer build() {
 			processInitializers();
-			return processor;
+			return new SystemInitializerImpl(this);
 		}
 
 		private void processInitializers() {
