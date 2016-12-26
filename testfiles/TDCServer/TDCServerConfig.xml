@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Config>
-	<SchemasConfigRoot>../TDCFiles/Schemas</SchemasConfigRoot>
-	<BooksConfigRoot>../TDCFiles/Books</BooksConfigRoot>
-	<WorkingRoot>Working</WorkingRoot>
-	<ServerPort>8080</ServerPort>
-	<BookCacheMaxSize>5</BookCacheMaxSize>
-</Config>

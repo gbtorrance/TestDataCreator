@@ -2,4 +2,10 @@
 <Config>
 	<SchemasConfigRoot>Schemas</SchemasConfigRoot>
 	<BooksConfigRoot>Books</BooksConfigRoot>
+	
+	<Server>
+		<WorkingRoot>Working</WorkingRoot>
+		<ServerPort>8080</ServerPort>
+		<BookCacheMaxSize>5</BookCacheMaxSize>
+	</Server>
 </Config>

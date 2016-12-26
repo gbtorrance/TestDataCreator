@@ -24,12 +24,14 @@ public class SystemConfigImpl implements SystemConfig {
 	private final Path schemasConfigRoot;
 	private final Path booksConfigRoot;
 	private final List<InitializerConfig> initializerConfigs;
+	private final ServerConfig serverConfig;
 	
 	private SystemConfigImpl(Builder builder) {
 		this.systemConfigRoot = builder.systemConfigRoot;
 		this.schemasConfigRoot = builder.schemasConfigRoot;
 		this.booksConfigRoot = builder.booksConfigRoot;
 		this.initializerConfigs = builder.initializerConfigs;
+		this.serverConfig = builder.serverConfig;
 	}
 	
 	@Override
@@ -57,6 +59,11 @@ public class SystemConfigImpl implements SystemConfig {
 		return initializerConfigs;
 	}
 	
+	@Override
+	public ServerConfig getServerConfig() {
+		return serverConfig;
+	}
+	
 	public static class Builder {
 		private final Path systemConfigRoot;
 		private final InitializerConfigFactory initializerConfigFactory;
@@ -65,6 +72,7 @@ public class SystemConfigImpl implements SystemConfig {
 		private Path schemasConfigRoot;
 		private Path booksConfigRoot;
 		private List<InitializerConfig> initializerConfigs;
+		private ServerConfig serverConfig;
 		
 		public Builder(Path systemConfigRoot, InitializerConfigFactory initializerConfigFactory) {
 			log.info("Creating SystemConfig: {}", systemConfigRoot);
@@ -96,6 +104,9 @@ public class SystemConfigImpl implements SystemConfig {
 			}
 			initializerConfigs = initializerConfigFactory
 					.createInitializerConfigs(config, "Initializers", systemConfigRoot);
+			serverConfig = new ServerConfigImpl
+					.Builder(config, systemConfigRoot)
+					.build();
 			config.ensureNoUnprocessedKeys();
 			return new SystemConfigImpl(this);
 		}

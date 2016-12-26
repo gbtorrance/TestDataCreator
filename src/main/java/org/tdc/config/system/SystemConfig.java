@@ -12,4 +12,5 @@ public interface SystemConfig {
 	Path getSchemasConfigRoot();
 	Path getBooksConfigRoot();
 	List<InitializerConfig> getInitializerConfigs();
+	ServerConfig getServerConfig();
 }

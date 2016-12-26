@@ -23,6 +23,7 @@ import org.tdc.process.ModelProcessor;
 import org.tdc.process.ModelProcessorImpl;
 import org.tdc.process.SystemInitializer;
 import org.tdc.process.SystemInitializerImpl;
+import org.tdc.server.TDCServer;
 import org.tdc.util.Addr;
 import org.tdc.util.Util;
 
@@ -62,6 +63,9 @@ public class CLIOperations {
 	private static final String OP_PROCESS_TASKS = "process-tasks";
 	private static final String OP_TASK_PARAM = "task-param";
 	
+	private static final String OP_V = "v";
+	private static final String OP_SERVER = "server";
+	
 	private static final String OP_TARGET = "target"; // applies to "z", "c", and "p"
 
 	private static final int INDENT_SPACES = 3;
@@ -83,6 +87,7 @@ public class CLIOperations {
 	private OptionSpec<String> opProcessTasks;
 	private OptionSpec<KeyValuePair> opTaskParam;
 	private OptionSpec<Path> opTarget;
+	private OptionSpec<?> opServer;
 
 	private Path systemConfigRoot;
 	private SystemInitializer init;
@@ -102,6 +107,7 @@ public class CLIOperations {
 		initParserCreateBook();
 		initParserProcessBook();
 		initParserProcessTarget();
+		initParserServer();
 	}
 	
 	private void initParserHelp() {
@@ -187,6 +193,11 @@ public class CLIOperations {
 				.describedAs("target file name");
 	}
 
+	private void initParserServer() {
+		opServer = parser.acceptsAll(Arrays.asList(
+				OP_V, OP_SERVER), "run as server");
+	}
+
 	public void execute(String[] args) {
 		try {
 			OptionSet options = parser.parse(args);
@@ -241,6 +252,9 @@ public class CLIOperations {
 			}
 			executeProcessBook(bookPath, schemaValidate, processTasks, 
 					taskIDsToProcess, taskParams, targetPath, noLog);
+		}
+		else if (options.has(opServer)) {
+			executeServer();
 		}
 		else {
 			outputAndEnd("No commands specified");
@@ -523,6 +537,17 @@ public class CLIOperations {
 		catch (IOException e) {
 			throw new RuntimeException("Unable to delete old backup files", e);
 		}
+	}
+
+	private void executeServer() {
+		TDCServer server = new TDCServer(
+				init.getSystemConfig().getServerConfig(), 
+				init.getSchemaConfigFactory(),
+				init.getModelConfigFactory(),
+				init.getBookConfigFactory(),
+				modelProcessor, 
+				bookProcessor);
+		server.startAndWait();
 	}
 
 	private void outputErrors(Map<Addr, Exception> errors) {
