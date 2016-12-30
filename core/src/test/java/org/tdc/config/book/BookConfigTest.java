@@ -36,12 +36,12 @@ public class BookConfigTest {
 	
 	@BeforeClass
 	public static void setup() {
-		schemasConfigRoot = Paths.get("testfiles/TDCFiles/Schemas");
+		schemasConfigRoot = Paths.get("testfiles/TDCConfig/Schemas");
 		schemaConfigFactory = new SchemaConfigFactoryImpl(schemasConfigRoot);
 		modelConfigFactory = new ModelConfigFactoryImpl(schemaConfigFactory);
 		filterConfigFactory = new FilterConfigFactoryImpl();
 		taskConfigFactory = new TaskConfigFactoryImpl();
-		booksConfigRoot = Paths.get("testfiles/TDCFiles/Books");
+		booksConfigRoot = Paths.get("testfiles/TDCConfig/Books");
 		bookConfigFactory = new BookConfigFactoryImpl(
 				booksConfigRoot, modelConfigFactory, 
 				filterConfigFactory, taskConfigFactory);

@@ -107,7 +107,7 @@ public class ModelTest {
 	
 	@BeforeClass
 	public static void setup() {
-		Path schemaRoot = Paths.get("testfiles/TDCFiles/Schemas");
+		Path schemaRoot = Paths.get("testfiles/TDCConfig/Schemas");
 		
 		spreadsheetFileFactory = new ExcelSpreadsheetFileFactory();
 

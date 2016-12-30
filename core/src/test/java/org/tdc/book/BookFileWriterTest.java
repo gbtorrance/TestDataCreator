@@ -27,7 +27,7 @@ public class BookFileWriterTest {
 
 	@BeforeClass
 	public static void setup() {
-		Path systemConfigRoot = Paths.get("testfiles/TDCFiles");
+		Path systemConfigRoot = Paths.get("testfiles/TDCConfig");
 		SystemInitializer init = new SystemInitializerImpl
 				.Builder()
 				.defaultFactories(systemConfigRoot)

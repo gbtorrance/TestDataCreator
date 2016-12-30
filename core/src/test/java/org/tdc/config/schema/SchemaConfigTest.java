@@ -24,7 +24,7 @@ public class SchemaConfigTest {
 	
 	@BeforeClass
 	public static void setup() {
-		schemasConfigRoot = Paths.get("testfiles/TDCFiles/Schemas");
+		schemasConfigRoot = Paths.get("testfiles/TDCConfig/Schemas");
 		schemaConfigFactory = new SchemaConfigFactoryImpl(schemasConfigRoot);
 		schemaAddr = new Addr("/ConfigTest/SchemaConfigTest");
 	}

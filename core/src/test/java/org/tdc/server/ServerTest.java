@@ -58,7 +58,7 @@ public class ServerTest {
 	
 	@BeforeClass
 	public static void setup() throws Exception {
-		Path systemConfigRoot = Paths.get("testfiles/TDCFiles");
+		Path systemConfigRoot = Paths.get("testfiles/TDCConfig");
 		SystemInitializer init = new SystemInitializerImpl.Builder()
 				.defaultFactories(systemConfigRoot)
 				.build();

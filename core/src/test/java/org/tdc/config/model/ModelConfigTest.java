@@ -29,7 +29,7 @@ public class ModelConfigTest {
 	
 	@BeforeClass
 	public static void setup() {
-		schemasConfigRoot = Paths.get("testfiles/TDCFiles/Schemas");
+		schemasConfigRoot = Paths.get("testfiles/TDCConfig/Schemas");
 		schemaConfigFactory = new SchemaConfigFactoryImpl(schemasConfigRoot);
 		modelConfigFactory = new ModelConfigFactoryImpl(schemaConfigFactory);
 		modelAddr = new Addr("/ConfigTest/SchemaConfigTest/ModelConfigTest");

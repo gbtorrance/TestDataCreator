@@ -39,7 +39,7 @@ public class ModelCustomizerTest {
 	
 	@BeforeClass
 	public static void setup() {
-		Path schemaRoot = Paths.get("testfiles/TDCFiles/Schemas");
+		Path schemaRoot = Paths.get("testfiles/TDCConfig/Schemas");
 		schemaConfigFactory = new SchemaConfigFactoryImpl(schemaRoot);
 		modelConfigFactory = new ModelConfigFactoryImpl(schemaConfigFactory);
 		schemaFactory = new SchemaFactoryImpl();
