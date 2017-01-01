@@ -3,8 +3,8 @@ package org.tdc.evaluator.factory;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.tdc.config.util.Config;
 import org.tdc.evaluator.Evaluator;
+import org.tdc.shared.config.Config;
 import org.tdc.spreadsheet.CellStyle;
 
 /**

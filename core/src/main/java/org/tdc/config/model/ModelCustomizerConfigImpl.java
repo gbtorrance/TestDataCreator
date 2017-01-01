@@ -4,8 +4,8 @@ import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
 
-import org.tdc.config.util.Config;
 import org.tdc.evaluator.factory.GeneralEvaluatorFactory;
+import org.tdc.shared.config.Config;
 import org.tdc.spreadsheet.CellStyle;
 import org.tdc.spreadsheet.CellStyleImpl;
 import org.tdc.util.Util;

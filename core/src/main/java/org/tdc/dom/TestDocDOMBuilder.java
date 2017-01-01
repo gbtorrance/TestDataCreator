@@ -18,9 +18,9 @@ import org.tdc.modelinst.ModelInst;
 import org.tdc.modelinst.NonAttribNodeInst;
 import org.tdc.result.Message;
 import org.tdc.result.Result;
+import org.tdc.shared.util.SharedConst;
 import org.tdc.spreadsheet.Spreadsheet;
 import org.tdc.spreadsheet.SpreadsheetFile;
-import org.tdc.util.Util;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -51,9 +51,9 @@ public class TestDocDOMBuilder {
 	
 	public TestDocDOMBuilder() {
 		documentBuilder = createDocumentBuilder();
-		nodeRowStart = Util.UNDEFINED;
-		testDocColNum = Util.UNDEFINED;
-		maxMessages = Util.NO_LIMIT;
+		nodeRowStart = SharedConst.UNDEFINED;
+		testDocColNum = SharedConst.UNDEFINED;
+		maxMessages = SharedConst.NO_LIMIT;
 	}
 	
 	public TestDocDOMBuilder setModelInst(ModelInst modelInst) {
@@ -94,7 +94,7 @@ public class TestDocDOMBuilder {
 	
 	public Document build() {
 		if (modelInst == null || sheet == null || 
-				nodeRowStart == Util.UNDEFINED || testDocColNum == Util.UNDEFINED || namespace == null) {
+				nodeRowStart == SharedConst.UNDEFINED || testDocColNum == SharedConst.UNDEFINED || namespace == null) {
 			throw new RuntimeException("Required TestDocDOMBuilder properties not initialized");
 		}
 		
@@ -241,7 +241,7 @@ public class TestDocDOMBuilder {
 	
 	private void warning(String messageStr, int rowNum, String value) {
 		if (result != null && 
-				(maxMessages == Util.NO_LIMIT || result.getMessages().size() < maxMessages)) {
+				(maxMessages == SharedConst.NO_LIMIT || result.getMessages().size() < maxMessages)) {
 			Message message = new Message
 					.Builder(MESSAGE_TYPE_WARNING, messageStr)
 					.setRowNumColNum(rowNum, testDocColNum)

@@ -8,15 +8,15 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.tdc.config.schema.SchemaConfig;
-import org.tdc.config.util.Config;
-import org.tdc.config.util.ConfigImpl;
 import org.tdc.evaluator.factory.GeneralEvaluatorFactory;
 import org.tdc.schemaparse.extractor.SchemaExtractor;
 import org.tdc.schemaparse.extractor.SchemaExtractorFactory;
 import org.tdc.schemaparse.filter.SchemaFilter;
 import org.tdc.schemaparse.filter.SchemaFilterImpl;
+import org.tdc.shared.config.Config;
+import org.tdc.shared.config.ConfigImpl;
+import org.tdc.shared.util.SharedConst;
 import org.tdc.util.Addr;
-import org.tdc.util.Util;
 
 /**
  * A {@link ModelConfig} implementation.
@@ -228,8 +228,8 @@ public class ModelConfigImpl implements ModelConfig {
 			schemaExtractors = schemaExtractorFactory.createSchemaExtractors(config, "SchemaExtractors");
 			modelCustomizerConfig = new ModelCustomizerConfigImpl.Builder(
 					config, modelConfigRoot, defaultOccursCount, modelName, evaluatorFactory).build();
-			testLoadMaxMessages = config.getInt("TestLoadMaxMessages", Util.NO_LIMIT, false);
-			schemaValidateMaxMessages = config.getInt("SchemaValidateMaxMessages", Util.NO_LIMIT, false);
+			testLoadMaxMessages = config.getInt("TestLoadMaxMessages", SharedConst.NO_LIMIT, false);
+			schemaValidateMaxMessages = config.getInt("SchemaValidateMaxMessages", SharedConst.NO_LIMIT, false);
 			schemaValidateEnable = config.getBoolean("SchemaValidateEnable", true, false);
 			config.ensureNoUnprocessedKeys();
 			return new ModelConfigImpl(this);

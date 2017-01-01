@@ -2,7 +2,7 @@ package org.tdc.schemaparse.extractor;
 
 import java.util.List;
 
-import org.tdc.config.util.Config;
+import org.tdc.shared.config.Config;
 
 /**
  * Interface defining factory for creating SchemaExtractor instances based

@@ -8,8 +8,8 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 import org.jboss.resteasy.annotations.providers.jackson.Formatted;
-import org.tdc.server.dto.SchemaConfigDTO;
 import org.tdc.server.process.ServerProcessor;
+import org.tdc.shared.dto.SchemaConfigDTO;
 
 /**
  * REST Resource for providing Schema Config info to the client.

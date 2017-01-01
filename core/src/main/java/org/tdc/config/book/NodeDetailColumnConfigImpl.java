@@ -3,7 +3,7 @@ package org.tdc.config.book;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.tdc.config.util.Config;
+import org.tdc.shared.config.Config;
 import org.tdc.spreadsheet.CellStyle;
 import org.tdc.spreadsheet.CellStyleImpl;
 import org.tdc.util.Util;

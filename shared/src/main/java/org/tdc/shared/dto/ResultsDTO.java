@@ -1,4 +1,4 @@
-package org.tdc.server.dto;
+package org.tdc.shared.dto;
 
 import java.util.HashMap;
 import java.util.Map;

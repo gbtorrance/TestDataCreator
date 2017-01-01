@@ -1,6 +1,6 @@
 package org.tdc.evaluator.factory;
 
-import org.tdc.config.util.Config;
+import org.tdc.shared.config.Config;
 
 /**
  * Contains a few simple helper methods used by Evaluator factories.

@@ -7,7 +7,7 @@ import org.tdc.dom.DOMUtil;
 import org.tdc.modelinst.NodeInst;
 import org.tdc.result.Message;
 import org.tdc.result.Result;
-import org.tdc.util.Util;
+import org.tdc.shared.util.SharedConst;
 import org.w3c.dom.Element;
 import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXException;
@@ -78,7 +78,7 @@ public class SchemaValidatorErrorHandler implements ErrorHandler {
 		catch (SAXNotRecognizedException | SAXNotSupportedException e) {
 			throw new UnsupportedOperationException(e);
 		}
-		if (maxMessages != Util.NO_LIMIT && result.getMessages().size() >= maxMessages) {
+		if (maxMessages != SharedConst.NO_LIMIT && result.getMessages().size() >= maxMessages) {
 			throw new MaxMessagesExceededException();
 		}
 	}

@@ -8,8 +8,8 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 import org.jboss.resteasy.annotations.providers.jackson.Formatted;
-import org.tdc.server.dto.ModelConfigDTO;
 import org.tdc.server.process.ServerProcessor;
+import org.tdc.shared.dto.ModelConfigDTO;
 
 /**
  * REST Resource for providing Model Config info to the client.

@@ -1,0 +1,10 @@
+<Config>
+
+	<CellStyle>
+		<FontName>Calibri</FontName>
+		<FontHeight>11</FontHeight>
+		<ColorRGB>50 100 150</ColorRGB>
+		<Italic>true</Italic>
+	</CellStyle>
+
+</Config>

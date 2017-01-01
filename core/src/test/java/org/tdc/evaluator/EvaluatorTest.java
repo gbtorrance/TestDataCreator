@@ -7,14 +7,14 @@ import java.nio.file.Paths;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.tdc.config.util.Config;
-import org.tdc.config.util.ConfigImpl;
 import org.tdc.evaluator.factory.GeneralEvaluatorFactory;
 import org.tdc.evaluator.factory.GeneralEvaluatorFactoryImpl;
 import org.tdc.evaluator.result.ValuePlusStyleResult;
 import org.tdc.evaluator.result.ValueResult;
 import org.tdc.modeldef.ElementNodeDef;
 import org.tdc.modeldef.ModelDefSharedState;
+import org.tdc.shared.config.Config;
+import org.tdc.shared.config.ConfigImpl;
 
 /**
  * Unit tests for {@link Evaluator} and its related classes.

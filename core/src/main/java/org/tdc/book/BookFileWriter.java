@@ -6,8 +6,8 @@ import java.util.List;
 
 import org.tdc.config.book.BookConfig;
 import org.tdc.config.book.DocIDRowConfig;
-import org.tdc.config.book.PageConfig;
 import org.tdc.config.book.NodeDetailColumnConfig;
+import org.tdc.config.book.PageConfig;
 import org.tdc.model.AttribNode;
 import org.tdc.model.CompositorNode;
 import org.tdc.model.ElementNode;
@@ -20,6 +20,7 @@ import org.tdc.modelinst.ModelInst;
 import org.tdc.modelinst.ModelInstFactory;
 import org.tdc.modelinst.NodeInst;
 import org.tdc.modelinst.NonAttribNodeInst;
+import org.tdc.shared.util.SharedConst;
 import org.tdc.spreadsheet.CellStyle;
 import org.tdc.spreadsheet.CellStyleImpl;
 import org.tdc.spreadsheet.Spreadsheet;
@@ -100,8 +101,8 @@ public class BookFileWriter {
 		basedOnPageConfig = null;
 		basedOnIndex = null;
 		basedOnSheet = null;
-		basedOnColStart = Util.UNDEFINED;
-		basedOnColEnd = Util.UNDEFINED;
+		basedOnColStart = SharedConst.UNDEFINED;
+		basedOnColEnd = SharedConst.UNDEFINED;
 		if (basedOnBook != null) {
 			Page basedOnPage = basedOnBook.getPages().get(currentPageConfig.getPageName());
 			if (basedOnPage != null) {

@@ -1,7 +1,7 @@
 package org.tdc.evaluator.factory;
 
-import org.tdc.config.util.Config;
 import org.tdc.evaluator.Evaluator;
+import org.tdc.shared.config.Config;
 import org.tdc.spreadsheet.CellStyle;
 
 /**

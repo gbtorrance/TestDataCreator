@@ -3,12 +3,12 @@ package org.tdc.evaluator.factory;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.tdc.config.util.Config;
 import org.tdc.evaluator.Evaluator;
 import org.tdc.evaluator.IfEvaluator;
 import org.tdc.evaluator.operator.EqualsOperator;
 import org.tdc.evaluator.operator.NotEqualsOperator;
 import org.tdc.evaluator.operator.Operator;
+import org.tdc.shared.config.Config;
 import org.tdc.spreadsheet.CellStyle;
 
 /**

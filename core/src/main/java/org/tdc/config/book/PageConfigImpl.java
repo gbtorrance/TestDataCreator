@@ -5,7 +5,7 @@ import java.util.Map;
 
 import org.tdc.config.model.ModelConfig;
 import org.tdc.config.model.ModelConfigFactory;
-import org.tdc.config.util.Config;
+import org.tdc.shared.config.Config;
 import org.tdc.util.Addr;
 
 /**

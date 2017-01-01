@@ -7,10 +7,10 @@ import java.nio.file.Path;
 import java.util.Map;
 
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.tdc.shared.util.SharedConst;
 import org.tdc.spreadsheet.CellStyle;
 import org.tdc.spreadsheet.Spreadsheet;
 import org.tdc.spreadsheet.SpreadsheetFile;
-import org.tdc.util.Util;
 
 /**
  * A {@link SpreadsheetFile} implementation for Excel workbooks.
@@ -87,7 +87,7 @@ public class ExcelSpreadsheetFile implements SpreadsheetFile {
 	@Override
 	public void setSpreadsheetHidden(String name, boolean hide) {
 		int index = workbook.getSheetIndex(name);
-		if (index == Util.UNDEFINED) {
+		if (index == SharedConst.UNDEFINED) {
 			throw new IllegalStateException("Unable to hide worksheet '" + name + "'; does not exist");
 		}
 		workbook.setSheetHidden(index, hide);

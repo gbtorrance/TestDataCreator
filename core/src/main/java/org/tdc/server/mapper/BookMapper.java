@@ -11,14 +11,14 @@ import org.tdc.result.Message;
 import org.tdc.result.Result;
 import org.tdc.result.Results;
 import org.tdc.result.TaskResult;
-import org.tdc.server.dto.BookDTO;
-import org.tdc.server.dto.MessageDTO;
-import org.tdc.server.dto.ResultDTO;
-import org.tdc.server.dto.ResultsDTO;
-import org.tdc.server.dto.TaskResultDTO;
-import org.tdc.server.dto.TestCaseDTO;
-import org.tdc.server.dto.TestDocDTO;
-import org.tdc.server.dto.TestSetDTO;
+import org.tdc.shared.dto.BookDTO;
+import org.tdc.shared.dto.MessageDTO;
+import org.tdc.shared.dto.ResultDTO;
+import org.tdc.shared.dto.ResultsDTO;
+import org.tdc.shared.dto.TaskResultDTO;
+import org.tdc.shared.dto.TestCaseDTO;
+import org.tdc.shared.dto.TestDocDTO;
+import org.tdc.shared.dto.TestSetDTO;
 
 /**
  * MapStruct Mapper to map {@link Book} (and related) to {@link BookDTO} (and related).

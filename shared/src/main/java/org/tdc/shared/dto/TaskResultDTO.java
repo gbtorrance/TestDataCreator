@@ -1,4 +1,4 @@
-package org.tdc.server.dto;
+package org.tdc.shared.dto;
 
 /**
  * Data Transfer Object for use with REST services. 

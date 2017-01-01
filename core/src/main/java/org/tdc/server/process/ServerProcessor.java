@@ -3,10 +3,10 @@ package org.tdc.server.process;
 import java.io.File;
 import java.util.List;
 
-import org.tdc.server.dto.BookConfigDTO;
-import org.tdc.server.dto.BookDTO;
-import org.tdc.server.dto.ModelConfigDTO;
-import org.tdc.server.dto.SchemaConfigDTO;
+import org.tdc.shared.dto.BookConfigDTO;
+import org.tdc.shared.dto.BookDTO;
+import org.tdc.shared.dto.ModelConfigDTO;
+import org.tdc.shared.dto.SchemaConfigDTO;
 
 public interface ServerProcessor {
 	List<SchemaConfigDTO> getSchemaConfigDTOs();

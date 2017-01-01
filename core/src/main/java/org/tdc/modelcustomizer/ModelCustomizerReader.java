@@ -13,8 +13,8 @@ import org.tdc.model.NonAttribNode;
 import org.tdc.model.TDCNode;
 import org.tdc.modeldef.ElementNodeDef;
 import org.tdc.modeldef.NodeDef;
+import org.tdc.shared.util.SharedConst;
 import org.tdc.spreadsheet.SpreadsheetFile;
-import org.tdc.util.Util;
 
 /**
  * Implementation of class with functionality for reading an existing customizer spreadsheet
@@ -87,9 +87,9 @@ public class ModelCustomizerReader extends AbstractModelCustomizer {
 	private void readOccursCountOverride(TDCNode node, boolean isAttrib) {
 		int row = getNodeRow(node);
 		int parentOverride = node.getParent() == null ? 
-				Util.UNDEFINED : getOccursOverride(node.getParent());
+				SharedConst.UNDEFINED : getOccursOverride(node.getParent());
 		int override = getOccursOverride(node);
-		if (override != Util.UNDEFINED) {
+		if (override != SharedConst.UNDEFINED) {
 			boolean allowInvalid = getConfig().getAllowMinMaxInvalidOccursCountOverride();
 			AttribNode attrib = isAttrib ? (AttribNode)node : null;
 			NonAttribNode nonAttrib = !isAttrib ? (NonAttribNode)node : null;
@@ -128,7 +128,7 @@ public class ModelCustomizerReader extends AbstractModelCustomizer {
 		int row = getNodeRow(node);
 		String overrideVariable = getConfig().getReadOccursCountOverrideFromVariable();
 		String overrideStr = node.getVariable(overrideVariable).trim();
-		int override = Util.UNDEFINED;
+		int override = SharedConst.UNDEFINED;
 		try {
 			if (overrideStr.length() > 0) {
 				override = Integer.parseUnsignedInt(overrideStr);
@@ -142,11 +142,11 @@ public class ModelCustomizerReader extends AbstractModelCustomizer {
 	}
 	
 	private void exception(int row, String invalidMsg, String actualValue, String expectedMsg) {
-		exception(row, Util.UNDEFINED, invalidMsg, actualValue, expectedMsg);
+		exception(row, SharedConst.UNDEFINED, invalidMsg, actualValue, expectedMsg);
 	}
 
 	private void exception(int row, int col, String invalidMsg, String actualValue, String expectedMsg) {
 		throw new RuntimeException(invalidMsg + " '" + actualValue + 
-				"' at row " + row + (col == Util.UNDEFINED ? "" : " col " + col) + "; " + expectedMsg);
+				"' at row " + row + (col == SharedConst.UNDEFINED ? "" : " col " + col) + "; " + expectedMsg);
 	}
 }

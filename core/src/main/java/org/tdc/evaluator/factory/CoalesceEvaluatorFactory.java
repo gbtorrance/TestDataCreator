@@ -3,9 +3,9 @@ package org.tdc.evaluator.factory;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.tdc.config.util.Config;
 import org.tdc.evaluator.CoalesceEvaluator;
 import org.tdc.evaluator.Evaluator;
+import org.tdc.shared.config.Config;
 import org.tdc.spreadsheet.CellStyle;
 
 /**

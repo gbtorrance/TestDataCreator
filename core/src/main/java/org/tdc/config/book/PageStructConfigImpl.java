@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import org.tdc.config.util.Config;
+import org.tdc.shared.config.Config;
 import org.tdc.spreadsheet.CellStyle;
 import org.tdc.util.Util;
 

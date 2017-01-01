@@ -1,6 +1,6 @@
 package org.tdc.model;
 
-import org.tdc.util.Util;
+import org.tdc.shared.util.SharedConst;
 
 /**
  * Abstract {@link TDCNode} implementation.
@@ -11,8 +11,8 @@ public abstract class AbstractTDCNode implements TDCNode {
 	private final ModelSharedState sharedState;
 	
 	private String mpath;
-	private int colOffset = Util.UNDEFINED;
-	private int rowOffset = Util.UNDEFINED;
+	private int colOffset = SharedConst.UNDEFINED;
+	private int rowOffset = SharedConst.UNDEFINED;
 
 	public AbstractTDCNode(TDCNode parent, ModelSharedState sharedState) {
 		this.parent = parent;

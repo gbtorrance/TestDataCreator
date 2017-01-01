@@ -6,7 +6,7 @@ import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.tdc.config.util.Config;
+import org.tdc.shared.config.Config;
 
 /**
  * A {@link SchemaExtractorFactory} implementation.

@@ -3,7 +3,7 @@ package org.tdc.config.book;
 import java.nio.file.Path;
 import java.util.List;
 
-import org.tdc.config.util.Config;
+import org.tdc.shared.config.Config;
 import org.tdc.util.Addr;
 
 /**

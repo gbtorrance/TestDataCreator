@@ -6,7 +6,7 @@ import java.nio.file.Path;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.tdc.config.book.TaskConfig;
-import org.tdc.config.util.Config;
+import org.tdc.shared.config.Config;
 import org.tdc.util.Addr;
 
 /**

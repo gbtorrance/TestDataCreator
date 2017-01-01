@@ -1,4 +1,4 @@
-package org.tdc.config.util;
+package org.tdc.shared.config;
 
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;

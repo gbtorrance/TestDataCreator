@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.xerces.xs.XSElementDeclaration;
-import org.tdc.config.util.Config;
+import org.tdc.shared.config.Config;
 
 /**
  * A {@link SchemaFilter} implementation.

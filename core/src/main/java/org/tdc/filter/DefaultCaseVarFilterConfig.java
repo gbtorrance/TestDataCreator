@@ -3,7 +3,7 @@ package org.tdc.filter;
 import java.nio.file.Path;
 
 import org.tdc.config.book.FilterConfig;
-import org.tdc.config.util.Config;
+import org.tdc.shared.config.Config;
 import org.tdc.util.Addr;
 
 /**

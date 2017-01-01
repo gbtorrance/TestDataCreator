@@ -3,7 +3,7 @@ package org.tdc.config.system;
 import java.nio.file.Path;
 import java.util.List;
 
-import org.tdc.config.util.Config;
+import org.tdc.shared.config.Config;
 
 /**
  * Interface defining factory for creating {@link InitializerConfig} instances based

@@ -11,10 +11,10 @@ import org.apache.xerces.dom.DocumentImpl;
 import org.apache.xerces.xs.XSAnnotation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.tdc.config.util.Config;
 import org.tdc.modeldef.AttribNodeDef;
 import org.tdc.modeldef.ElementNodeDef;
 import org.tdc.modeldef.NodeDef;
+import org.tdc.shared.config.Config;
 import org.w3c.dom.Node;
 
 /**

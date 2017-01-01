@@ -1,4 +1,4 @@
-package org.tdc.config.util;
+package org.tdc.shared.config;
 
 import java.util.Map;
 

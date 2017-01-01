@@ -1,4 +1,4 @@
-package org.tdc.config.util;
+package org.tdc.shared.config;
 
 import java.io.ByteArrayOutputStream;
 import java.nio.charset.Charset;

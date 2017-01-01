@@ -6,7 +6,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 import org.tdc.config.book.BookConfig;
-import org.tdc.server.dto.BookConfigDTO;
+import org.tdc.shared.dto.BookConfigDTO;
 
 /**
  * MapStruct Mapper to map {@link BookConfig} to {@link BookConfigDTO}.

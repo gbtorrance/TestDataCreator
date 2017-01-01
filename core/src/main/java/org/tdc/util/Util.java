@@ -9,20 +9,14 @@ import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 
-import org.tdc.config.util.Config;
+import org.tdc.shared.config.Config;
+import org.tdc.shared.util.SharedConst;
 
 /**
  * Static helper members and methods.
  */
 public class Util {
-	
-	public static final DateTimeFormatter DATE_TIME_FORMATTER = 
-			DateTimeFormatter.ofPattern("yyMMdd_kkmmss_SSS");
-	
-	public static final int UNDEFINED = -1;
-	public static final int NO_LIMIT = -1;
 	
 	/**
 	 * Returns a certain number of spaces.
@@ -164,7 +158,7 @@ public class Util {
 	public static Path createBatchDir(Path root, String prefix) {
 		String batchDirName = 
 				Util.legalizeName(prefix) + "_" + 
-				LocalDateTime.now().format(Util.DATE_TIME_FORMATTER);
+				LocalDateTime.now().format(SharedConst.DATE_TIME_FORMATTER);
 		Path batchDir = root.resolve(batchDirName);
 		Util.createDirectory(batchDir);
 		return batchDir;

@@ -6,7 +6,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 import org.tdc.config.schema.SchemaConfig;
-import org.tdc.server.dto.SchemaConfigDTO;
+import org.tdc.shared.dto.SchemaConfigDTO;
 
 /**
  * MapStruct Mapper to map {@link SchemaConfig} to {@link SchemaConfigDTO}.

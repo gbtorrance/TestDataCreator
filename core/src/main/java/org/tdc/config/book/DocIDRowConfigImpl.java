@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import org.tdc.config.util.Config;
+import org.tdc.shared.config.Config;
 
 /**
  * A {@link DocIDRowConfig} implementation.

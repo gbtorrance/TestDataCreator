@@ -9,7 +9,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.tdc.config.util.Config;
+import org.tdc.shared.config.Config;
 import org.tdc.util.Addr;
 
 /**

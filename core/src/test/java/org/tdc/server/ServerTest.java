@@ -29,13 +29,13 @@ import org.tdc.process.ModelProcessor;
 import org.tdc.process.ModelProcessorImpl;
 import org.tdc.process.SystemInitializer;
 import org.tdc.process.SystemInitializerImpl;
-import org.tdc.server.dto.BookConfigDTO;
-import org.tdc.server.dto.BookDTO;
-import org.tdc.server.dto.ModelConfigDTO;
-import org.tdc.server.dto.SchemaConfigDTO;
-import org.tdc.server.dto.TestCaseDTO;
-import org.tdc.server.dto.TestDocDTO;
-import org.tdc.server.dto.TestSetDTO;
+import org.tdc.shared.dto.BookConfigDTO;
+import org.tdc.shared.dto.BookDTO;
+import org.tdc.shared.dto.ModelConfigDTO;
+import org.tdc.shared.dto.SchemaConfigDTO;
+import org.tdc.shared.dto.TestCaseDTO;
+import org.tdc.shared.dto.TestDocDTO;
+import org.tdc.shared.dto.TestSetDTO;
 import org.tdc.util.Util;
 
 /**

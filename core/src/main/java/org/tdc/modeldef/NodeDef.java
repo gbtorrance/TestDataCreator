@@ -1,7 +1,7 @@
 package org.tdc.modeldef;
 
 import org.tdc.model.AbstractTDCNode;
-import org.tdc.util.Util;
+import org.tdc.shared.util.SharedConst;
 
 /**
  * {@link AbstractTDCNode} implementation specific to 'definition' nodes. 
@@ -11,7 +11,7 @@ import org.tdc.util.Util;
  */
 public abstract class NodeDef extends AbstractTDCNode {
 	
-	private int occursCountOverride = Util.UNDEFINED;
+	private int occursCountOverride = SharedConst.UNDEFINED;
 	
 	public NodeDef(NonAttribNodeDef parent, ModelDefSharedState sharedState) {
 		super(parent, sharedState);

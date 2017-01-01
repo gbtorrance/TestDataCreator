@@ -3,7 +3,7 @@ package org.tdc.config.book;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import org.tdc.config.util.Config;
+import org.tdc.shared.config.Config;
 
 /**
  * A {@link DocTypeConfig} implementation.

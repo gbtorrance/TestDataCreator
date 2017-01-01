@@ -15,8 +15,8 @@ import org.apache.xerces.xs.XSTypeDefinition;
 import org.apache.xerces.xs.XSValue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.tdc.config.util.Config;
 import org.tdc.modeldef.NodeDef;
+import org.tdc.shared.config.Config;
 
 /**
  * Implementation of {@link SchemaDataTypeExtractor}.

@@ -19,8 +19,8 @@ import javax.ws.rs.core.Response;
 import org.jboss.resteasy.annotations.providers.jackson.Formatted;
 import org.jboss.resteasy.plugins.providers.multipart.InputPart;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
-import org.tdc.server.dto.BookDTO;
 import org.tdc.server.process.ServerProcessor;
+import org.tdc.shared.dto.BookDTO;
 
 /**
  * REST Resource for uploading and processing Book spreadsheets.

@@ -3,8 +3,8 @@ package org.tdc.spreadsheet;
 import java.awt.Color;
 import java.util.Objects;
 
-import org.tdc.config.util.Config;
-import org.tdc.util.Util;
+import org.tdc.shared.config.Config;
+import org.tdc.shared.util.SharedConst;
 
 /**
  * A {@link CellStyle} implementation.
@@ -65,17 +65,17 @@ public class CellStyleImpl implements CellStyle {
 
 	@Override
 	public int getColorRed() {
-		return color == null ? Util.UNDEFINED : color.getRed();
+		return color == null ? SharedConst.UNDEFINED : color.getRed();
 	}
 
 	@Override
 	public int getColorGreen() {
-		return color == null ? Util.UNDEFINED : color.getGreen();
+		return color == null ? SharedConst.UNDEFINED : color.getGreen();
 	}
 
 	@Override
 	public int getColorBlue() {
-		return color == null ? Util.UNDEFINED : color.getBlue();
+		return color == null ? SharedConst.UNDEFINED : color.getBlue();
 	}
 
 	@Override
@@ -90,17 +90,17 @@ public class CellStyleImpl implements CellStyle {
 
 	@Override
 	public int getFillColorRed() {
-		return fillColor == null ? Util.UNDEFINED : fillColor.getRed();
+		return fillColor == null ? SharedConst.UNDEFINED : fillColor.getRed();
 	}
 
 	@Override
 	public int getFillColorGreen() {
-		return fillColor == null ? Util.UNDEFINED : fillColor.getGreen();
+		return fillColor == null ? SharedConst.UNDEFINED : fillColor.getGreen();
 	}
 
 	@Override
 	public int getFillColorBlue() {
-		return fillColor == null ? Util.UNDEFINED : fillColor.getBlue();
+		return fillColor == null ? SharedConst.UNDEFINED : fillColor.getBlue();
 	}
 
 	@Override

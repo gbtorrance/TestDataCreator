@@ -6,7 +6,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 import org.tdc.config.model.ModelConfig;
-import org.tdc.server.dto.ModelConfigDTO;
+import org.tdc.shared.dto.ModelConfigDTO;
 
 /**
  * MapStruct Mapper to map {@link ModelConfig} to {@link ModelConfigDTO}.

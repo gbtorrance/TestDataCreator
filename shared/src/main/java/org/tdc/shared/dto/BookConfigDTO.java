@@ -1,13 +1,10 @@
-package org.tdc.server.dto;
-
-import java.util.List;
+package org.tdc.shared.dto;
 
 /**
  * Data Transfer Object for use with REST services. 
  */
-public class BookDTO {
+public class BookConfigDTO {
 	private String addr;
-	private List<TestSetDTO> testSets;
 	
 	public String getBookAddress() {
 		return addr;
@@ -15,14 +12,6 @@ public class BookDTO {
 	
 	public void setBookAddress(String addr) {
 		this.addr = addr;
-	}
-
-	public List<TestSetDTO> getTestSets() {
-		return testSets;
-	}
-
-	public void setTestSets(List<TestSetDTO> testSets) {
-		this.testSets = testSets;
 	}
 	
 	@Override
