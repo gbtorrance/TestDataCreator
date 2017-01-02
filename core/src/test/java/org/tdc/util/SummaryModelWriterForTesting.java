@@ -4,7 +4,7 @@ import org.tdc.model.AttribNode;
 import org.tdc.model.CompositorNode;
 import org.tdc.model.ElementNode;
 import org.tdc.model.TDCNode;
-import org.tdc.util.Util;
+import org.tdc.shared.util.SharedUtil;
 
 /**
  * A {@link AbstractModelWriterForTesting} implementation for creating 
@@ -24,7 +24,7 @@ public class SummaryModelWriterForTesting extends AbstractModelWriterForTesting 
 	@Override
 	protected String tempBuildNodeString(TDCNode node, int level) {
 		String summary = getTestSummaryString(node);
-		return Util.spaces(level * getIndentSize()) + summary;
+		return SharedUtil.spaces(level * getIndentSize()) + summary;
 	}
 	
 	private String getTestSummaryString(TDCNode node) {

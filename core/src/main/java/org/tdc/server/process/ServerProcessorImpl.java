@@ -31,6 +31,8 @@ import org.tdc.shared.dto.BookConfigDTO;
 import org.tdc.shared.dto.BookDTO;
 import org.tdc.shared.dto.ModelConfigDTO;
 import org.tdc.shared.dto.SchemaConfigDTO;
+import org.tdc.shared.dto.ServerInfoDTO;
+import org.tdc.shared.util.SharedConst;
 import org.tdc.util.Cache;
 import org.tdc.util.LRUCache;
 import org.tdc.util.Util;
@@ -50,6 +52,7 @@ public class ServerProcessorImpl implements ServerProcessor {
 	private final List<SchemaConfig> schemaConfigs;
 	private final List<ModelConfig> modelConfigs;
 	private final List<BookConfig> bookConfigs;
+	private final ServerInfoDTO serverInfoDTO;
 	private final List<SchemaConfigDTO> schemaConfigDTOs;
 	private final List<ModelConfigDTO> modelConfigDTOs;
 	private final List<BookConfigDTO> bookConfigDTOs;
@@ -65,10 +68,16 @@ public class ServerProcessorImpl implements ServerProcessor {
 		this.schemaConfigs = builder.schemaConfigs;
 		this.modelConfigs = builder.modelConfigs;
 		this.bookConfigs = builder.bookConfigs;
+		this.serverInfoDTO = builder.serverInfoDTO;
 		this.schemaConfigDTOs = builder.schemaConfigDTOs;
 		this.modelConfigDTOs = builder.modelConfigDTOs;
 		this.bookConfigDTOs = builder.bookConfigDTOs;
 		this.bookCache = builder.bookCache;
+	}
+	
+	@Override
+	public ServerInfoDTO getServerInfoDTO() {
+		return serverInfoDTO;
 	}
 	
 	@Override
@@ -203,6 +212,7 @@ public class ServerProcessorImpl implements ServerProcessor {
 		private final ModelProcessor modelProcessor;
 		private final BookProcessor bookProcessor;
 		
+		private ServerInfoDTO serverInfoDTO;
 		private List<SchemaConfig> schemaConfigs;
 		private List<ModelConfig> modelConfigs;
 		private List<BookConfig> bookConfigs;
@@ -229,6 +239,7 @@ public class ServerProcessorImpl implements ServerProcessor {
 		}
 		
 		public ServerProcessor build() {
+			initServerInfoDTO();
 			schemaConfigs = schemaConfigFactory.getAllSchemaConfigs(null); // TODO handle error list
 			modelConfigs = modelConfigFactory.getAllModelConfigs(null); // TODO handle error list
 			bookConfigs = bookConfigFactory.getAllBookConfigs(null); // TODO handle error list
@@ -244,6 +255,13 @@ public class ServerProcessorImpl implements ServerProcessor {
 			ensureBooksWorkingRootExists();
 			bookCache = new LRUCache<>(serverConfig.getBookCacheMaxSize());
 			return new ServerProcessorImpl(this);
+		}
+
+		private void initServerInfoDTO() {
+			serverInfoDTO = new ServerInfoDTO();
+			serverInfoDTO.setServerStartTime(LocalDateTime
+					.now()
+					.format(SharedConst.DT_FORMAT_USER));
 		}
 
 		private void ensureBooksWorkingRootExists() {

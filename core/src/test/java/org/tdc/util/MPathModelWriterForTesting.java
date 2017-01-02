@@ -1,7 +1,7 @@
 package org.tdc.util;
 
 import org.tdc.model.TDCNode;
-import org.tdc.util.Util;
+import org.tdc.shared.util.SharedUtil;
 
 /**
  * A {@link AbstractModelWriterForTesting} implementation for creating MPath node representations.
@@ -15,6 +15,6 @@ public class MPathModelWriterForTesting extends AbstractModelWriterForTesting {
 	@Override
 	protected String tempBuildNodeString(TDCNode node, int level) {
 		String mpath = node.getMPath();
-		return Util.spaces(level * getIndentSize()) + mpath;
+		return SharedUtil.spaces(level * getIndentSize()) + mpath;
 	}
 }

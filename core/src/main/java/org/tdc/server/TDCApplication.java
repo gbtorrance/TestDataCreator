@@ -12,6 +12,7 @@ import org.tdc.server.resource.BooksResource;
 import org.tdc.server.resource.ConfigBooksResource;
 import org.tdc.server.resource.ConfigModelsResource;
 import org.tdc.server.resource.ConfigSchemasResource;
+import org.tdc.server.resource.ServerResource;
 
 /**
  * REST application for providing TDC services.
@@ -28,11 +29,13 @@ public class TDCApplication extends Application {
 
 		serverProcessor = (ServerProcessor)servletContext.getAttribute(ATTRIB_SERVER_PROCESSOR);
 		
+		ServerResource serverResource = new ServerResource(serverProcessor);
 		ConfigSchemasResource configSchemasResource = new ConfigSchemasResource(serverProcessor);
 		ConfigModelsResource configModelsResource = new ConfigModelsResource(serverProcessor);
 		ConfigBooksResource configBooksResource = new ConfigBooksResource(serverProcessor);
 		BooksResource booksResource =  new BooksResource(serverProcessor); 
 
+		singletons.add(serverResource);
 		singletons.add(configSchemasResource);
 		singletons.add(configModelsResource);
 		singletons.add(configBooksResource);

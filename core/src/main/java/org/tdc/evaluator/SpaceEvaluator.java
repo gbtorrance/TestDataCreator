@@ -2,7 +2,7 @@ package org.tdc.evaluator;
 
 import org.tdc.evaluator.result.ValueResult;
 import org.tdc.model.TDCNode;
-import org.tdc.util.Util;
+import org.tdc.shared.util.SharedUtil;
 
 /**
  * An {@link Evaluator} implementation for spaces.
@@ -31,7 +31,7 @@ public class SpaceEvaluator implements Evaluator {
 	private final ValueResult spaceResult;
 	
 	public SpaceEvaluator(int size) {
-		this.spaceResult = size == 1 ? SPACE_1 : new ValueResult(Util.spaces(size)); 
+		this.spaceResult = size == 1 ? SPACE_1 : new ValueResult(SharedUtil.spaces(size)); 
 	}
 	
 	@Override

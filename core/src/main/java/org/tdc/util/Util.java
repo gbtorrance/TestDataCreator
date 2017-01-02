@@ -12,36 +12,13 @@ import java.time.LocalDateTime;
 
 import org.tdc.shared.config.Config;
 import org.tdc.shared.util.SharedConst;
+import org.tdc.shared.util.SharedUtil;
 
 /**
  * Static helper members and methods.
  */
 public class Util {
 	
-	/**
-	 * Returns a certain number of spaces.
-	 * 
-	 * @param count Number of spaces to return.
-	 * @return String containing spaces.
-	 */
-	public static String spaces(int count) {
-		return new String(new char[count]).replace('\0', ' ');
-	}
-	
-	/**
-	 * Replaces any character in a string that is not a 
-	 * letter, number, or underscore with an underscore.
-	 * 
-	 * <p>This doesn't guaranteed that any resulting folder or file name will be legal;
-	 * the various file system rules about legal names are extremely complex, but it's a start.
-	 * 
-	 * @param name A name that might contain illegal characters.
-	 * @return The name with potentially illegal characters stripped out.
-	 */
-	public static String legalizeName(String name) {
-		return name.replaceAll("\\W+", "_");
-	}
-
 	/**
 	 * Extracts a "property" value from an object using Reflection. 
 	 * The property name prefixed with "get" indicates the name of the method to call.
@@ -157,8 +134,8 @@ public class Util {
 	 */
 	public static Path createBatchDir(Path root, String prefix) {
 		String batchDirName = 
-				Util.legalizeName(prefix) + "_" + 
-				LocalDateTime.now().format(SharedConst.DATE_TIME_FORMATTER);
+				SharedUtil.legalizeName(prefix) + "_" + 
+				LocalDateTime.now().format(SharedConst.DT_FORMAT_SORTABLE);
 		Path batchDir = root.resolve(batchDirName);
 		Util.createDirectory(batchDir);
 		return batchDir;

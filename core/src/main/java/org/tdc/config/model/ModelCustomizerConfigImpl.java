@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.tdc.evaluator.factory.GeneralEvaluatorFactory;
 import org.tdc.shared.config.Config;
+import org.tdc.shared.util.SharedUtil;
 import org.tdc.spreadsheet.CellStyle;
 import org.tdc.spreadsheet.CellStyleImpl;
 import org.tdc.util.Util;
@@ -221,7 +222,7 @@ public class ModelCustomizerConfigImpl implements ModelCustomizerConfig {
 			if (config.hasNode(CONFIG_PREFIX)) {
 				String fileNamePrefix = config.getString(
 						CONFIG_PREFIX + ".FileNamePrefix", "Customizer_", false);
-				String fileName = Util.legalizeName(fileNamePrefix + modelName) + ".xlsx";
+				String fileName = SharedUtil.legalizeName(fileNamePrefix + modelName) + ".xlsx";
 				filePath = modelConfigRoot.resolve(fileName);
 				defaultStyle = new CellStyleImpl.Builder().setFromConfig(
 						config, CONFIG_PREFIX + ".DefaultStyle", null, true).build();

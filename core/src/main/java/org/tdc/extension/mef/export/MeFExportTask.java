@@ -20,6 +20,7 @@ import org.tdc.filter.Filter;
 import org.tdc.result.Message;
 import org.tdc.result.Results;
 import org.tdc.result.TaskResult;
+import org.tdc.shared.util.SharedUtil;
 import org.tdc.task.AbstractTask;
 import org.tdc.task.Task;
 import org.tdc.util.Util;
@@ -193,7 +194,7 @@ public class MeFExportTask extends AbstractTask {
 			// prefix dir with an index value to ensure that there will
 			// never be a clash if two 'legalized names' end up 
 			// being the same
-			String suffix = setName.equals("") ? "DefaultSet" : Util.legalizeName(setName); 
+			String suffix = setName.equals("") ? "DefaultSet" : SharedUtil.legalizeName(setName); 
 			setDir = setDir.resolve(index + "_" + suffix);
 			Util.createDirectory(setDir);
 		}
