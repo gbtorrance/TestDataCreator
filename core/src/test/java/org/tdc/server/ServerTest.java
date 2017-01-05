@@ -12,7 +12,6 @@ import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.GenericEntity;
-import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
@@ -30,9 +29,12 @@ import org.tdc.process.ModelProcessorImpl;
 import org.tdc.process.SystemInitializer;
 import org.tdc.process.SystemInitializerImpl;
 import org.tdc.shared.dto.BookConfigDTO;
+import org.tdc.shared.dto.BookConfigsDTO;
 import org.tdc.shared.dto.BookDTO;
 import org.tdc.shared.dto.ModelConfigDTO;
+import org.tdc.shared.dto.ModelConfigsDTO;
 import org.tdc.shared.dto.SchemaConfigDTO;
+import org.tdc.shared.dto.SchemaConfigsDTO;
 import org.tdc.shared.dto.TestCaseDTO;
 import org.tdc.shared.dto.TestDocDTO;
 import org.tdc.shared.dto.TestSetDTO;
@@ -100,9 +102,10 @@ public class ServerTest {
 	public void testConfigSchemas() throws IOException {
 		String target = urlPrefix + "/tdc/config/schemas";
 		Response response = client.target(target).request().get();
-		List<SchemaConfigDTO> list = response.readEntity(new GenericType<List<SchemaConfigDTO>>(){});
+		SchemaConfigsDTO configs = response.readEntity(SchemaConfigsDTO.class);
 		response.close();
 		int foundCount = 0;
+		List<SchemaConfigDTO> list = configs.getSchemaConfigs();
 		for (SchemaConfigDTO dto : list) {
 			if (dto.getSchemaAddress().equals("ConfigTest/SchemaConfigTest")) {
 				foundCount++;
@@ -118,9 +121,10 @@ public class ServerTest {
 	public void testConfigModels() throws IOException {
 		String target = urlPrefix + "/tdc/config/models";
 		Response response = client.target(target).request().get();
-		List<ModelConfigDTO> list = response.readEntity(new GenericType<List<ModelConfigDTO>>(){});
+		ModelConfigsDTO configs = response.readEntity(ModelConfigsDTO.class);
 		response.close();
 		int foundCount = 0;
+		List<ModelConfigDTO> list = configs.getModelConfigs();
 		for (ModelConfigDTO dto : list) {
 			if (dto.getModelAddress().equals("ConfigTest/SchemaConfigTest/ModelConfigTest")) {
 				foundCount++;
@@ -136,9 +140,10 @@ public class ServerTest {
 	public void testConfigBooks() throws IOException {
 		String target = urlPrefix + "/tdc/config/books";
 		Response response = client.target(target).request().get();
-		List<BookConfigDTO> list = response.readEntity(new GenericType<List<BookConfigDTO>>(){});
+		BookConfigsDTO configs = response.readEntity(BookConfigsDTO.class);
 		response.close();
 		int foundCount = 0;
+		List<BookConfigDTO> list = configs.getBookConfigs();
 		for (BookConfigDTO dto : list) {
 			if (dto.getBookAddress().equals("ConfigTest/BookConfigTest")) {
 				foundCount++;

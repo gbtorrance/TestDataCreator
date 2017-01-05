@@ -169,4 +169,19 @@ public class Util {
 		}
 		return labels;
 	}
+	
+	/**
+	 * Returns a concatenated list of all messages of a Throwable 
+	 * (and all 'causing' Throwables).
+	 * 
+	 * @param throwable Throwable for which to extract messages.
+	 * @return String containing all messages.
+	 */
+	public static String getAllMessages(Throwable throwable) {
+		String message = throwable.getMessage();
+		if (throwable.getCause() != null) {
+			message += " / " + getAllMessages(throwable.getCause());
+		}
+		return message;
+	}
 }

@@ -555,8 +555,9 @@ public class CLIOperations {
 	private void outputErrors(Map<Addr, Exception> errors) {
 		if (errors.size() > 0) {
 			output("Errors:");
-			for (Entry<Addr, Exception> e : errors.entrySet()) {
-				output(1, e.getKey() + " (" + e.getValue().getMessage() + ")");
+			for (Entry<Addr, Exception> entry : errors.entrySet()) {
+				String errorMessage = Util.getAllMessages(entry.getValue());
+				output(1, entry.getKey() + " (" + errorMessage + ")");
 			}
 		}
 	}

@@ -1,12 +1,11 @@
 package org.tdc.server.process;
 
 import java.io.File;
-import java.util.List;
 
-import org.tdc.shared.dto.BookConfigDTO;
+import org.tdc.shared.dto.BookConfigsDTO;
 import org.tdc.shared.dto.BookDTO;
-import org.tdc.shared.dto.ModelConfigDTO;
-import org.tdc.shared.dto.SchemaConfigDTO;
+import org.tdc.shared.dto.ModelConfigsDTO;
+import org.tdc.shared.dto.SchemaConfigsDTO;
 import org.tdc.shared.dto.ServerInfoDTO;
 
 /**
@@ -14,9 +13,9 @@ import org.tdc.shared.dto.ServerInfoDTO;
  */
 public interface ServerProcessor {
 	ServerInfoDTO getServerInfoDTO();
-	List<SchemaConfigDTO> getSchemaConfigDTOs();
-	List<ModelConfigDTO> getModelConfigDTOs();
-	List<BookConfigDTO> getBookConfigDTOs();
+	SchemaConfigsDTO getSchemaConfigsDTO();
+	ModelConfigsDTO getModelConfigsDTO();
+	BookConfigsDTO getBookConfigsDTO();
 	String uploadBookFile(File bookFile);
 	BookDTO getBookInfo(String bookID);
 }

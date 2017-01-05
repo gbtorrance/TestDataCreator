@@ -8,8 +8,9 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,12 +28,13 @@ import org.tdc.server.mapper.BookConfigMapper;
 import org.tdc.server.mapper.BookMapper;
 import org.tdc.server.mapper.ModelConfigMapper;
 import org.tdc.server.mapper.SchemaConfigMapper;
-import org.tdc.shared.dto.BookConfigDTO;
+import org.tdc.shared.dto.BookConfigsDTO;
 import org.tdc.shared.dto.BookDTO;
-import org.tdc.shared.dto.ModelConfigDTO;
-import org.tdc.shared.dto.SchemaConfigDTO;
+import org.tdc.shared.dto.ModelConfigsDTO;
+import org.tdc.shared.dto.SchemaConfigsDTO;
 import org.tdc.shared.dto.ServerInfoDTO;
 import org.tdc.shared.util.SharedConst;
+import org.tdc.util.Addr;
 import org.tdc.util.Cache;
 import org.tdc.util.LRUCache;
 import org.tdc.util.Util;
@@ -49,13 +51,10 @@ public class ServerProcessorImpl implements ServerProcessor {
 	private final ServerConfig serverConfig;
 	private final ModelProcessor modelProcessor;
 	private final BookProcessor bookProcessor;
-	private final List<SchemaConfig> schemaConfigs;
-	private final List<ModelConfig> modelConfigs;
-	private final List<BookConfig> bookConfigs;
 	private final ServerInfoDTO serverInfoDTO;
-	private final List<SchemaConfigDTO> schemaConfigDTOs;
-	private final List<ModelConfigDTO> modelConfigDTOs;
-	private final List<BookConfigDTO> bookConfigDTOs;
+	private final SchemaConfigsDTO schemaConfigsDTO;
+	private final ModelConfigsDTO modelConfigsDTO;
+	private final BookConfigsDTO bookConfigsDTO;
 	private final Cache<String,Book> bookCache;
 	
 	private int currentYearPlusDay;
@@ -65,13 +64,10 @@ public class ServerProcessorImpl implements ServerProcessor {
 		this.serverConfig = builder.serverConfig;
 		this.modelProcessor = builder.modelProcessor;
 		this.bookProcessor = builder.bookProcessor;
-		this.schemaConfigs = builder.schemaConfigs;
-		this.modelConfigs = builder.modelConfigs;
-		this.bookConfigs = builder.bookConfigs;
 		this.serverInfoDTO = builder.serverInfoDTO;
-		this.schemaConfigDTOs = builder.schemaConfigDTOs;
-		this.modelConfigDTOs = builder.modelConfigDTOs;
-		this.bookConfigDTOs = builder.bookConfigDTOs;
+		this.schemaConfigsDTO = builder.schemaConfigsDTO;
+		this.modelConfigsDTO = builder.modelConfigsDTO;
+		this.bookConfigsDTO = builder.bookConfigsDTO;
 		this.bookCache = builder.bookCache;
 	}
 	
@@ -81,18 +77,18 @@ public class ServerProcessorImpl implements ServerProcessor {
 	}
 	
 	@Override
-	public List<SchemaConfigDTO> getSchemaConfigDTOs() {
-		return schemaConfigDTOs;
+	public SchemaConfigsDTO getSchemaConfigsDTO() {
+		return schemaConfigsDTO;
 	}
 
 	@Override
-	public List<ModelConfigDTO> getModelConfigDTOs() {
-		return modelConfigDTOs;
+	public ModelConfigsDTO getModelConfigsDTO() {
+		return modelConfigsDTO;
 	}
 
 	@Override
-	public List<BookConfigDTO> getBookConfigDTOs() {
-		return bookConfigDTOs;
+	public BookConfigsDTO getBookConfigsDTO() {
+		return bookConfigsDTO;
 	}
 	
 	@Override
@@ -213,12 +209,9 @@ public class ServerProcessorImpl implements ServerProcessor {
 		private final BookProcessor bookProcessor;
 		
 		private ServerInfoDTO serverInfoDTO;
-		private List<SchemaConfig> schemaConfigs;
-		private List<ModelConfig> modelConfigs;
-		private List<BookConfig> bookConfigs;
-		private List<SchemaConfigDTO> schemaConfigDTOs;
-		private List<ModelConfigDTO> modelConfigDTOs;
-		private List<BookConfigDTO> bookConfigDTOs;
+		private SchemaConfigsDTO schemaConfigsDTO;
+		private ModelConfigsDTO modelConfigsDTO;
+		private BookConfigsDTO bookConfigsDTO;
 		
 		private Cache<String,Book> bookCache;
 
@@ -240,18 +233,7 @@ public class ServerProcessorImpl implements ServerProcessor {
 		
 		public ServerProcessor build() {
 			initServerInfoDTO();
-			schemaConfigs = schemaConfigFactory.getAllSchemaConfigs(null); // TODO handle error list
-			modelConfigs = modelConfigFactory.getAllModelConfigs(null); // TODO handle error list
-			bookConfigs = bookConfigFactory.getAllBookConfigs(null); // TODO handle error list
-			schemaConfigDTOs = SchemaConfigMapper.INSTANCE.schemaConfigsToSchemaConfigDTOs(schemaConfigs);
-			modelConfigDTOs = ModelConfigMapper.INSTANCE.modelConfigsToModelConfigDTOs(modelConfigs);
-			bookConfigDTOs = BookConfigMapper.INSTANCE.bookConfigsToBookConfigDTOs(bookConfigs);
-			schemaConfigs = Collections.unmodifiableList(schemaConfigs); // unmodifiable
-			modelConfigs = Collections.unmodifiableList(modelConfigs); // unmodifiable
-			bookConfigs = Collections.unmodifiableList(bookConfigs); // unmodifiable
-			schemaConfigDTOs = Collections.unmodifiableList(schemaConfigDTOs); // unmodifiable
-			modelConfigDTOs = Collections.unmodifiableList(modelConfigDTOs); // unmodifiable
-			bookConfigDTOs = Collections.unmodifiableList(bookConfigDTOs); // unmodifiable
+			initConfigDTOs();
 			ensureBooksWorkingRootExists();
 			bookCache = new LRUCache<>(serverConfig.getBookCacheMaxSize());
 			return new ServerProcessorImpl(this);
@@ -259,9 +241,25 @@ public class ServerProcessorImpl implements ServerProcessor {
 
 		private void initServerInfoDTO() {
 			serverInfoDTO = new ServerInfoDTO();
-			serverInfoDTO.setServerStartTime(LocalDateTime
-					.now()
-					.format(SharedConst.DT_FORMAT_USER));
+			serverInfoDTO.setServerStartTime(
+					LocalDateTime.now().format(SharedConst.DT_FORMAT_USER));
+		}
+
+		private void initConfigDTOs() {
+			Map<Addr, Exception> exceptions = new HashMap<>();
+			List<SchemaConfig> schemaConfigs = schemaConfigFactory.getAllSchemaConfigs(exceptions);
+			schemaConfigsDTO = SchemaConfigMapper.INSTANCE
+					.schemaConfigsToSchemaConfigsDTO(schemaConfigs, exceptions);
+
+			exceptions.clear();
+			List<ModelConfig> modelConfigs = modelConfigFactory.getAllModelConfigs(exceptions);
+			modelConfigsDTO = ModelConfigMapper.INSTANCE
+					.modelConfigsToModelConfigsDTO(modelConfigs, exceptions);
+			
+			exceptions.clear();
+			List<BookConfig> bookConfigs = bookConfigFactory.getAllBookConfigs(exceptions);
+			bookConfigsDTO = BookConfigMapper.INSTANCE
+					.bookConfigsToBookConfigsDTO(bookConfigs, exceptions);
 		}
 
 		private void ensureBooksWorkingRootExists() {

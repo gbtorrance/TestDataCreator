@@ -7,16 +7,19 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import org.tdc.client.config.ClientConfig;
 import org.tdc.client.config.ClientConfigImpl;
 import org.tdc.client.config.ProfileConfig;
 import org.tdc.client.profile.Profile;
 import org.tdc.client.profile.ProfileImpl;
+import org.tdc.shared.dto.AddrErrorDTO;
 import org.tdc.shared.dto.BookConfigDTO;
+import org.tdc.shared.dto.BookConfigsDTO;
 import org.tdc.shared.dto.ModelConfigDTO;
+import org.tdc.shared.dto.ModelConfigsDTO;
 import org.tdc.shared.dto.SchemaConfigDTO;
+import org.tdc.shared.dto.SchemaConfigsDTO;
 import org.tdc.shared.util.SharedUtil;
 
 import joptsimple.OptionException;
@@ -267,45 +270,33 @@ public class CLIOperations {
 	}
 
 	private void outputSchemaConfigsList() {
-		Map<String, Exception> errors = new HashMap<>();
-		List<SchemaConfigDTO> schemaConfigDTOs = 
-				profile.getAllSchemaConfigs(errors);
+		SchemaConfigsDTO schemaConfigsDTO = profile.getAllSchemaConfigs();
 		output("Schema Config addresses:");
-		for (SchemaConfigDTO schemaConfigDTO : schemaConfigDTOs) {
+		for (SchemaConfigDTO schemaConfigDTO : schemaConfigsDTO.getSchemaConfigs()) {
 			String addr = schemaConfigDTO.getSchemaAddress();
 			output(1, addr);
 		}
-		outputErrors(errors);
+		outputErrors(schemaConfigsDTO.getErrors());
 	}
 
 	private void outputModelConfigsList() {
-		Map<String, Exception> errors = new HashMap<>();
-		List<ModelConfigDTO> modelConfigDTOs = 
-				profile.getAllModelConfigs(errors);
+		ModelConfigsDTO modelConfigsDTO = profile.getAllModelConfigs();
 		output("Model Config addresses:");
-		for (ModelConfigDTO modelConfigDTO : modelConfigDTOs) {
+		for (ModelConfigDTO modelConfigDTO : modelConfigsDTO.getModelConfigs()) {
 			String addr = modelConfigDTO.getModelAddress();
-			String name = modelConfigDTO.getModelName();
-			String desc = modelConfigDTO.getModelDescription();
-			String nameDesc = name + (desc.length() == 0 ? "" : ": " + desc);
-			output(1, addr + " (" + nameDesc + ")");
+			output(1, addr);
 		}
-		outputErrors(errors);
+		outputErrors(modelConfigsDTO.getErrors());
 	}
 
 	private void outputBookConfigsList() {
-		Map<String, Exception> errors = new HashMap<>();
-		List<BookConfigDTO> bookConfigDTOs = 
-				profile.getAllBookConfigs(errors);
+		BookConfigsDTO bookConfigsDTO = profile.getAllBookConfigs();
 		output("Book Config addresses:");
-		for (BookConfigDTO bookConfigDTO : bookConfigDTOs) {
+		for (BookConfigDTO bookConfigDTO : bookConfigsDTO.getBookConfigs()) {
 			String addr = bookConfigDTO.getBookAddress();
-			String name = bookConfigDTO.getBookName();
-			String desc = bookConfigDTO.getBookDescription();
-			String nameDesc = name + (desc.length() == 0 ? "" : ": " + desc);
-			output(1, addr + " (" + nameDesc + ")");
+			output(1, addr);
 		}
-		outputErrors(errors);
+		outputErrors(bookConfigsDTO.getErrors());
 	}
 
 	private void executeProcessBook(
@@ -439,11 +430,11 @@ public class CLIOperations {
 	}
 	*/
 
-	private void outputErrors(Map<String, Exception> errors) {
-		if (errors.size() > 0) {
+	private void outputErrors(List<AddrErrorDTO> list) {
+		if (list.size() > 0) {
 			output("Errors:");
-			for (Entry<String, Exception> e : errors.entrySet()) {
-				output(1, e.getKey() + " (" + e.getValue().getMessage() + ")");
+			for (AddrErrorDTO e : list) {
+				output(1, e.getAddr() + " (" + e.getErrorMessage() + ")");
 			}
 		}
 	}

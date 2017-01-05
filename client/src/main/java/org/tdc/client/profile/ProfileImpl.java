@@ -1,16 +1,13 @@
 package org.tdc.client.profile;
 
-import java.util.List;
-import java.util.Map;
-
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.core.Response;
 
 import org.tdc.client.config.ProfileConfig;
-import org.tdc.shared.dto.BookConfigDTO;
-import org.tdc.shared.dto.ModelConfigDTO;
-import org.tdc.shared.dto.SchemaConfigDTO;
+import org.tdc.shared.dto.BookConfigsDTO;
+import org.tdc.shared.dto.ModelConfigsDTO;
+import org.tdc.shared.dto.SchemaConfigsDTO;
 import org.tdc.shared.dto.ServerInfoDTO;
 
 /**
@@ -68,21 +65,36 @@ public class ProfileImpl implements Profile {
 	}
 	
 	@Override
-	public List<SchemaConfigDTO> getAllSchemaConfigs(Map<String, Exception> errors) {
-		// TODO Auto-generated method stub
-		return null;
+	public SchemaConfigsDTO getAllSchemaConfigs() {
+		lastStatus = 0;
+		String target = urlPrefix + "/tdc/config/schemas";
+		Response response = client.target(target).request().get();
+		lastStatus = response.getStatus();
+		SchemaConfigsDTO configs = response.readEntity(SchemaConfigsDTO.class);
+		response.close();
+		return configs;
 	}
 
 	@Override
-	public List<ModelConfigDTO> getAllModelConfigs(Map<String, Exception> errors) {
-		// TODO Auto-generated method stub
-		return null;
+	public ModelConfigsDTO getAllModelConfigs() {
+		lastStatus = 0;
+		String target = urlPrefix + "/tdc/config/models";
+		Response response = client.target(target).request().get();
+		lastStatus = response.getStatus();
+		ModelConfigsDTO configs = response.readEntity(ModelConfigsDTO.class);
+		response.close();
+		return configs;
 	}
 
 	@Override
-	public List<BookConfigDTO> getAllBookConfigs(Map<String, Exception> errors) {
-		// TODO Auto-generated method stub
-		return null;
+	public BookConfigsDTO getAllBookConfigs() {
+		lastStatus = 0;
+		String target = urlPrefix + "/tdc/config/books";
+		Response response = client.target(target).request().get();
+		lastStatus = response.getStatus();
+		BookConfigsDTO configs = response.readEntity(BookConfigsDTO.class);
+		response.close();
+		return configs;
 	}
 
 	@Override
