@@ -2,7 +2,7 @@
 
  [![Build Status](https://travis-ci.org/gbtorrance/TestDataCreator.svg?branch=master)](https://travis-ci.org/gbtorrance/TestDataCreator)  [![MIT licensed](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/gbtorrance/TestDataCreator/master/LICENSE)
 
-*TestDataCreator* (*TDC*) helps **non-technical users** easily create **complex XML documents** with nothing more than a basic understanding of **Microsoft Excel**. It is ideal for testing systems that require XML input files, but can be used in almost any context where XML Schemas are available and XML documents need to be created.
+*TestDataCreator* (*TDC*) helps **non-technical users** easily create and validate **complex XML documents** with nothing more than a basic understanding of **Microsoft Excel**. It is ideal for testing systems that require XML input files, but can be used in almost any context where XML Schemas are available and XML documents need to be created.
 
 ![screenshot1](https://cloud.githubusercontent.com/assets/16735709/13554422/742b89f0-e375-11e5-9f1a-1164e6ebb730.JPG)
 
