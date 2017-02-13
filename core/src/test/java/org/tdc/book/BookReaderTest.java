@@ -45,7 +45,8 @@ public class BookReaderTest {
 	public void testReadBookAndValidate() throws IOException {
 		Path bookPath = Paths.get("testfiles/SampleFiles/TestBook.xlsx");
 		Path targetPath = Paths.get("testfiles/Temp/TestBookWithLog.xlsx");
-		Util.purgeDirectory(Paths.get("testfiles/Temp/ExportRoot"));
+		Util.purgeDirectory(Paths.get("testfiles/Temp/ExportRoot"), 
+				Paths.get("testfiles/Temp/ExportRoot/.gitignore"));
 		Files.deleteIfExists(targetPath);
 		
 		bookProcessor.loadAndProcessBook(

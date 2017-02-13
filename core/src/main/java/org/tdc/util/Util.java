@@ -3,6 +3,7 @@ package org.tdc.util;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.nio.file.DirectoryNotEmptyException;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -74,19 +75,33 @@ public class Util {
 	 * 
 	 * @param dir Path of directory to purge.
 	 */
-	public static void purgeDirectory(Path dirToPurge) {
+	public static void purgeDirectory(Path dirToPurge, Path... excludes) {
 		if (Files.isDirectory(dirToPurge)) {
 			try {
 				Files.walkFileTree(dirToPurge, new SimpleFileVisitor<Path>() {
 					@Override
 					public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-						Files.delete(file);
+						boolean isExclude = false;
+						for (Path exclude : excludes) {
+							if (Files.isSameFile(exclude, file)) {
+								isExclude = true;
+								break;
+							}
+						}
+						if (!isExclude) {
+							Files.delete(file);
+						}
 						return FileVisitResult.CONTINUE;
 					}
 					@Override
 					public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
 						if (!Files.isSameFile(dirToPurge, dir)) {
-							Files.delete(dir);
+							try {
+								Files.delete(dir);
+							}
+							catch (DirectoryNotEmptyException e) {
+								// ignore; due to exclude Paths, may very well not be empty
+							}
 						}
 						return FileVisitResult.CONTINUE;
 					}
