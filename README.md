@@ -6,7 +6,7 @@
 
 ![screenshot1](https://cloud.githubusercontent.com/assets/16735709/13554422/742b89f0-e375-11e5-9f1a-1164e6ebb730.JPG)
 
-###How might it be used?
+### How might it be used?
 
 A basic workflow with TestDataCreator consists of the following:
 
@@ -16,7 +16,7 @@ A basic workflow with TestDataCreator consists of the following:
 4. *TestDataCreator* then processes the *Book* file, Schema-validates the *Test Cases*, and then generates XML documents for those *Test Cases*.
 5. Additional *Tasks* can be performed on *Test Cases* with custom Java plugins (e.g. processing in a rules engine, exporting to an external system, etc.)
 
-###Features
+### Features
 
 - Uses XML Schemas for *Book* file creation and *Test Case* validation.
 - Leverages Microsoft Excel for easy *Test Case* creation by end users.
@@ -29,20 +29,20 @@ A basic workflow with TestDataCreator consists of the following:
 - Custom *Tasks* plugins can be created (in Java) to perform post-processing on *Test Cases* (e.g. processing in a rules engine, exporting to an external system, etc.)
 - Though *TestDataCreator*  can be run as a stand-alone tool, client-server extensions are being developed to more effectively support centralized administration and processing on more-capable server hardware. (This is ideal for situations where Schemas and *Book* files are large and complex, and user PCs are relatively underpowered.)
 
-###Examples
+### Examples
 
 If you're interested in playing around with a sample Excel *Book* file, click [here](https://github.com/gbtorrance/TestDataCreator/files/160333/2015_IRS-1040_Demo.xlsx).
 
 For more information, please refer to the [Wiki](https://github.com/gbtorrance/TestDataCreator/wiki).
 
-###Setup & Configuration
+### Setup & Configuration
 
 Details pending...
 
-###Feedback & Support
+### Feedback & Support
 
 Please send questions, concerns, and stock tips to greg.torrance@pobox.com.
 
-###Licensing
+### Licensing
 
 *TestDataCreator* is an open source tool available under the [MIT License](https://github.com/gbtorrance/TestDataCreator/blob/master/LICENSE).
